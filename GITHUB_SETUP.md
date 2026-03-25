@@ -4,6 +4,23 @@
 
 Repositories live under **your GitHub username**, not your email. Use the GitHub account where **kiarash.jam@gmail.com** is verified (Settings → Emails).
 
+### Already done on this machine (nothing required)
+
+| Item | Status |
+|------|--------|
+| Git repo + `main` + history | Done |
+| `.gitignore` (secrets, `node_modules`, local `*.db`, `dist`, etc.) | Done |
+| Commit author for **this repo**: `Kiarash Jamishidi <kiarash.jam@gmail.com>` | Done (`git config --local`) |
+| GitHub Actions **CI** (backend test + web build) | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
+| **Dependabot** (weekly PRs: Actions, web/mobile npm) | [`.github/dependabot.yml`](.github/dependabot.yml) |
+| MVP product/docs/code (earlier work) | In tree |
+| CI parity check | Backend `dotnet test -c Release` + web `npm run build` succeed locally |
+
+### Only you can do (needs GitHub login)
+
+1. Create empty repo at [github.com/new](https://github.com/new).  
+2. `git remote add origin …` and `git push -u origin main` (commands below).
+
 ## 1. Create the empty repository on GitHub
 
 1. Sign in at [github.com](https://github.com) with the account that owns **kiarash.jam@gmail.com**.
@@ -47,15 +64,14 @@ Mobile is not in CI yet (Expo needs more setup); add it later if you want.
 
 ## 4. Optional: GitHub CLI next time
 
-Install [GitHub CLI](https://cli.github.com/), run `gh auth login`, then you can create and push in one go:
+Install [GitHub CLI](https://cli.github.com/), run `gh auth login`, then create the remote and push (repo is already committed locally):
 
 ```powershell
 cd "c:\Users\KiaJamishidi\Documents\repo\dispenser\smart-medication-dispenser"
-git init
-git add .
-git commit -m "Initial commit"
 gh repo create smart-medication-dispenser --private --source=. --remote=origin --push
 ```
+
+Adjust visibility (`--public`) or name as needed.
 
 ## 5. Secrets (production)
 
