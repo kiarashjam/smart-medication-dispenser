@@ -1,0 +1,43 @@
+# Secrets & local env
+.env
+.env.local
+*.user
+appsettings.*.local.json
+
+# .NET
+**/bin/
+**/obj/
+**/out/
+*.cache
+.vs/
+*.DotSettings.user
+
+# Node
+node_modules/
+dist/
+.npm
+.pnpm-store
+
+# Expo / React Native
+.expo/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# OS & editors
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+*.swo
+
+# Test / coverage
+TestResults/
+coverage/
+*.trx
+
+# Docker (optional local overrides)
+docker-compose.override.yml

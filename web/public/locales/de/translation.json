@@ -1,0 +1,78 @@
+{
+  "app": {
+    "name": "Intelligenter Medikamentenspender",
+    "tagline": "Ihre Medikamente, pünktlich, jedes Mal"
+  },
+  "nav": {
+    "dashboard": "Übersicht",
+    "devices": "Geräte",
+    "history": "Verlauf",
+    "travel": "Reisemodus",
+    "notifications": "Benachrichtigungen",
+    "integrations": "Integrationen",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "fullName": "Vollständiger Name",
+    "noAccount": "Noch kein Konto?",
+    "hasAccount": "Bereits ein Konto?"
+  },
+  "dashboard": {
+    "title": "Übersicht",
+    "welcome": "Willkommen zurück",
+    "todaySchedule": "Heutiger Zeitplan",
+    "adherence": "Einhaltung",
+    "devices": "Geräte",
+    "recentActivity": "Letzte Aktivität"
+  },
+  "devices": {
+    "title": "Geräte",
+    "addDevice": "Gerät hinzufügen",
+    "online": "Online",
+    "offline": "Offline",
+    "battery": "Batterie",
+    "firmware": "Firmware",
+    "lastSeen": "Zuletzt gesehen"
+  },
+  "schedule": {
+    "title": "Zeitplan",
+    "addSchedule": "Zeitplan hinzufügen",
+    "medication": "Medikament",
+    "time": "Uhrzeit",
+    "days": "Tage",
+    "pillsPerDose": "Pillen pro Dosis"
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "markAllRead": "Alle als gelesen markieren",
+    "noNotifications": "Keine Benachrichtigungen",
+    "missedDose": "Verpasste Dosis",
+    "lowStock": "Niedriger Bestand",
+    "deviceOffline": "Gerät offline"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "profile": "Profil",
+    "security": "Sicherheit",
+    "preferences": "Einstellungen",
+    "language": "Sprache",
+    "timeZone": "Zeitzone",
+    "save": "Einstellungen speichern",
+    "changePassword": "Passwort ändern"
+  },
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Fehler",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "confirm": "Bestätigen",
+    "back": "Zurück"
+  }
+}

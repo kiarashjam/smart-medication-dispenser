@@ -1,0 +1,29 @@
+@import './styles/theme.css';
+@import './styles/responsive.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Design System Utilities ── */
+@layer utilities {
+  .text-heading {
+    @apply font-bold tracking-tight text-gray-900;
+  }
+  .text-subtitle {
+    @apply text-sm font-medium text-gray-500;
+  }
+  .gradient-brand {
+    @apply bg-gradient-to-r from-brand-600 to-brand-500;
+  }
+  .gradient-brand-text {
+    @apply bg-gradient-to-r from-brand-600 to-brand-400 bg-clip-text text-transparent;
+  }
+}

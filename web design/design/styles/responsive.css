@@ -1,0 +1,42 @@
+/* Responsive utility classes for the app */
+
+/* Hide scrollbar on mobile menus */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Responsive text sizes */
+@media (max-width: 640px) {
+  .responsive-heading-1 {
+    font-size: 1.875rem; /* 30px */
+  }
+  
+  .responsive-heading-2 {
+    font-size: 1.25rem; /* 20px */
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .responsive-heading-1 {
+    font-size: 2.25rem; /* 36px */
+  }
+  
+  .responsive-heading-2 {
+    font-size: 1.5rem; /* 24px */
+  }
+}
+
+@media (min-width: 1025px) {
+  .responsive-heading-1 {
+    font-size: 3rem; /* 48px */
+  }
+  
+  .responsive-heading-2 {
+    font-size: 1.875rem; /* 30px */
+  }
+}

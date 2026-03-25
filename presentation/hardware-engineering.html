@@ -1,0 +1,2487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Medication Dispenser | Hardware Engineering Overview</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================
+           CSS VARIABLES - ENGINEERING THEME
+           ======================================== */
+        :root {
+            --primary: #00B4D8;
+            --primary-light: #48CAE4;
+            --primary-dark: #0077B6;
+            --secondary: #0A0A1A;
+            --secondary-light: #1A1A2E;
+            --accent: #00FF9F;
+            --accent-orange: #FF6B35;
+            --warning: #FFD60A;
+            --success: #00FF9F;
+            --white: #FFFFFF;
+            --off-white: #F8F9FA;
+            --gray-100: #E9ECEF;
+            --gray-200: #DEE2E6;
+            --gray-300: #CED4DA;
+            --gray-400: #ADB5BD;
+            --gray-500: #6C757D;
+            --gray-600: #495057;
+            --gray-700: #343A40;
+            --gray-800: #212529;
+            --gray-900: #0D0D0D;
+            
+            --gradient-primary: linear-gradient(135deg, #00B4D8 0%, #48CAE4 50%, #00B4D8 100%);
+            --gradient-dark: linear-gradient(135deg, #0A0A1A 0%, #1A1A2E 50%, #0F2942 100%);
+            --gradient-accent: linear-gradient(135deg, #00FF9F 0%, #00B4D8 100%);
+            --gradient-mesh: radial-gradient(at 40% 20%, rgba(0, 180, 216, 0.15) 0px, transparent 50%),
+                            radial-gradient(at 80% 0%, rgba(0, 255, 159, 0.1) 0px, transparent 50%),
+                            radial-gradient(at 0% 50%, rgba(0, 119, 182, 0.1) 0px, transparent 50%);
+            
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.15);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.2);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.3);
+            --shadow-glow: 0 0 40px rgba(0, 180, 216, 0.4);
+            --shadow-glow-accent: 0 0 40px rgba(0, 255, 159, 0.4);
+            
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --radius-full: 9999px;
+            
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ========================================
+           RESET & BASE
+           ======================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+            scroll-snap-type: y mandatory;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--secondary);
+            color: var(--white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ========================================
+           KEYFRAME ANIMATIONS
+           ======================================== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(60px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-60px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-60px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(60px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 180, 216, 0.4); }
+            50% { transform: scale(1.02); box-shadow: 0 0 30px 10px rgba(0, 180, 216, 0.2); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes circuit {
+            0% { stroke-dashoffset: 1000; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        @keyframes dataPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Animation Classes */
+        .animate-fade-up { animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-fade-down { animation: fadeInDown 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-fade-left { animation: fadeInLeft 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-fade-right { animation: fadeInRight 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-scale { animation: scaleIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-pulse { animation: pulse 3s ease-in-out infinite; }
+
+        .delay-1 { animation-delay: 0.1s; opacity: 0; }
+        .delay-2 { animation-delay: 0.2s; opacity: 0; }
+        .delay-3 { animation-delay: 0.3s; opacity: 0; }
+        .delay-4 { animation-delay: 0.4s; opacity: 0; }
+        .delay-5 { animation-delay: 0.5s; opacity: 0; }
+        .delay-6 { animation-delay: 0.6s; opacity: 0; }
+        .delay-7 { animation-delay: 0.7s; opacity: 0; }
+        .delay-8 { animation-delay: 0.8s; opacity: 0; }
+
+        /* ========================================
+           SLIDE CONTAINER
+           ======================================== */
+        .presentation {
+            width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+        }
+
+        .slide {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 80px;
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ========================================
+           BACKGROUND STYLES
+           ======================================== */
+        .bg-dark {
+            background: var(--gradient-dark);
+        }
+
+        .bg-pattern {
+            background: var(--secondary);
+            background-image: var(--gradient-mesh);
+        }
+
+        .bg-engineering {
+            background: linear-gradient(135deg, #0077B6 0%, #023E8A 100%);
+            position: relative;
+        }
+
+        .bg-engineering::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            animation: rotate 40s linear infinite;
+        }
+
+        .bg-mesh {
+            background: var(--secondary);
+            position: relative;
+        }
+
+        .bg-mesh::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 180, 216, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(0, 255, 159, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(0, 119, 182, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Circuit board background */
+        .bg-circuit {
+            background: var(--secondary);
+            position: relative;
+        }
+
+        .bg-circuit::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 180, 216, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 180, 216, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        /* ========================================
+           TYPOGRAPHY
+           ======================================== */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .title-hero {
+            font-size: 4.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF 0%, #48CAE4 50%, #FFFFFF 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 4s linear infinite;
+        }
+
+        .title-xl {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .title-lg {
+            font-size: 2.5rem;
+        }
+
+        .title-md {
+            font-size: 1.75rem;
+        }
+
+        .title-sm {
+            font-size: 1.25rem;
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 1.5rem;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .text-gradient {
+            background: var(--gradient-primary);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientFlow 4s ease infinite;
+        }
+
+        .text-gradient-accent {
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .text-cyan { color: var(--primary); }
+        .text-accent { color: var(--accent); }
+        .text-warning { color: var(--warning); }
+        .text-orange { color: var(--accent-orange); }
+        .text-white { color: var(--white); }
+        .text-muted { color: var(--gray-400); }
+
+        /* ========================================
+           LAYOUT UTILITIES
+           ======================================== */
+        .grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+        .flex { display: flex; }
+        .flex-center { display: flex; justify-content: center; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .flex-col { flex-direction: column; }
+
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
+        .gap-3 { gap: 1.5rem; }
+        .gap-4 { gap: 2rem; }
+        .gap-5 { gap: 3rem; }
+
+        .content-full {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .content-center {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 2rem; }
+        .mb-5 { margin-bottom: 3rem; }
+        .mb-6 { margin-bottom: 4rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mt-4 { margin-top: 2rem; }
+        .mt-5 { margin-top: 3rem; }
+
+        /* ========================================
+           CARDS - ENGINEERING STYLE
+           ======================================== */
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 180, 216, 0.3), transparent);
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(0, 180, 216, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 180, 216, 0.1);
+        }
+
+        .card-glow {
+            border: 1px solid rgba(0, 180, 216, 0.3);
+        }
+
+        .card-glow:hover {
+            border-color: rgba(0, 180, 216, 0.6);
+            box-shadow: 0 0 40px rgba(0, 180, 216, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-accent {
+            border: 1px solid rgba(0, 255, 159, 0.3);
+        }
+
+        .card-accent:hover {
+            border-color: rgba(0, 255, 159, 0.6);
+            box-shadow: 0 0 40px rgba(0, 255, 159, 0.2);
+        }
+
+        /* ========================================
+           SPECS & NUMBERS
+           ======================================== */
+        .spec-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .spec-label {
+            font-size: 0.9rem;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+        }
+
+        .spec-unit {
+            font-size: 1.25rem;
+            color: var(--gray-400);
+            margin-left: 0.25rem;
+        }
+
+        /* ========================================
+           ICONS
+           ======================================== */
+        .icon {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, rgba(0, 180, 216, 0.2) 0%, rgba(0, 180, 216, 0.05) 100%);
+            border: 1px solid rgba(0, 180, 216, 0.3);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .icon-sm {
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .icon-accent {
+            background: linear-gradient(135deg, rgba(0, 255, 159, 0.2) 0%, rgba(0, 255, 159, 0.05) 100%);
+            border-color: rgba(0, 255, 159, 0.3);
+        }
+
+        .icon-orange {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.2) 0%, rgba(255, 107, 53, 0.05) 100%);
+            border-color: rgba(255, 107, 53, 0.3);
+        }
+
+        /* ========================================
+           TABLES - TECHNICAL
+           ======================================== */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: var(--radius-md);
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 1rem 1.25rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        th {
+            background: rgba(0, 180, 216, 0.1);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            color: var(--primary-light);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-mono td:first-child {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--primary);
+        }
+
+        /* ========================================
+           CODE BLOCKS
+           ======================================== */
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.8;
+            overflow-x: auto;
+            white-space: pre;
+            color: var(--gray-300);
+        }
+
+        .code-block .comment { color: var(--gray-500); }
+        .code-block .keyword { color: var(--accent-orange); }
+        .code-block .string { color: var(--accent); }
+        .code-block .number { color: var(--primary-light); }
+        .code-block .function { color: var(--warning); }
+
+        /* ========================================
+           DIAGRAM STYLES
+           ======================================== */
+        .diagram {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.6;
+            white-space: pre;
+            overflow-x: auto;
+            color: var(--gray-300);
+        }
+
+        .diagram-title {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: block;
+            font-size: 0.85rem;
+        }
+
+        /* ========================================
+           BADGES & TAGS
+           ======================================== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.85rem;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-primary {
+            background: rgba(0, 180, 216, 0.2);
+            color: var(--primary-light);
+            border: 1px solid rgba(0, 180, 216, 0.3);
+        }
+
+        .badge-accent {
+            background: rgba(0, 255, 159, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(0, 255, 159, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(255, 214, 10, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(255, 214, 10, 0.3);
+        }
+
+        .badge-orange {
+            background: rgba(255, 107, 53, 0.15);
+            color: var(--accent-orange);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+        }
+
+        /* ========================================
+           NAVIGATION
+           ======================================== */
+        .nav {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot:hover {
+            background: rgba(0, 180, 216, 0.5);
+            transform: scale(1.3);
+        }
+
+        .nav-dot.active {
+            background: var(--primary);
+            border-color: var(--white);
+            transform: scale(1.3);
+        }
+
+        /* ========================================
+           PROGRESS BAR
+           ======================================== */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient-primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* ========================================
+           PINOUT DIAGRAM
+           ======================================== */
+        .pinout {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(0, 180, 216, 0.3);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .pinout-row {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+        }
+
+        .pinout-row:nth-child(odd) {
+            justify-content: flex-end;
+            text-align: right;
+            border-right: 2px solid var(--primary);
+        }
+
+        .pinout-row:nth-child(even) {
+            justify-content: flex-start;
+            border-left: 2px solid var(--primary);
+        }
+
+        .pin-name {
+            color: var(--gray-300);
+        }
+
+        .pin-num {
+            background: var(--primary);
+            color: var(--white);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            margin: 0 0.5rem;
+        }
+
+        .pin-func {
+            color: var(--accent);
+            font-size: 0.7rem;
+        }
+
+        /* ========================================
+           LIST STYLES
+           ======================================== */
+        .check-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .check-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .check-list li:last-child {
+            border-bottom: none;
+        }
+
+        .check-list .check {
+            color: var(--accent);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        /* ========================================
+           HERO ANIMATION
+           ======================================== */
+        .chip-animation {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 2rem auto;
+        }
+
+        .chip-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #1A1A2E 0%, #0A0A1A 100%);
+            border: 3px solid var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 40px rgba(0, 180, 216, 0.3);
+            z-index: 2;
+        }
+
+        .chip-core span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .chip-pin {
+            position: absolute;
+            width: 4px;
+            height: 30px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .chip-pins-top, .chip-pins-bottom, .chip-pins-left, .chip-pins-right {
+            position: absolute;
+            display: flex;
+            gap: 8px;
+        }
+
+        .chip-pins-top {
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .chip-pins-bottom {
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .chip-pins-left {
+            left: 50px;
+            top: 50%;
+            transform: translateY(-50%) rotate(90deg);
+        }
+
+        .chip-pins-right {
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%) rotate(90deg);
+        }
+
+        .data-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+            animation: dataPulse 2s ease-in-out infinite;
+        }
+
+        /* ========================================
+           COMPARISON TABLE
+           ======================================== */
+        .comparison-highlight {
+            background: rgba(0, 255, 159, 0.1) !important;
+        }
+
+        .recommended {
+            position: relative;
+        }
+
+        .recommended::after {
+            content: 'RECOMMENDED';
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: var(--gradient-accent);
+            color: var(--secondary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: 700;
+        }
+
+        /* ========================================
+           RESPONSIVE
+           ======================================== */
+        @media (max-width: 1200px) {
+            .slide {
+                padding: 40px 60px;
+            }
+            .title-hero {
+                font-size: 3.5rem;
+            }
+            .title-xl {
+                font-size: 2.5rem;
+            }
+            .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 30px 30px;
+            }
+            .title-hero {
+                font-size: 2.5rem;
+            }
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+            .nav {
+                display: none;
+            }
+        }
+
+        /* ========================================
+           SWISS CROSS (Engineering Badge)
+           ======================================== */
+        .swiss-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            color: var(--gray-400);
+        }
+
+        .swiss-cross {
+            width: 18px;
+            height: 18px;
+            background: #E31937;
+            position: relative;
+            border-radius: 2px;
+        }
+
+        .swiss-cross::before,
+        .swiss-cross::after {
+            content: '';
+            position: absolute;
+            background: white;
+        }
+
+        .swiss-cross::before {
+            width: 10px;
+            height: 4px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .swiss-cross::after {
+            width: 4px;
+            height: 10px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* ========================================
+           FLOW DIAGRAM
+           ======================================== */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .flow-box {
+            background: rgba(0, 180, 216, 0.1);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.5rem;
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .flow-box-accent {
+            background: rgba(0, 255, 159, 0.1);
+            border-color: var(--accent);
+        }
+
+        .flow-arrow {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        /* ========================================
+           BOM STYLING
+           ======================================== */
+        .bom-category {
+            background: rgba(0, 180, 216, 0.1);
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            color: var(--primary-light);
+        }
+
+        .price {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+        }
+
+        .price-total {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Navigation Dots -->
+    <nav class="nav" id="navDots"></nav>
+
+    <div class="presentation" id="presentation">
+        
+        <!-- SLIDE 1: TITLE -->
+        <section class="slide bg-circuit" id="slide-1">
+            <div class="content-center">
+                <div class="swiss-badge animate-fade-down">
+                    <span class="swiss-cross"></span>
+                    <span>Designed in Lausanne, Switzerland</span>
+                </div>
+                
+                <h1 class="title-hero mt-5 animate-fade-up delay-1">Smart Medication<br>Dispenser</h1>
+                
+                <p class="subtitle animate-fade-up delay-2">Hardware Engineering Overview</p>
+                
+                <div class="flex-center gap-3 mt-5 animate-fade-up delay-3">
+                    <span class="badge badge-primary">ESP32-S3</span>
+                    <span class="badge badge-accent">CE Class IIa</span>
+                    <span class="badge badge-warning">Medical Device</span>
+                </div>
+                
+                <div class="chip-animation animate-scale delay-4">
+                    <div class="chip-core">
+                        <span>ESP32-S3<br>WROOM-1<br>N16R8</span>
+                    </div>
+                    <div class="chip-pins-top">
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                    </div>
+                    <div class="chip-pins-bottom">
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                    </div>
+                    <div class="chip-pins-left">
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                    </div>
+                    <div class="chip-pins-right">
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                        <div class="chip-pin"></div>
+                    </div>
+                </div>
+                
+                <p class="text-muted animate-fade-up delay-5" style="font-size: 0.9rem;">
+                    Technical presentation for Electronic Engineers<br>
+                    Version 3.0 | February 2026
+                </p>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: PRODUCT FAMILY -->
+        <section class="slide bg-mesh" id="slide-2">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">Product Family</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">Two form factors, shared architecture</p>
+                
+                <div class="grid grid-2 gap-4">
+                    <!-- SMD-100 Home -->
+                    <div class="card card-glow animate-fade-left delay-2">
+                        <div class="flex-between mb-4">
+                            <span class="badge badge-primary">SMD-100</span>
+                            <span class="badge badge-accent">Home Device</span>
+                        </div>
+                        <div class="icon">🏠</div>
+                        <h3 class="title-md mb-3">Home Unit</h3>
+                        <p class="text-muted mb-4">Countertop, permanent installation with 10 medication slots</p>
+                        
+                        <div class="table-wrapper">
+                            <table class="table-mono">
+                                <tr><td>Dimensions</td><td>305 × 203 × 254 mm</td></tr>
+                                <tr><td>Weight</td><td>1.6 kg (empty)</td></tr>
+                                <tr><td>Slots</td><td>10 medication chambers</td></tr>
+                                <tr><td>Capacity</td><td>90 days per slot</td></tr>
+                                <tr><td>Max Pill Ø</td><td>20 mm</td></tr>
+                                <tr><td>Display</td><td>4.3" TFT touch (800×480)</td></tr>
+                                <tr><td>Connectivity</td><td>WiFi 2.4/5 GHz + BLE 5.0</td></tr>
+                                <tr><td>Power</td><td>12V DC, 2A + 48h backup</td></tr>
+                                <tr><td>IP Rating</td><td>IP22</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- SMD-200 Travel -->
+                    <div class="card card-accent animate-fade-right delay-3">
+                        <div class="flex-between mb-4">
+                            <span class="badge badge-primary">SMD-200</span>
+                            <span class="badge badge-orange">Travel Device</span>
+                        </div>
+                        <div class="icon icon-accent">✈️</div>
+                        <h3 class="title-md mb-3">Travel Unit</h3>
+                        <p class="text-muted mb-4">Portable, battery-powered with cellular connectivity</p>
+                        
+                        <div class="table-wrapper">
+                            <table class="table-mono">
+                                <tr><td>Dimensions</td><td>152 × 102 × 76 mm</td></tr>
+                                <tr><td>Weight</td><td>360 g (empty)</td></tr>
+                                <tr><td>Slots</td><td>4 medication chambers</td></tr>
+                                <tr><td>Capacity</td><td>14 days per slot</td></tr>
+                                <tr><td>Max Pill Ø</td><td>15 mm</td></tr>
+                                <tr><td>Display</td><td>2.4" OLED touch (128×64)</td></tr>
+                                <tr><td>Connectivity</td><td>WiFi + LTE Cat-M1 + BLE</td></tr>
+                                <tr><td>Power</td><td>Li-Po 3000 mAh (USB-C)</td></tr>
+                                <tr><td>IP Rating</td><td>IP44</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: SYSTEM BLOCK DIAGRAM -->
+        <section class="slide bg-dark" id="slide-3">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">System Architecture</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">SMD-100 Home Device Block Diagram</p>
+                
+                <div class="diagram animate-scale delay-2">
+<span class="diagram-title">SMD-100 HOME DEVICE - SYSTEM BLOCK DIAGRAM</span>
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                             │
+│  ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐                      │
+│  │   AC ADAPTER    │     │   POWER MGMT     │     │    BATTERY      │                      │
+│  │   12V/2A        │────▶│   BQ24195 +      │◀───▶│   18650 × 2     │                      │
+│  │   (Type J CH)   │     │   TPS62150       │     │   5000 mAh      │                      │
+│  └─────────────────┘     └────────┬─────────┘     └─────────────────┘                      │
+│                                   │                                                         │
+│                          ┌────────┴────────┐                                               │
+│                          │   3.3V / 5V     │                                               │
+│                          │   Power Rails   │                                               │
+│                          └────────┬────────┘                                               │
+│                                   │                                                         │
+│  ┌────────────────────────────────┼────────────────────────────────────┐                   │
+│  │                                ▼                                    │                   │
+│  │                    ┌───────────────────────┐                        │                   │
+│  │                    │   ESP32-S3-WROOM-1    │                        │                   │
+│  │                    │   Dual-core 240MHz    │                        │                   │
+│  │                    │   512KB SRAM          │                        │                   │
+│  │                    │   16MB Flash          │                        │                   │
+│  │                    │   8MB PSRAM           │                        │                   │
+│  │                    │   WiFi + BLE 5.0      │                        │                   │
+│  │                    └───────────┬───────────┘                        │                   │
+│  │                                │                                    │                   │
+│  │    ┌───────────────┬───────────┼───────────┬───────────────┐       │                   │
+│  │    ▼               ▼           ▼           ▼               ▼       │                   │
+│  │ ┌──────┐     ┌──────────┐ ┌──────────┐ ┌──────────┐  ┌─────────┐  │                   │
+│  │ │DISP  │     │  MOTORS  │ │ SENSORS  │ │  AUDIO   │  │ STORAGE │  │                   │
+│  │ │4.3"  │     │ 10×28BYJ │ │   HUB    │ │MAX98357A │  │ SD Card │  │                   │
+│  │ │TFT   │     │ +ULN2003 │ │          │ │  + SPK   │  │ 16GB    │  │                   │
+│  │ └──────┘     └──────────┘ └──────────┘ └──────────┘  └─────────┘  │                   │
+│  │                                                                    │                   │
+│  └────────────────────────────────────────────────────────────────────┘                   │
+│                                                                                             │
+│  SENSOR HUB:  • 10× Optical Pill Counters (TCPT1300X01)                                    │
+│               • 10× Hall Effect Position Sensors (A3144)                                   │
+│               • 1× Load Cell + HX711 ADC (Output Tray)                                     │
+│               • 1× SHT40 Temp/Humidity (I2C)                                               │
+│               • 1× PIR Motion Sensor (AM312)                                               │
+│               • 1× Reed Switch (Door/Tray)                                                 │
+│               • 1× Ambient Light Sensor (BH1750)                                           │
+│                                                                                             │
+└─────────────────────────────────────────────────────────────────────────────────────────────┘</div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: MCU SELECTION -->
+        <section class="slide bg-mesh" id="slide-4">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">MCU Selection</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">ESP32-S3-WROOM-1-N16R8 — Primary Recommendation</p>
+                
+                <div class="grid grid-2 gap-4">
+                    <div class="animate-fade-left delay-2">
+                        <div class="card card-glow mb-4">
+                            <h3 class="title-md mb-4 text-cyan">Core Specifications</h3>
+                            <div class="table-wrapper">
+                                <table class="table-mono">
+                                    <tr><td>Chip</td><td>ESP32-S3-WROOM-1-N16R8</td></tr>
+                                    <tr><td>CPU</td><td>Xtensa LX7 dual-core, 240 MHz</td></tr>
+                                    <tr><td>SRAM</td><td>512 KB</td></tr>
+                                    <tr><td>Flash</td><td>16 MB (quad SPI)</td></tr>
+                                    <tr><td>PSRAM</td><td>8 MB (octal SPI)</td></tr>
+                                    <tr><td>GPIO</td><td>45 programmable</td></tr>
+                                    <tr><td>ADC</td><td>20 channels, 12-bit</td></tr>
+                                    <tr><td>PWM</td><td>8 channels (LEDC)</td></tr>
+                                    <tr><td>SPI</td><td>4 interfaces</td></tr>
+                                    <tr><td>I2C</td><td>2 interfaces</td></tr>
+                                    <tr><td>I2S</td><td>2 interfaces</td></tr>
+                                    <tr><td>UART</td><td>3 interfaces</td></tr>
+                                    <tr><td>USB</td><td>OTG support</td></tr>
+                                    <tr><td>Voltage</td><td>3.0-3.6V (3.3V typical)</td></tr>
+                                    <tr><td>Package</td><td>25.5 × 18.0 mm module</td></tr>
+                                    <tr><td>Price</td><td class="price">$4-6 (volume 1K)</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="animate-fade-right delay-3">
+                        <div class="card card-accent mb-4">
+                            <h3 class="title-md mb-4 text-accent">Why ESP32-S3?</h3>
+                            <ul class="check-list">
+                                <li>
+                                    <span class="check">✓</span>
+                                    <div>
+                                        <strong>Integrated WiFi + BLE</strong>
+                                        <p class="text-muted" style="font-size: 0.85rem;">Reduces BOM, no external RF module needed</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="check">✓</span>
+                                    <div>
+                                        <strong>Dual-core 240MHz</strong>
+                                        <p class="text-muted" style="font-size: 0.85rem;">Handles UI + networking simultaneously</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="check">✓</span>
+                                    <div>
+                                        <strong>8MB PSRAM</strong>
+                                        <p class="text-muted" style="font-size: 0.85rem;">Large buffers for audio, display graphics</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="check">✓</span>
+                                    <div>
+                                        <strong>Hardware Crypto</strong>
+                                        <p class="text-muted" style="font-size: 0.85rem;">AES, SHA, RSA acceleration for security</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="check">✓</span>
+                                    <div>
+                                        <strong>USB OTG</strong>
+                                        <p class="text-muted" style="font-size: 0.85rem;">Direct firmware programming, diagnostics</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="check">✓</span>
+                                    <div>
+                                        <strong>10µA Deep Sleep</strong>
+                                        <p class="text-muted" style="font-size: 0.85rem;">Essential for battery backup mode</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="check">✓</span>
+                                    <div>
+                                        <strong>OTA Support</strong>
+                                        <p class="text-muted" style="font-size: 0.85rem;">Built-in dual-partition firmware update</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: MCU ALTERNATIVES -->
+        <section class="slide bg-dark" id="slide-5">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">MCU Options Comparison</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">Alternative microcontroller choices</p>
+                
+                <div class="table-wrapper animate-scale delay-2">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Option</th>
+                                <th>Part Number</th>
+                                <th>Pros</th>
+                                <th>Cons</th>
+                                <th>Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="comparison-highlight">
+                                <td><span class="badge badge-accent">A (Recommended)</span></td>
+                                <td class="mono text-cyan">ESP32-S3-WROOM-1-N16R8</td>
+                                <td>Best balance of features, cost, ecosystem</td>
+                                <td>None significant</td>
+                                <td class="price">$5</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-primary">B</span></td>
+                                <td class="mono text-cyan">STM32F407VGT6 + ESP32-C3</td>
+                                <td>More GPIO, medical-grade variants (ISO 13485)</td>
+                                <td>Two chips, more complex design</td>
+                                <td class="price">$12</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-primary">C</span></td>
+                                <td class="mono text-cyan">nRF52840 + ESP32-C3</td>
+                                <td>Ultra-low power BLE, excellent for wearables</td>
+                                <td>WiFi separate, less processing power</td>
+                                <td class="price">$14</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-primary">D</span></td>
+                                <td class="mono text-cyan">Raspberry Pi Pico W</td>
+                                <td>Very cheap, good documentation</td>
+                                <td>Less memory, limited crypto support</td>
+                                <td class="price">$4</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="card mt-4 animate-fade-up delay-3" style="border-color: rgba(255, 214, 10, 0.3);">
+                    <p class="flex gap-2" style="align-items: flex-start;">
+                        <span style="font-size: 1.5rem;">💡</span>
+                        <span><strong class="text-warning">Recommendation:</strong> Start with ESP32-S3. Only consider STM32F4 if you need strict medical-grade certification (STM32 has ISO 13485 variants available from ST).</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: POWER SYSTEM -->
+        <section class="slide bg-circuit" id="slide-6">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">Power System Architecture</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">Dual-source power with automatic failover</p>
+                
+                <div class="diagram animate-scale delay-2">
+<span class="diagram-title">POWER SYSTEM ARCHITECTURE</span>
+┌────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                            │
+│  AC INPUT                        POWER PATH                           BATTERY              │
+│  ┌──────────┐                   ┌───────────┐                       ┌──────────┐          │
+│  │ 100-240V │                   │ BQ24195   │                       │ 2× 18650 │          │
+│  │ AC       │──▶ 12V/2A ──────▶│ Power     │◀─────────────────────▶│ 7.4V     │          │
+│  │          │    Adapter        │ Path IC   │ Charge/Discharge      │ 5000mAh  │          │
+│  └──────────┘                   └─────┬─────┘                       └──────────┘          │
+│                                       │                                                    │
+│                                       │ VSYS (4.5-12V)                                    │
+│                                       ▼                                                    │
+│                              ┌───────────────┐                                            │
+│                              │  TPS62150     │                                            │
+│                              │  5V @ 1A      │                                            │
+│                              │  Buck         │                                            │
+│                              └───────┬───────┘                                            │
+│                                      │                                                     │
+│               ┌──────────────────────┼──────────────────────┐                             │
+│               │                      │                      │                             │
+│               ▼                      ▼                      ▼                             │
+│       ┌─────────────┐        ┌─────────────┐       ┌─────────────┐                        │
+│       │  AP2112K    │        │   Direct    │       │  Direct     │                        │
+│       │  3.3V@600mA │        │   5V        │       │  12V (in)   │                        │
+│       │  LDO        │        │             │       │             │                        │
+│       └──────┬──────┘        └──────┬──────┘       └──────┬──────┘                        │
+│              │                      │                      │                              │
+│              ▼                      ▼                      ▼                              │
+│       ┌─────────────┐        ┌─────────────┐       ┌─────────────┐                        │
+│       │ ESP32-S3    │        │ Sensors     │       │ Motors      │                        │
+│       │ Display     │        │ Audio Amp   │       │ (via ULN)   │                        │
+│       │ SD Card     │        │ USB         │       │             │                        │
+│       └─────────────┘        └─────────────┘       └─────────────┘                        │
+│                                                                                            │
+└────────────────────────────────────────────────────────────────────────────────────────────┘</div>
+                
+                <div class="grid grid-3 gap-4 mt-4">
+                    <div class="card animate-fade-up delay-3">
+                        <h4 class="title-sm mb-3 text-cyan">BQ24195</h4>
+                        <p class="text-muted mb-2" style="font-size: 0.85rem;">Power Path Controller</p>
+                        <ul class="text-muted" style="font-size: 0.8rem; padding-left: 1rem;">
+                            <li>Input: 4.35-17V</li>
+                            <li>Battery: 7.4V (2S Li-ion)</li>
+                            <li>Charge: Up to 2.1A</li>
+                            <li>I2C programmable</li>
+                        </ul>
+                        <p class="price mt-2">$3.50</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-4">
+                        <h4 class="title-sm mb-3 text-cyan">TPS62150</h4>
+                        <p class="text-muted mb-2" style="font-size: 0.85rem;">5V Buck Regulator</p>
+                        <ul class="text-muted" style="font-size: 0.8rem; padding-left: 1rem;">
+                            <li>Input: 3-17V</li>
+                            <li>Output: 5V @ 1A</li>
+                            <li>Efficiency: 95%</li>
+                            <li>2.5MHz switching</li>
+                        </ul>
+                        <p class="price mt-2">$1.80</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-5">
+                        <h4 class="title-sm mb-3 text-cyan">AP2112K-3.3</h4>
+                        <p class="text-muted mb-2" style="font-size: 0.85rem;">3.3V LDO</p>
+                        <ul class="text-muted" style="font-size: 0.8rem; padding-left: 1rem;">
+                            <li>Input: 2.5-6V</li>
+                            <li>Output: 3.3V @ 600mA</li>
+                            <li>Dropout: 250mV</li>
+                            <li>Quiescent: 55µA</li>
+                        </ul>
+                        <p class="price mt-2">$0.25</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: POWER BUDGET -->
+        <section class="slide bg-mesh" id="slide-7">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">Power Consumption Budget</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">Validated 48-hour battery backup target</p>
+                
+                <div class="grid grid-2 gap-4">
+                    <div class="animate-fade-left delay-2">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Active</th>
+                                        <th>Sleep</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>ESP32-S3</td>
+                                        <td class="mono">240mA</td>
+                                        <td class="mono">10µA</td>
+                                        <td class="text-muted">WiFi TX peak</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Display</td>
+                                        <td class="mono">150mA</td>
+                                        <td class="mono">0mA</td>
+                                        <td class="text-muted">Backlight @ 50%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Motors (×1)</td>
+                                        <td class="mono">200mA</td>
+                                        <td class="mono">0mA</td>
+                                        <td class="text-muted">During dispense</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sensors</td>
+                                        <td class="mono">20mA</td>
+                                        <td class="mono">5mA</td>
+                                        <td class="text-muted">I2C polling</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Audio</td>
+                                        <td class="mono">300mA</td>
+                                        <td class="mono">0mA</td>
+                                        <td class="text-muted">Peak during alert</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Other</td>
+                                        <td class="mono">30mA</td>
+                                        <td class="mono">5mA</td>
+                                        <td class="text-muted">LEDs, misc</td>
+                                    </tr>
+                                    <tr style="background: rgba(0, 180, 216, 0.1);">
+                                        <td><strong>TOTAL</strong></td>
+                                        <td class="mono"><strong>940mA</strong></td>
+                                        <td class="mono"><strong>20mA</strong></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="animate-fade-right delay-3">
+                        <div class="card card-accent">
+                            <h3 class="title-md mb-4 text-accent">Battery Life Calculation</h3>
+                            
+                            <div class="mb-4">
+                                <p class="text-muted mb-2">Pure Standby Mode</p>
+                                <div class="code-block" style="font-size: 0.9rem;">
+5000mAh ÷ 20mA = <span class="number">250 hours</span> ≈ <span class="string">10 days</span></div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <p class="text-muted mb-2">With 4 Dispenses/Day (realistic use)</p>
+                                <div class="code-block" style="font-size: 0.9rem;">
+Daily consumption:
+  Standby: 20mA × 23.9h = 478mAh
+  Dispense: 940mA × 0.1h = 94mAh
+  Total: <span class="number">572mAh/day</span>
+  
+5000mAh ÷ 572mAh = <span class="string">~48 hours</span> ✓</div>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <span class="badge badge-accent">Target Met</span>
+                                <span class="badge badge-primary">48h Backup</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: DISPLAY SYSTEM -->
+        <section class="slide bg-dark" id="slide-8">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">Display Subsystem</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">4.3" TFT with capacitive touch — Optimized for elderly users</p>
+                
+                <div class="grid grid-2 gap-4">
+                    <div class="animate-fade-left delay-2">
+                        <div class="card card-glow">
+                            <h3 class="title-md mb-4 text-cyan">Display Specifications</h3>
+                            <div class="table-wrapper">
+                                <table class="table-mono">
+                                    <tr><td>Type</td><td>TFT LCD with IPS</td></tr>
+                                    <tr><td>Size</td><td>4.3" (105.5 × 67.2 mm)</td></tr>
+                                    <tr><td>Resolution</td><td>800 × 480 pixels</td></tr>
+                                    <tr><td>Interface</td><td>RGB888 (24-bit parallel)</td></tr>
+                                    <tr><td>Touch</td><td>Capacitive, GT911 (I2C)</td></tr>
+                                    <tr><td>Driver IC</td><td>ST7262 or ILI9806</td></tr>
+                                    <tr><td>Backlight</td><td>LED, PWM dimmable</td></tr>
+                                    <tr><td>Viewing</td><td>170° H / 170° V</td></tr>
+                                    <tr><td>Brightness</td><td>400 cd/m²</td></tr>
+                                    <tr><td>Connector</td><td>40-pin FFC, 0.5mm pitch</td></tr>
+                                </table>
+                            </div>
+                            <p class="price mt-3">Waveshare 4.3" RGB — $28</p>
+                        </div>
+                    </div>
+                    
+                    <div class="animate-fade-right delay-3">
+                        <div class="card mb-4">
+                            <h3 class="title-md mb-4 text-cyan">Why RGB Interface?</h3>
+                            <ul class="check-list">
+                                <li>
+                                    <span class="check">✓</span>
+                                    <div>
+                                        <strong>60 FPS refresh rate</strong>
+                                        <p class="text-muted" style="font-size: 0.85rem;">vs 15 FPS for SPI displays</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="check">✓</span>
+                                    <div>
+                                        <strong>Smooth UI animations</strong>
+                                        <p class="text-muted" style="font-size: 0.85rem;">Critical for elderly UX</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="check">✓</span>
+                                    <div>
+                                        <strong>Native LCD controller</strong>
+                                        <p class="text-muted" style="font-size: 0.85rem;">ESP32-S3 has built-in support</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card" style="border-color: rgba(255, 214, 10, 0.3);">
+                            <h4 class="title-sm mb-3 text-warning">LVGL Configuration</h4>
+                            <div class="code-block" style="font-size: 0.75rem;">
+<span class="comment">// lv_conf.h key settings</span>
+<span class="keyword">#define</span> LV_COLOR_DEPTH <span class="number">16</span>
+<span class="keyword">#define</span> LV_DPI_DEF <span class="number">130</span>
+<span class="keyword">#define</span> LV_USE_GPU_ESP32_S3 <span class="number">1</span>
+<span class="keyword">#define</span> LV_MEM_SIZE (<span class="number">48</span> * <span class="number">1024</span>)
+<span class="keyword">#define</span> LV_FONT_MONTSERRAT_32 <span class="number">1</span>
+<span class="keyword">#define</span> LV_THEME_DEFAULT_DARK <span class="number">1</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: MOTOR SYSTEM -->
+        <section class="slide bg-mesh" id="slide-9">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">Motor & Dispensing System</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">28BYJ-48 stepper motors with ULN2003A drivers</p>
+                
+                <div class="grid grid-2 gap-4">
+                    <div class="animate-fade-left delay-2">
+                        <div class="card card-glow mb-4">
+                            <h3 class="title-md mb-4 text-cyan">28BYJ-48 Stepper Motor</h3>
+                            <div class="table-wrapper">
+                                <table class="table-mono">
+                                    <tr><td>Type</td><td>Unipolar 5-wire</td></tr>
+                                    <tr><td>Voltage</td><td>5V DC</td></tr>
+                                    <tr><td>Phase Resistance</td><td>50Ω</td></tr>
+                                    <tr><td>Steps/Revolution</td><td>2048 (half-step)</td></tr>
+                                    <tr><td>Step Angle</td><td>5.625°/64 = 0.088°</td></tr>
+                                    <tr><td>Max Speed</td><td>15 RPM</td></tr>
+                                    <tr><td>Holding Torque</td><td>34.3 mN·m</td></tr>
+                                    <tr><td>Weight</td><td>30g</td></tr>
+                                </table>
+                            </div>
+                            <p class="price mt-3">$1.50-2.00 each × 10 = $15-20</p>
+                        </div>
+                        
+                        <div class="card">
+                            <h4 class="title-sm mb-3 text-cyan">Why 28BYJ-48?</h4>
+                            <ul class="check-list" style="font-size: 0.9rem;">
+                                <li><span class="check">✓</span> Very cheap and widely available</li>
+                                <li><span class="check">✓</span> Low noise (home device requirement)</li>
+                                <li><span class="check">✓</span> Sufficient torque for pills</li>
+                                <li><span class="check">✓</span> 5V compatible (no extra regulator)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="animate-fade-right delay-3">
+                        <div class="card">
+                            <h3 class="title-md mb-4 text-cyan">Half-Step Sequence</h3>
+                            <div class="table-wrapper">
+                                <table style="text-align: center;">
+                                    <thead>
+                                        <tr>
+                                            <th>Step</th>
+                                            <th>IN1</th>
+                                            <th>IN2</th>
+                                            <th>IN3</th>
+                                            <th>IN4</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>1</td><td class="text-accent">1</td><td>0</td><td>0</td><td>0</td></tr>
+                                        <tr><td>2</td><td class="text-accent">1</td><td class="text-accent">1</td><td>0</td><td>0</td></tr>
+                                        <tr><td>3</td><td>0</td><td class="text-accent">1</td><td>0</td><td>0</td></tr>
+                                        <tr><td>4</td><td>0</td><td class="text-accent">1</td><td class="text-accent">1</td><td>0</td></tr>
+                                        <tr><td>5</td><td>0</td><td>0</td><td class="text-accent">1</td><td>0</td></tr>
+                                        <tr><td>6</td><td>0</td><td>0</td><td class="text-accent">1</td><td class="text-accent">1</td></tr>
+                                        <tr><td>7</td><td>0</td><td>0</td><td>0</td><td class="text-accent">1</td></tr>
+                                        <tr><td>8</td><td class="text-accent">1</td><td>0</td><td>0</td><td class="text-accent">1</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="diagram mt-4" style="font-size: 0.7rem;">
+<span class="diagram-title">ULN2003A WIRING</span>
+ESP32-S3             ULN2003A            28BYJ-48
+──────────           ─────────           ─────────
+GPIO (IN1) ────────▶ IN1 ── OUT1 ──────▶ Blue
+GPIO (IN2) ────────▶ IN2 ── OUT2 ──────▶ Pink
+GPIO (IN3) ────────▶ IN3 ── OUT3 ──────▶ Yellow
+GPIO (IN4) ────────▶ IN4 ── OUT4 ──────▶ Orange
+
+                     COM ─────────────▶ 5V
+                     GND ─────────────▶ GND
+                     Motor Red ───────▶ 5V (common)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: SENSOR SUITE -->
+        <section class="slide bg-dark" id="slide-10">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">Sensor Subsystem</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">Comprehensive sensing for accurate dispensing and monitoring</p>
+                
+                <div class="grid grid-3 gap-3">
+                    <div class="card animate-fade-up delay-1">
+                        <div class="icon icon-sm">📸</div>
+                        <h4 class="title-sm mb-2">Pill Counter</h4>
+                        <p class="mono text-cyan mb-2" style="font-size: 0.85rem;">TCPT1300X01</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">Transmissive optical sensor, 3mm gap, 10µs response</p>
+                        <p class="price mt-2">$0.80 × 10</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-2">
+                        <div class="icon icon-sm icon-accent">⚖️</div>
+                        <h4 class="title-sm mb-2">Weight Sensor</h4>
+                        <p class="mono text-cyan mb-2" style="font-size: 0.85rem;">Load Cell + HX711</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">1kg rated, 24-bit ADC, 0.1g resolution</p>
+                        <p class="price mt-2">$5.00</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-3">
+                        <div class="icon icon-sm icon-orange">🌡️</div>
+                        <h4 class="title-sm mb-2">Temp & Humidity</h4>
+                        <p class="mono text-cyan mb-2" style="font-size: 0.85rem;">SHT40-AD1B</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">±0.2°C accuracy, ±1.8% RH, I2C</p>
+                        <p class="price mt-2">$2.50</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-4">
+                        <div class="icon icon-sm">🧲</div>
+                        <h4 class="title-sm mb-2">Position Sensor</h4>
+                        <p class="mono text-cyan mb-2" style="font-size: 0.85rem;">A3144 Hall Effect</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">Carousel position verification per slot</p>
+                        <p class="price mt-2">$0.30 × 10</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-5">
+                        <div class="icon icon-sm icon-accent">👁️</div>
+                        <h4 class="title-sm mb-2">Motion Sensor</h4>
+                        <p class="mono text-cyan mb-2" style="font-size: 0.85rem;">AM312 PIR</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">3-5m range, 100° angle, 20µA</p>
+                        <p class="price mt-2">$1.50</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-6">
+                        <div class="icon icon-sm icon-orange">🚪</div>
+                        <h4 class="title-sm mb-2">Door Sensor</h4>
+                        <p class="mono text-cyan mb-2" style="font-size: 0.85rem;">Reed Switch</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">NO type, 15mm activation distance</p>
+                        <p class="price mt-2">$0.30</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-7">
+                        <div class="icon icon-sm">💡</div>
+                        <h4 class="title-sm mb-2">Light Sensor</h4>
+                        <p class="mono text-cyan mb-2" style="font-size: 0.85rem;">BH1750FVI</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">1-65535 lux, I2C, auto-brightness</p>
+                        <p class="price mt-2">$1.00</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-8" style="grid-column: span 2; border-color: rgba(0, 255, 159, 0.3);">
+                        <h4 class="title-sm mb-3 text-accent">Sensor Data Flow</h4>
+                        <div class="flow-container">
+                            <div class="flow-box">Pill Falls</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-box">TCPT1300 Detects</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-box">Count ++</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-box">Gate Closes</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-box flow-box-accent">HX711 Verifies Weight</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 11: AUDIO SYSTEM -->
+        <section class="slide bg-mesh" id="slide-11">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">Audio System</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">I2S digital audio with MAX98357A amplifier</p>
+                
+                <div class="grid grid-2 gap-4">
+                    <div class="animate-fade-left delay-2">
+                        <div class="card card-glow mb-4">
+                            <h3 class="title-md mb-4 text-cyan">MAX98357A Specifications</h3>
+                            <div class="table-wrapper">
+                                <table class="table-mono">
+                                    <tr><td>Type</td><td>I2S Class D amplifier</td></tr>
+                                    <tr><td>Output Power</td><td>3.2W @ 4Ω</td></tr>
+                                    <tr><td>THD+N</td><td>0.03%</td></tr>
+                                    <tr><td>Sample Rates</td><td>8-96 kHz</td></tr>
+                                    <tr><td>Interface</td><td>I2S (BCK, LRCK, DIN)</td></tr>
+                                    <tr><td>Voltage</td><td>2.5-5.5V</td></tr>
+                                    <tr><td>Package</td><td>QFN-16 (3×3mm)</td></tr>
+                                </table>
+                            </div>
+                            <p class="price mt-3">$2.50</p>
+                        </div>
+                        
+                        <div class="card">
+                            <h4 class="title-sm mb-3 text-cyan">Why MAX98357A?</h4>
+                            <ul class="check-list" style="font-size: 0.9rem;">
+                                <li><span class="check">✓</span> No external codec needed</li>
+                                <li><span class="check">✓</span> I2S direct from ESP32</li>
+                                <li><span class="check">✓</span> Filterless design</li>
+                                <li><span class="check">✓</span> Built-in gain control</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="animate-fade-right delay-3">
+                        <div class="diagram mb-4">
+<span class="diagram-title">I2S WIRING</span>
+ESP32-S3                MAX98357A            Speaker
+──────────              ──────────           ─────────
+GPIO17 (BCLK) ────────▶ BCLK
+GPIO16 (LRCK) ────────▶ LRCLK
+GPIO15 (DOUT) ────────▶ DIN
+
+                        GAIN ─────▶ GND (15dB)
+                        SD ───────▶ 3.3V (enable)
+                        VDD ──────▶ 5V
+                        GND ──────▶ GND
+                        OUT+ ──────────────────▶ Speaker +
+                        OUT- ──────────────────▶ Speaker -</div>
+                        
+                        <div class="card" style="border-color: rgba(255, 214, 10, 0.3);">
+                            <h4 class="title-sm mb-3 text-warning">ESP-IDF I2S Config</h4>
+                            <div class="code-block" style="font-size: 0.7rem;">
+<span class="keyword">i2s_config_t</span> i2s_config = {
+    .mode = I2S_MODE_MASTER | I2S_MODE_TX,
+    .sample_rate = <span class="number">16000</span>,
+    .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+    .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+    .dma_buf_count = <span class="number">8</span>,
+    .dma_buf_len = <span class="number">1024</span>,
+};
+
+<span class="keyword">i2s_pin_config_t</span> pin_config = {
+    .bck_io_num = <span class="number">GPIO_NUM_17</span>,
+    .ws_io_num = <span class="number">GPIO_NUM_16</span>,
+    .data_out_num = <span class="number">GPIO_NUM_15</span>,
+};</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 12: PCB DESIGN -->
+        <section class="slide bg-dark" id="slide-12">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">PCB Design Guidelines</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">4-layer stack-up with proper EMC considerations</p>
+                
+                <div class="grid grid-2 gap-4">
+                    <div class="animate-fade-left delay-2">
+                        <div class="diagram mb-4">
+<span class="diagram-title">4-LAYER STACK-UP (1.6mm total)</span>
+┌─────────────────────────────────────────────┐
+│ Layer 1 (Top): Signal + Components          │ 1.0 oz Cu
+├─────────────────────────────────────────────┤
+│ Prepreg: FR-4, 0.2mm                        │
+├─────────────────────────────────────────────┤
+│ Layer 2: Ground Plane (solid)               │ 1.0 oz Cu
+├─────────────────────────────────────────────┤
+│ Core: FR-4, 1.0mm                           │
+├─────────────────────────────────────────────┤
+│ Layer 3: Power Planes (3.3V, 5V, 12V)       │ 1.0 oz Cu
+├─────────────────────────────────────────────┤
+│ Prepreg: FR-4, 0.2mm                        │
+├─────────────────────────────────────────────┤
+│ Layer 4 (Bottom): Signal + Components       │ 1.0 oz Cu
+└─────────────────────────────────────────────┘</div>
+                        
+                        <div class="card">
+                            <h4 class="title-sm mb-3 text-cyan">Design Rules</h4>
+                            <div class="table-wrapper">
+                                <table style="font-size: 0.8rem;">
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Min</th>
+                                            <th>Preferred</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>Signal trace</td><td class="mono">0.15mm</td><td class="mono">0.2mm</td></tr>
+                                        <tr><td>Power trace</td><td class="mono">0.3mm</td><td class="mono">0.5mm</td></tr>
+                                        <tr><td>Motor trace</td><td class="mono">0.5mm</td><td class="mono">1.0mm</td></tr>
+                                        <tr><td>Via drill</td><td class="mono">0.2mm</td><td class="mono">0.25mm</td></tr>
+                                        <tr><td>Via diameter</td><td class="mono">0.4mm</td><td class="mono">0.5mm</td></tr>
+                                        <tr><td>Spacing</td><td class="mono">0.15mm</td><td class="mono">0.2mm</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="animate-fade-right delay-3">
+                        <div class="card card-accent mb-4">
+                            <h4 class="title-sm mb-3 text-accent">EMC Guidelines</h4>
+                            <ul class="check-list" style="font-size: 0.85rem;">
+                                <li><span class="check">✓</span> Solid L2 ground plane, NO splits under signals</li>
+                                <li><span class="check">✓</span> 100nF decoupling per power pin within 3mm</li>
+                                <li><span class="check">✓</span> 15mm clearance around WiFi antenna</li>
+                                <li><span class="check">✓</span> No ground plane under antenna area</li>
+                                <li><span class="check">✓</span> Crystal traces < 5mm with ground guard</li>
+                                <li><span class="check">✓</span> Motor power isolated with ferrite at entry</li>
+                                <li><span class="check">✓</span> TVS diodes on all external connections</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="diagram">
+<span class="diagram-title">THERMAL VIA PATTERN (under QFN pads)</span>
+    ┌───────────────────┐
+    │                   │
+    │  ●  ●  ●  ●  ●   │
+    │  ●  ●  ●  ●  ●   │  ● = 0.3mm via
+    │  ●  ● [PAD] ●  ●   │
+    │  ●  ●  ●  ●  ●   │  Grid: 1mm spacing
+    │  ●  ●  ●  ●  ●   │
+    │                   │  Connects to GND (L2)
+    └───────────────────┘</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 13: BILL OF MATERIALS -->
+        <section class="slide bg-mesh" id="slide-13">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">Bill of Materials</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">SMD-100 Home Device — Key Components</p>
+                
+                <div class="table-wrapper animate-scale delay-2" style="max-height: 500px; overflow-y: auto;">
+                    <table style="font-size: 0.85rem;">
+                        <thead>
+                            <tr>
+                                <th>Ref</th>
+                                <th>Component</th>
+                                <th>Part Number</th>
+                                <th>Qty</th>
+                                <th>Unit</th>
+                                <th>Total</th>
+                                <th>Supplier</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bom-category"><td colspan="7">ACTIVE COMPONENTS</td></tr>
+                            <tr>
+                                <td class="mono">U1</td>
+                                <td>MCU Module</td>
+                                <td class="mono text-cyan">ESP32-S3-WROOM-1-N16R8</td>
+                                <td>1</td>
+                                <td class="price">$5.50</td>
+                                <td class="price">$5.50</td>
+                                <td>DigiKey</td>
+                            </tr>
+                            <tr>
+                                <td class="mono">U2</td>
+                                <td>Power Path IC</td>
+                                <td class="mono text-cyan">BQ24195RGER</td>
+                                <td>1</td>
+                                <td class="price">$3.50</td>
+                                <td class="price">$3.50</td>
+                                <td>Mouser</td>
+                            </tr>
+                            <tr>
+                                <td class="mono">U3</td>
+                                <td>5V Buck</td>
+                                <td class="mono text-cyan">TPS62150RGTR</td>
+                                <td>1</td>
+                                <td class="price">$1.80</td>
+                                <td class="price">$1.80</td>
+                                <td>DigiKey</td>
+                            </tr>
+                            <tr>
+                                <td class="mono">U4</td>
+                                <td>3.3V LDO</td>
+                                <td class="mono text-cyan">AP2112K-3.3TRG1</td>
+                                <td>2</td>
+                                <td class="price">$0.25</td>
+                                <td class="price">$0.50</td>
+                                <td>LCSC</td>
+                            </tr>
+                            <tr>
+                                <td class="mono">U5-11</td>
+                                <td>Motor Driver</td>
+                                <td class="mono text-cyan">ULN2003AN</td>
+                                <td>7</td>
+                                <td class="price">$0.30</td>
+                                <td class="price">$2.10</td>
+                                <td>LCSC</td>
+                            </tr>
+                            <tr>
+                                <td class="mono">U12</td>
+                                <td>Audio Amp</td>
+                                <td class="mono text-cyan">MAX98357AETE+</td>
+                                <td>1</td>
+                                <td class="price">$2.50</td>
+                                <td class="price">$2.50</td>
+                                <td>DigiKey</td>
+                            </tr>
+                            
+                            <tr class="bom-category"><td colspan="7">ELECTROMECHANICAL</td></tr>
+                            <tr>
+                                <td class="mono">LCD1</td>
+                                <td>Display</td>
+                                <td class="mono text-cyan">Waveshare 4.3" RGB</td>
+                                <td>1</td>
+                                <td class="price">$28.00</td>
+                                <td class="price">$28.00</td>
+                                <td>Waveshare</td>
+                            </tr>
+                            <tr>
+                                <td class="mono">M1-10</td>
+                                <td>Stepper Motor</td>
+                                <td class="mono text-cyan">28BYJ-48 5V</td>
+                                <td>10</td>
+                                <td class="price">$1.50</td>
+                                <td class="price">$15.00</td>
+                                <td>AliExpress</td>
+                            </tr>
+                            <tr>
+                                <td class="mono">M11</td>
+                                <td>Servo</td>
+                                <td class="mono text-cyan">SG90</td>
+                                <td>1</td>
+                                <td class="price">$2.00</td>
+                                <td class="price">$2.00</td>
+                                <td>Amazon</td>
+                            </tr>
+                            
+                            <tr class="bom-category"><td colspan="7">SENSORS</td></tr>
+                            <tr>
+                                <td class="mono">Q1-10</td>
+                                <td>Optical Sensor</td>
+                                <td class="mono text-cyan">TCPT1300X01</td>
+                                <td>10</td>
+                                <td class="price">$0.80</td>
+                                <td class="price">$8.00</td>
+                                <td>DigiKey</td>
+                            </tr>
+                            <tr>
+                                <td class="mono">U13</td>
+                                <td>Load Cell ADC</td>
+                                <td class="mono text-cyan">HX711</td>
+                                <td>1</td>
+                                <td class="price">$0.80</td>
+                                <td class="price">$0.80</td>
+                                <td>LCSC</td>
+                            </tr>
+                            <tr>
+                                <td class="mono">U14</td>
+                                <td>Temp/Humidity</td>
+                                <td class="mono text-cyan">SHT40-AD1B</td>
+                                <td>1</td>
+                                <td class="price">$2.50</td>
+                                <td class="price">$2.50</td>
+                                <td>DigiKey</td>
+                            </tr>
+                            
+                            <tr class="bom-category"><td colspan="7">POWER</td></tr>
+                            <tr>
+                                <td class="mono">BAT1</td>
+                                <td>Battery</td>
+                                <td class="mono text-cyan">Samsung INR18650-25R</td>
+                                <td>2</td>
+                                <td class="price">$4.00</td>
+                                <td class="price">$8.00</td>
+                                <td>IMRbatteries</td>
+                            </tr>
+                            <tr>
+                                <td class="mono">PSU1</td>
+                                <td>AC Adapter</td>
+                                <td class="mono text-cyan">GST25E12-P1J</td>
+                                <td>1</td>
+                                <td class="price">$12.00</td>
+                                <td class="price">$12.00</td>
+                                <td>Mouser</td>
+                            </tr>
+                            
+                            <tr class="bom-category"><td colspan="7">PCB & ASSEMBLY</td></tr>
+                            <tr>
+                                <td class="mono">PCB1</td>
+                                <td>Main PCB</td>
+                                <td class="mono text-cyan">4-layer, 150×100mm</td>
+                                <td>1</td>
+                                <td class="price">$8.00</td>
+                                <td class="price">$8.00</td>
+                                <td>JLCPCB</td>
+                            </tr>
+                            <tr>
+                                <td class="mono">ENC1</td>
+                                <td>Enclosure</td>
+                                <td class="mono text-cyan">ABS injection</td>
+                                <td>1</td>
+                                <td class="price">$22.00</td>
+                                <td class="price">$22.00</td>
+                                <td>Alibaba</td>
+                            </tr>
+                            
+                            <tr style="background: rgba(0, 255, 159, 0.1);">
+                                <td colspan="4"></td>
+                                <td class="price-total">TOTAL COGS</td>
+                                <td class="price price-total">~$159</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 14: VOLUME PRICING -->
+        <section class="slide bg-dark" id="slide-14">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">Volume Pricing</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">Cost optimization at scale</p>
+                
+                <div class="grid grid-2 gap-4">
+                    <div class="animate-fade-left delay-2">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>100 units</th>
+                                        <th>1,000 units</th>
+                                        <th>10,000 units</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Components</td>
+                                        <td class="price">$90</td>
+                                        <td class="price">$75</td>
+                                        <td class="price">$62</td>
+                                    </tr>
+                                    <tr>
+                                        <td>PCBs</td>
+                                        <td class="price">$11</td>
+                                        <td class="price">$8</td>
+                                        <td class="price">$5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Enclosure</td>
+                                        <td class="price">$22</td>
+                                        <td class="price">$18</td>
+                                        <td class="price">$14</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Assembly</td>
+                                        <td class="price">$15</td>
+                                        <td class="price">$12</td>
+                                        <td class="price">$10</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Packaging</td>
+                                        <td class="price">$8</td>
+                                        <td class="price">$6</td>
+                                        <td class="price">$4</td>
+                                    </tr>
+                                    <tr style="background: rgba(0, 180, 216, 0.1);">
+                                        <td><strong>Total COGS</strong></td>
+                                        <td class="price price-total">$146</td>
+                                        <td class="price price-total">$119</td>
+                                        <td class="price price-total">$95</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="animate-fade-right delay-3">
+                        <div class="grid grid-3 gap-3">
+                            <div class="card" style="text-align: center;">
+                                <p class="spec-number">35%</p>
+                                <p class="spec-label">Cost Reduction</p>
+                                <p class="text-muted" style="font-size: 0.8rem;">100 → 10K units</p>
+                            </div>
+                            <div class="card" style="text-align: center;">
+                                <p class="spec-number text-accent">$95</p>
+                                <p class="spec-label">Target COGS</p>
+                                <p class="text-muted" style="font-size: 0.8rem;">At 10K volume</p>
+                            </div>
+                            <div class="card" style="text-align: center;">
+                                <p class="spec-number text-warning">3.2×</p>
+                                <p class="spec-label">Gross Margin</p>
+                                <p class="text-muted" style="font-size: 0.8rem;">At CHF 299 MSRP</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4" style="border-color: rgba(0, 255, 159, 0.3);">
+                            <h4 class="title-sm mb-3 text-accent">Recommended Suppliers</h4>
+                            <div class="grid grid-2 gap-2" style="font-size: 0.85rem;">
+                                <div>
+                                    <p class="text-cyan">PCB Prototype:</p>
+                                    <p class="text-muted">JLCPCB — $8/board</p>
+                                </div>
+                                <div>
+                                    <p class="text-cyan">PCB Production:</p>
+                                    <p class="text-muted">Eurocircuits (EU)</p>
+                                </div>
+                                <div>
+                                    <p class="text-cyan">Components:</p>
+                                    <p class="text-muted">LCSC, DigiKey, Mouser</p>
+                                </div>
+                                <div>
+                                    <p class="text-cyan">Assembly:</p>
+                                    <p class="text-muted">JLCPCB, PCBWay</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 15: FIRMWARE ARCHITECTURE -->
+        <section class="slide bg-mesh" id="slide-15">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">Firmware Architecture</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">ESP-IDF + FreeRTOS layered design</p>
+                
+                <div class="diagram animate-scale delay-2" style="font-size: 0.65rem;">
+<span class="diagram-title">FIRMWARE ARCHITECTURE</span>
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                              APPLICATION LAYER                                       │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐                  │
+│  │ Schedule │ │    UI    │ │ API Sync │ │ Settings │ │   OTA    │                  │
+│  │ Manager  │ │ Manager  │ │  Client  │ │ Manager  │ │ Updater  │                  │
+│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘                  │
+│       │            │            │            │            │                         │
+├───────┴────────────┴────────────┴────────────┴────────────┴─────────────────────────┤
+│                              MIDDLEWARE LAYER                                        │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐                  │
+│  │  Event   │ │   Task   │ │  Queue   │ │  Timer   │ │   NVS    │                  │
+│  │   Bus    │ │ Manager  │ │ Manager  │ │ Service  │ │ Storage  │                  │
+│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘                  │
+│       │            │            │            │            │                         │
+├───────┴────────────┴────────────┴────────────┴────────────┴─────────────────────────┤
+│                                DRIVER LAYER                                          │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐                  │
+│  │  Motor   │ │ Display  │ │  Sensor  │ │  WiFi    │ │  Audio   │                  │
+│  │  Driver  │ │  Driver  │ │  Driver  │ │  Driver  │ │  Driver  │                  │
+│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘                  │
+│       │            │            │            │            │                         │
+├───────┴────────────┴────────────┴────────────┴────────────┴─────────────────────────┤
+│                                  HAL LAYER                                           │
+│                             ESP-IDF + FreeRTOS                                       │
+└─────────────────────────────────────────────────────────────────────────────────────┘</div>
+                
+                <div class="grid grid-4 gap-3 mt-4">
+                    <div class="card animate-fade-up delay-3">
+                        <p class="mono text-cyan mb-2">main_task</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">Core 0, Priority 5</p>
+                        <p class="text-muted" style="font-size: 0.75rem;">System coordination</p>
+                    </div>
+                    <div class="card animate-fade-up delay-4">
+                        <p class="mono text-cyan mb-2">wifi_task</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">Core 1, Priority 5</p>
+                        <p class="text-muted" style="font-size: 0.75rem;">API communication</p>
+                    </div>
+                    <div class="card animate-fade-up delay-5">
+                        <p class="mono text-cyan mb-2">ui_task</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">Core 1, Priority 4</p>
+                        <p class="text-muted" style="font-size: 0.75rem;">LVGL rendering</p>
+                    </div>
+                    <div class="card animate-fade-up delay-6">
+                        <p class="mono text-cyan mb-2">dispense_task</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">Core 0, Priority 6</p>
+                        <p class="text-muted" style="font-size: 0.75rem;">Motor control</p>
+                    </div>
+                </div>
+                
+                <div class="flex-center gap-3 mt-5 animate-fade-up delay-7">
+                    <span class="badge badge-primary">ESP-IDF v5.1+</span>
+                    <span class="badge badge-accent">LVGL v8.3+</span>
+                    <span class="badge badge-warning">FreeRTOS</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 16: PROTOTYPING ROADMAP -->
+        <section class="slide bg-dark" id="slide-16">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">Prototyping Roadmap</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">From breadboard to production</p>
+                
+                <div class="grid grid-3 gap-3">
+                    <div class="card animate-fade-up delay-1">
+                        <span class="badge badge-primary mb-3">Phase 1</span>
+                        <h4 class="title-sm mb-2">Breadboard</h4>
+                        <p class="text-muted mb-3" style="font-size: 0.85rem;">Prove concept with dev boards</p>
+                        <div class="flex gap-2">
+                            <span class="badge badge-accent">2 weeks</span>
+                        </div>
+                        <p class="text-muted mt-3" style="font-size: 0.8rem;">Deliverable: Working motor + sensor validation</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-2">
+                        <span class="badge badge-primary mb-3">Phase 2</span>
+                        <h4 class="title-sm mb-2">Dev Boards</h4>
+                        <p class="text-muted mb-3" style="font-size: 0.85rem;">Firmware development on ESP32-S3-DevKitC</p>
+                        <div class="flex gap-2">
+                            <span class="badge badge-accent">4 weeks</span>
+                        </div>
+                        <p class="text-muted mt-3" style="font-size: 0.8rem;">Deliverable: Complete firmware</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-3">
+                        <span class="badge badge-primary mb-3">Phase 3</span>
+                        <h4 class="title-sm mb-2">Custom PCB v1</h4>
+                        <p class="text-muted mb-3" style="font-size: 0.85rem;">Integration testing on custom board</p>
+                        <div class="flex gap-2">
+                            <span class="badge badge-accent">4 weeks</span>
+                        </div>
+                        <p class="text-muted mt-3" style="font-size: 0.8rem;">Deliverable: First PCB prototype</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-4">
+                        <span class="badge badge-warning mb-3">Phase 4</span>
+                        <h4 class="title-sm mb-2">PCB v2</h4>
+                        <p class="text-muted mb-3" style="font-size: 0.85rem;">Fix issues from v1 testing</p>
+                        <div class="flex gap-2">
+                            <span class="badge badge-accent">2 weeks</span>
+                        </div>
+                        <p class="text-muted mt-3" style="font-size: 0.8rem;">Deliverable: Production-ready PCB</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-5">
+                        <span class="badge badge-warning mb-3">Phase 5</span>
+                        <h4 class="title-sm mb-2">Pilot Build</h4>
+                        <p class="text-muted mb-3" style="font-size: 0.85rem;">DFM validation, small batch</p>
+                        <div class="flex gap-2">
+                            <span class="badge badge-accent">4 weeks</span>
+                        </div>
+                        <p class="text-muted mt-3" style="font-size: 0.8rem;">Deliverable: 50 units for testing</p>
+                    </div>
+                    
+                    <div class="card card-accent animate-fade-up delay-6">
+                        <span class="badge badge-accent mb-3">Phase 6</span>
+                        <h4 class="title-sm mb-2 text-accent">Production</h4>
+                        <p class="text-muted mb-3" style="font-size: 0.85rem;">Scale manufacturing</p>
+                        <div class="flex gap-2">
+                            <span class="badge badge-primary">Ongoing</span>
+                        </div>
+                        <p class="text-muted mt-3" style="font-size: 0.8rem;">Deliverable: Mass production</p>
+                    </div>
+                </div>
+                
+                <div class="card mt-5 animate-fade-up delay-7" style="border-color: rgba(255, 214, 10, 0.3);">
+                    <h4 class="title-sm mb-3 text-warning">Recommended Dev Boards</h4>
+                    <div class="grid grid-3 gap-4" style="font-size: 0.9rem;">
+                        <div>
+                            <p class="text-cyan">ESP32-S3-DevKitC-1</p>
+                            <p class="text-muted">$10 — Firmware dev</p>
+                        </div>
+                        <div>
+                            <p class="text-cyan">ESP32-S3-LCD-EV-Board</p>
+                            <p class="text-muted">$60 — Display/UI dev</p>
+                        </div>
+                        <div>
+                            <p class="text-cyan">WT32-SC01 Plus</p>
+                            <p class="text-muted">$35 — Compact UI testing</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 17: COMMON PITFALLS -->
+        <section class="slide bg-mesh" id="slide-17">
+            <div class="content-full">
+                <h2 class="title-xl text-gradient mb-2 animate-fade-up">Common Pitfalls & Solutions</h2>
+                <p class="text-muted mb-5 animate-fade-up delay-1">Learn from our experience</p>
+                
+                <div class="grid grid-2 gap-3">
+                    <div class="card animate-fade-up delay-1" style="border-left: 3px solid var(--accent-orange);">
+                        <h4 class="title-sm mb-2 text-orange">Motor Noise</h4>
+                        <p class="text-muted mb-2" style="font-size: 0.85rem;"><strong>Problem:</strong> Stepper causes EMI, affects WiFi</p>
+                        <p class="text-accent" style="font-size: 0.85rem;"><strong>Solution:</strong> Add 100nF across each motor coil, ferrite beads on motor power</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-2" style="border-left: 3px solid var(--accent-orange);">
+                        <h4 class="title-sm mb-2 text-orange">WiFi Interference</h4>
+                        <p class="text-muted mb-2" style="font-size: 0.85rem;"><strong>Problem:</strong> Motors affect WiFi performance</p>
+                        <p class="text-accent" style="font-size: 0.85rem;"><strong>Solution:</strong> Separate power paths, star ground, proper filtering</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-3" style="border-left: 3px solid var(--accent-orange);">
+                        <h4 class="title-sm mb-2 text-orange">Power Sequencing</h4>
+                        <p class="text-muted mb-2" style="font-size: 0.85rem;"><strong>Problem:</strong> Brown-out when motor starts</p>
+                        <p class="text-accent" style="font-size: 0.85rem;"><strong>Solution:</strong> Add inrush current limiting, bulk capacitors on motor rail</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-4" style="border-left: 3px solid var(--accent-orange);">
+                        <h4 class="title-sm mb-2 text-orange">Touch Sensitivity</h4>
+                        <p class="text-muted mb-2" style="font-size: 0.85rem;"><strong>Problem:</strong> Erratic touch input</p>
+                        <p class="text-accent" style="font-size: 0.85rem;"><strong>Solution:</strong> Ground display bezel, use shielded FFC cable</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-5" style="border-left: 3px solid var(--accent-orange);">
+                        <h4 class="title-sm mb-2 text-orange">Battery Drain</h4>
+                        <p class="text-muted mb-2" style="font-size: 0.85rem;"><strong>Problem:</strong> Won't last 48h backup</p>
+                        <p class="text-accent" style="font-size: 0.85rem;"><strong>Solution:</strong> Proper sleep modes, kill power to peripherals with load switches</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-6" style="border-left: 3px solid var(--accent-orange);">
+                        <h4 class="title-sm mb-2 text-orange">Load Cell Drift</h4>
+                        <p class="text-muted mb-2" style="font-size: 0.85rem;"><strong>Problem:</strong> Weight readings vary with temperature</p>
+                        <p class="text-accent" style="font-size: 0.85rem;"><strong>Solution:</strong> Temperature compensation, periodic tare calibration</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 18: CALL TO ACTION -->
+        <section class="slide bg-engineering" id="slide-18">
+            <div class="content-center">
+                <h2 class="title-xl mb-4 animate-fade-up">Ready to Build?</h2>
+                <p class="subtitle mb-5 animate-fade-up delay-1" style="color: rgba(255,255,255,0.8);">
+                    Join our engineering team and help bring precision medication management to millions.
+                </p>
+                
+                <div class="grid grid-3 gap-4 mb-5">
+                    <div class="card animate-fade-up delay-2" style="background: rgba(255,255,255,0.1);">
+                        <div class="icon icon-sm">📋</div>
+                        <h4 class="title-sm mb-2">Full Documentation</h4>
+                        <p class="text-muted" style="font-size: 0.85rem;">Complete hardware specs, schematics, and BOM available</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-3" style="background: rgba(255,255,255,0.1);">
+                        <div class="icon icon-sm icon-accent">🔧</div>
+                        <h4 class="title-sm mb-2">Dev Kit Available</h4>
+                        <p class="text-muted" style="font-size: 0.85rem;">ESP32-S3 dev boards ready for immediate prototyping</p>
+                    </div>
+                    
+                    <div class="card animate-fade-up delay-4" style="background: rgba(255,255,255,0.1);">
+                        <div class="icon icon-sm icon-orange">🏭</div>
+                        <h4 class="title-sm mb-2">Production Ready</h4>
+                        <p class="text-muted" style="font-size: 0.85rem;">Validated supply chain, CE Class IIa pathway</p>
+                    </div>
+                </div>
+                
+                <div class="swiss-badge animate-fade-up delay-5" style="font-size: 1rem; padding: 0.75rem 1.5rem;">
+                    <span class="swiss-cross"></span>
+                    <span>Swiss Engineering Excellence — Lausanne</span>
+                </div>
+                
+                <p class="text-muted mt-5 animate-fade-up delay-6" style="font-size: 0.9rem;">
+                    contact@smartmeddispenser.ch | Version 3.0 | February 2026
+                </p>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Navigation dots
+        const slides = document.querySelectorAll('.slide');
+        const navContainer = document.getElementById('navDots');
+        const progressBar = document.getElementById('progressBar');
+        const presentation = document.getElementById('presentation');
+
+        // Create navigation dots
+        slides.forEach((slide, index) => {
+            const dot = document.createElement('div');
+            dot.className = 'nav-dot';
+            dot.addEventListener('click', () => {
+                slide.scrollIntoView({ behavior: 'smooth' });
+            });
+            navContainer.appendChild(dot);
+        });
+
+        const navDots = document.querySelectorAll('.nav-dot');
+
+        // Update active dot and progress bar on scroll
+        function updateNavigation() {
+            const scrollTop = presentation.scrollTop;
+            const scrollHeight = presentation.scrollHeight - presentation.clientHeight;
+            const progress = (scrollTop / scrollHeight) * 100;
+            progressBar.style.width = progress + '%';
+
+            slides.forEach((slide, index) => {
+                const rect = slide.getBoundingClientRect();
+                if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+                    navDots.forEach(dot => dot.classList.remove('active'));
+                    navDots[index].classList.add('active');
+                }
+            });
+        }
+
+        presentation.addEventListener('scroll', updateNavigation);
+        updateNavigation();
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            const activeIndex = Array.from(navDots).findIndex(dot => dot.classList.contains('active'));
+            
+            if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+                e.preventDefault();
+                if (activeIndex < slides.length - 1) {
+                    slides[activeIndex + 1].scrollIntoView({ behavior: 'smooth' });
+                }
+            } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                e.preventDefault();
+                if (activeIndex > 0) {
+                    slides[activeIndex - 1].scrollIntoView({ behavior: 'smooth' });
+                }
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                slides[0].scrollIntoView({ behavior: 'smooth' });
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                slides[slides.length - 1].scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            root: presentation,
+            threshold: 0.2
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.querySelectorAll('.animate-fade-up, .animate-fade-down, .animate-fade-left, .animate-fade-right, .animate-scale').forEach(el => {
+                        el.style.animationPlayState = 'running';
+                    });
+                }
+            });
+        }, observerOptions);
+
+        slides.forEach(slide => observer.observe(slide));
+    </script>
+</body>
+</html>

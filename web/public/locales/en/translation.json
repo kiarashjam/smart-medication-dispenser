@@ -1,0 +1,78 @@
+{
+  "app": {
+    "name": "Smart Medication Dispenser",
+    "tagline": "Your medication, on time, every time"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "devices": "Devices",
+    "history": "History",
+    "travel": "Travel Mode",
+    "notifications": "Notifications",
+    "integrations": "Integrations",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full Name",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "todaySchedule": "Today's Schedule",
+    "adherence": "Adherence",
+    "devices": "Devices",
+    "recentActivity": "Recent Activity"
+  },
+  "devices": {
+    "title": "Devices",
+    "addDevice": "Add Device",
+    "online": "Online",
+    "offline": "Offline",
+    "battery": "Battery",
+    "firmware": "Firmware",
+    "lastSeen": "Last Seen"
+  },
+  "schedule": {
+    "title": "Schedule",
+    "addSchedule": "Add Schedule",
+    "medication": "Medication",
+    "time": "Time",
+    "days": "Days",
+    "pillsPerDose": "Pills per Dose"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "noNotifications": "No notifications",
+    "missedDose": "Missed Dose",
+    "lowStock": "Low Stock",
+    "deviceOffline": "Device Offline"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "security": "Security",
+    "preferences": "Preferences",
+    "language": "Language",
+    "timeZone": "Time Zone",
+    "save": "Save Preferences",
+    "changePassword": "Change Password"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "back": "Back"
+  }
+}

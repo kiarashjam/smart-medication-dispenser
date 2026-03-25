@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: dispenser
+      POSTGRES_PASSWORD: dispenser_secret
+      POSTGRES_DB: dispenser
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dispenser -d dispenser"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: src/Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5000
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=dispenser;Username=dispenser;Password=dispenser_secret"
+      Jwt__SecretKey: "SmartMedicationDispenser_MVP_SecretKey_AtLeast32Characters!"
+      Jwt__Issuer: "SmartMedicationDispenser"
+      Jwt__Audience: "SmartMedicationDispenser"
+      Mvp__Enabled: "true"
+      Mvp__Label: "mvp-1"
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

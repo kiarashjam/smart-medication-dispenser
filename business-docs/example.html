@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BonApp Finance Pro — Business Report</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  /* ═══════════════════════════════════════════════════════════
+     A4 PAGE SETUP
+     ═══════════════════════════════════════════════════════════ */
+  @page { size: A4; margin: 0; }
+
+  :root {
+    --pad: 48px 52px;
+    --indigo: #6366f1; --emerald: #10b981; --rose: #f43f5e;
+    --amber: #f59e0b; --sky: #0ea5e9; --violet: #8b5cf6;
+    --teal: #14b8a6; --slate: #334155;
+    --gold: #C9A84C; --gold-light: #E8D5A0;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #fff; color: #1e293b; line-height: 1.6;
+    font-size: 13px; -webkit-font-smoothing: antialiased;
+    print-color-adjust: exact; -webkit-print-color-adjust: exact;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     PAGE SYSTEM
+     ═══════════════════════════════════════════════════════════ */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    padding: var(--pad);
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  .page-footer {
+    position: absolute; bottom: 20px; left: 52px; right: 52px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 9px; color: #b0b0b0; border-top: 1px solid #eee; padding-top: 8px;
+  }
+  .page-footer .pf-brand { font-weight: 600; letter-spacing: 0.5px; }
+
+  /* ═══════════════════════════════════════════════════════════
+     COVER PAGE
+     ═══════════════════════════════════════════════════════════ */
+  .cover-page {
+    width: 210mm; min-height: 297mm; page-break-after: always;
+    background: linear-gradient(135deg, #0f0c29, #302b63 50%, #24243e);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; color: #fff; position: relative; overflow: hidden;
+  }
+  .cover-page::before {
+    content: ''; position: absolute; inset: -50%; width: 200%; height: 200%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(201,168,76,0.2), transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(14,102,85,0.15), transparent 50%);
+  }
+  .cover-badge {
+    display: inline-block; padding: 7px 26px; border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50px; font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,255,255,0.65); margin-bottom: 40px; background: rgba(255,255,255,0.05);
+    position: relative; z-index: 1;
+  }
+  .cover-page h1 {
+    font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 900;
+    line-height: 1.08; margin-bottom: 20px; position: relative; z-index: 1;
+    background: linear-gradient(135deg, #C9A84C, #E8D5A0, #F4D03F, #C9A84C);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .cover-line { width: 60px; height: 3px; background: linear-gradient(90deg, var(--gold), var(--teal)); border-radius: 2px; margin: 28px auto; position: relative; z-index: 1; }
+  .cover-sub { font-size: 15px; color: rgba(255,255,255,0.55); max-width: 460px; line-height: 1.7; position: relative; z-index: 1; font-weight: 300; }
+  .cover-meta { position: absolute; bottom: 40px; left: 0; right: 0; text-align: center; font-size: 10px; color: rgba(255,255,255,0.25); z-index: 1; letter-spacing: 1px; }
+
+  /* ═══════════════════════════════════════════════════════════
+     SECTION HEADERS — unique per section
+     ═══════════════════════════════════════════════════════════ */
+  .sh {
+    padding: 22px 40px; margin: -48px -52px 22px -52px; position: relative;
+  }
+  .sh-num { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 900; line-height: 1; margin-bottom: -2px; }
+  .sh-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; line-height: 1.25; }
+  .sh-sub { font-size: 11px; margin-top: 4px; opacity: 0.7; }
+  .sh-line { width: 40px; height: 2px; border-radius: 2px; margin-top: 10px; }
+
+  .sh-indigo  { background: linear-gradient(135deg, #312e81, #4338ca); color: #fff; }
+  .sh-indigo .sh-num { color: rgba(255,255,255,0.12); } .sh-indigo .sh-line { background: #818cf8; }
+  .sh-coral   { background: linear-gradient(135deg, #9f1239, #e11d48); color: #fff; }
+  .sh-coral .sh-num { color: rgba(255,255,255,0.12); } .sh-coral .sh-line { background: #fda4af; }
+  .sh-emerald { background: linear-gradient(135deg, #064e3b, #059669); color: #fff; }
+  .sh-emerald .sh-num { color: rgba(255,255,255,0.12); } .sh-emerald .sh-line { background: #6ee7b7; }
+  .sh-amber   { background: linear-gradient(135deg, #78350f, #d97706); color: #fff; }
+  .sh-amber .sh-num { color: rgba(255,255,255,0.12); } .sh-amber .sh-line { background: #fcd34d; }
+  .sh-violet  { background: linear-gradient(135deg, #4c1d95, #7c3aed); color: #fff; }
+  .sh-violet .sh-num { color: rgba(255,255,255,0.12); } .sh-violet .sh-line { background: #c4b5fd; }
+  .sh-teal    { background: linear-gradient(135deg, #134e4a, #14b8a6); color: #fff; }
+  .sh-teal .sh-num { color: rgba(255,255,255,0.12); } .sh-teal .sh-line { background: #5eead4; }
+  .sh-rose    { background: linear-gradient(135deg, #881337, #f43f5e); color: #fff; }
+  .sh-rose .sh-num { color: rgba(255,255,255,0.12); } .sh-rose .sh-line { background: #fecdd3; }
+  .sh-sky     { background: linear-gradient(135deg, #0c4a6e, #0284c7); color: #fff; }
+  .sh-sky .sh-num { color: rgba(255,255,255,0.12); } .sh-sky .sh-line { background: #7dd3fc; }
+  .sh-dark    { background: linear-gradient(135deg, #18181b, #3f3f46); color: #fff; }
+  .sh-dark .sh-num { color: rgba(255,255,255,0.08); } .sh-dark .sh-line { background: linear-gradient(90deg, var(--gold), #14b8a6); }
+  .sh-slate   { background: #f1f5f9; border-left: 5px solid #334155; color: #0f172a; }
+  .sh-slate .sh-num { color: #cbd5e1; } .sh-slate .sh-line { background: #334155; }
+  .sh-gold    { background: linear-gradient(135deg, #78350f, #b45309, #d97706); color: #fff; }
+  .sh-gold .sh-num { color: rgba(255,255,255,0.12); } .sh-gold .sh-line { background: var(--gold-light); }
+
+  /* ═══════════════════════════════════════════════════════════
+     TYPOGRAPHY
+     ═══════════════════════════════════════════════════════════ */
+  h3 { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: #1e293b; margin: 16px 0 8px; }
+  h4 { font-size: 10px; font-weight: 700; color: #475569; margin: 14px 0 6px; text-transform: uppercase; letter-spacing: 1.2px; }
+  p  { margin-bottom: 10px; color: #475569; font-size: 12px; line-height: 1.6; }
+  strong { color: #1e293b; }
+
+  /* ═══════════════════════════════════════════════════════════
+     CARDS & BOXES
+     ═══════════════════════════════════════════════════════════ */
+  .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; margin: 6px 0; }
+  .card-dark { background: #1e293b; color: #e2e8f0; border-radius: 10px; padding: 14px 16px; margin: 6px 0; }
+  .card-dark p, .card-dark li { color: #cbd5e1; } .card-dark strong { color: #fff; }
+  .card-accent { border-left: 4px solid #6366f1; background: #eef2ff; border-radius: 0 10px 10px 0; padding: 11px 16px; margin: 8px 0; }
+  .card-success { border-left: 4px solid #10b981; background: #ecfdf5; border-radius: 0 10px 10px 0; padding: 11px 16px; margin: 8px 0; }
+  .card-warning { border-left: 4px solid #f59e0b; background: #fffbeb; border-radius: 0 10px 10px 0; padding: 11px 16px; margin: 8px 0; }
+  .card-danger { border-left: 4px solid #ef4444; background: #fef2f2; border-radius: 0 10px 10px 0; padding: 11px 16px; margin: 8px 0; }
+  .highlight-box { background: linear-gradient(135deg, #312e81, #4338ca); border-radius: 10px; padding: 14px 18px; color: #fff; margin: 12px 0; }
+  .highlight-box p { color: rgba(255,255,255,0.85); } .highlight-box strong { color: #fff; }
+  .card-gold { border-left: 4px solid var(--gold); background: #fefce8; border-radius: 0 10px 10px 0; padding: 11px 16px; margin: 8px 0; }
+
+  /* ═══════════════════════════════════════════════════════════
+     TABLES
+     ═══════════════════════════════════════════════════════════ */
+  table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 10px 0; font-size: 11px; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; }
+  thead th { background: #1e293b; color: #fff; padding: 7px 10px; text-align: left; font-weight: 600; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.6px; }
+  tbody td { padding: 6px 10px; border-bottom: 1px solid #f1f5f9; color: #475569; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  table.tbl-green thead th { background: #064e3b; }
+  table.tbl-green tbody tr:nth-child(even) { background: #ecfdf5; }
+  table.tbl-purple thead th { background: #4c1d95; }
+  table.tbl-purple tbody tr:nth-child(even) { background: #f5f3ff; }
+  table.tbl-amber thead th { background: #78350f; }
+  table.tbl-amber tbody tr:nth-child(even) { background: #fffbeb; }
+  table.tbl-sky thead th { background: #0c4a6e; }
+  table.tbl-sky tbody tr:nth-child(even) { background: #f0f9ff; }
+  table.tbl-rose thead th { background: #881337; }
+  table.tbl-rose tbody tr:nth-child(even) { background: #fff1f2; }
+  table.tbl-gold thead th { background: #78350f; }
+  table.tbl-gold tbody tr:nth-child(even) { background: #fefce8; }
+  table.tbl-teal thead th { background: #134e4a; }
+  table.tbl-teal tbody tr:nth-child(even) { background: #f0fdfa; }
+
+  /* ═══════════════════════════════════════════════════════════
+     FLOW DIAGRAMS
+     ═══════════════════════════════════════════════════════════ */
+  .flow { display: flex; align-items: center; gap: 4px; margin: 12px 0; flex-wrap: wrap; }
+  .flow-step { background: #fff; border: 2px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 11px; font-weight: 600; color: #334155; text-align: center; flex: 1; min-width: 60px; }
+  .flow-step.active { background: #4338ca; color: #fff; border-color: #4338ca; }
+  .flow-step.success { background: #059669; color: #fff; border-color: #059669; }
+  .flow-step.locked { background: #1e293b; color: #fff; border-color: #1e293b; }
+  .flow-step.gold { background: var(--gold); color: #fff; border-color: var(--gold); }
+  .flow-step.danger { background: #dc2626; color: #fff; border-color: #dc2626; }
+  .flow-arrow { color: #94a3b8; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+
+  /* ═══════════════════════════════════════════════════════════
+     STAT CARDS
+     ═══════════════════════════════════════════════════════════ */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0; }
+  .stat-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 10px; text-align: center; }
+  .stat-card .stat-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 800; }
+  .stat-card .stat-label { font-size: 8.5px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+  .stat-card.st-indigo { border-bottom: 3px solid var(--indigo); } .stat-card.st-indigo .stat-num { color: var(--indigo); }
+  .stat-card.st-emerald { border-bottom: 3px solid var(--emerald); } .stat-card.st-emerald .stat-num { color: var(--emerald); }
+  .stat-card.st-amber { border-bottom: 3px solid var(--amber); } .stat-card.st-amber .stat-num { color: var(--amber); }
+  .stat-card.st-rose { border-bottom: 3px solid var(--rose); } .stat-card.st-rose .stat-num { color: var(--rose); }
+  .stat-card.st-gold { border-bottom: 3px solid var(--gold); } .stat-card.st-gold .stat-num { color: var(--gold); }
+  .stat-card.st-sky { border-bottom: 3px solid var(--sky); } .stat-card.st-sky .stat-num { color: var(--sky); }
+  .stat-card.st-teal { border-bottom: 3px solid var(--teal); } .stat-card.st-teal .stat-num { color: var(--teal); }
+  .stat-card.st-violet { border-bottom: 3px solid var(--violet); } .stat-card.st-violet .stat-num { color: var(--violet); }
+
+  /* ═══════════════════════════════════════════════════════════
+     ICON LISTS
+     ═══════════════════════════════════════════════════════════ */
+  .icon-list { list-style: none; padding: 0; }
+  .icon-list li { padding: 4px 0 4px 22px; position: relative; color: #475569; font-size: 11.5px; line-height: 1.5; }
+  .icon-list li::before { position: absolute; left: 0; font-size: 13px; }
+  .icon-list.check li::before { content: '✓'; color: #10b981; font-weight: 700; }
+  .icon-list.cross li::before { content: '✗'; color: #ef4444; font-weight: 700; }
+  .icon-list.arrow li::before { content: '→'; color: #6366f1; font-weight: 700; }
+  .icon-list.star li::before { content: '★'; color: #f59e0b; }
+  .icon-list.gold li::before { content: '→'; color: var(--gold); font-weight: 700; }
+
+  /* ═══════════════════════════════════════════════════════════
+     COMPARE / MODE CARDS
+     ═══════════════════════════════════════════════════════════ */
+  .compare-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 14px 0; }
+  .compare-card { border-radius: 12px; padding: 18px 14px; text-align: center; }
+  .compare-card.mode-a { background: linear-gradient(180deg, #f0fdf4, #dcfce7); border: 2px solid #86efac; }
+  .compare-card.mode-b { background: linear-gradient(180deg, #eff6ff, #dbeafe); border: 2px solid #93c5fd; }
+  .compare-card.mode-c { background: linear-gradient(180deg, #faf5ff, #ede9fe); border: 2px solid #c4b5fd; }
+  .compare-card .cc-icon { font-size: 28px; margin-bottom: 6px; }
+  .compare-card .cc-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; color: #1e293b; }
+  .compare-card .cc-sub { font-size: 10px; color: #64748b; margin-top: 2px; }
+
+  /* ═══════════════════════════════════════════════════════════
+     BEFORE/AFTER
+     ═══════════════════════════════════════════════════════════ */
+  .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-radius: 10px; overflow: hidden; margin: 10px 0; border: 1px solid #e2e8f0; }
+  .ba-before { background: #fef2f2; padding: 14px 16px; }
+  .ba-after { background: #ecfdf5; padding: 14px 16px; }
+
+  /* ═══════════════════════════════════════════════════════════
+     FUNNEL
+     ═══════════════════════════════════════════════════════════ */
+  .funnel { margin: 16px auto; max-width: 400px; }
+  .funnel-step { padding: 12px 18px; text-align: center; color: #fff; font-weight: 600; font-size: 11px; }
+  .funnel-step:nth-child(1) { background: #0c4a6e; border-radius: 10px 10px 0 0; }
+  .funnel-step:nth-child(2) { background: #059669; margin: 0 16px; }
+  .funnel-step:nth-child(3) { background: #4338ca; margin: 0 32px; }
+  .funnel-step:nth-child(4) { background: var(--gold); margin: 0 48px; border-radius: 0 0 10px 10px; }
+  .funnel-label { font-size: 8.5px; opacity: 0.7; display: block; font-weight: 400; }
+
+  /* ═══════════════════════════════════════════════════════════
+     CODE BLOCK
+     ═══════════════════════════════════════════════════════════ */
+  .code-block { background: #1e1e2e; color: #cdd6f4; border-radius: 10px; padding: 14px; font-family: 'JetBrains Mono', monospace; font-size: 10px; line-height: 1.6; overflow-x: auto; margin: 10px 0; white-space: pre; }
+  .hl-gold { color: #f9e2af; } .hl-teal { color: #a6e3a1; } .hl-blue { color: #89b4fa; }
+
+  /* ═══════════════════════════════════════════════════════════
+     LAYOUTS
+     ═══════════════════════════════════════════════════════════ */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 10px 0; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 10px 0; }
+
+  /* ═══════════════════════════════════════════════════════════
+     BADGES & SEPARATORS
+     ═══════════════════════════════════════════════════════════ */
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 50px; font-size: 9px; font-weight: 600; }
+  .badge-green { background: #d1fae5; color: #065f46; }
+  .badge-amber { background: #fef3c7; color: #854d0e; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-gray { background: #f1f5f9; color: #475569; }
+  .badge-purple { background: #ede9fe; color: #5b21b6; }
+  .badge-gold { background: #fef3c7; color: #78350f; }
+  .sep { height: 1px; background: linear-gradient(90deg, transparent, #e2e8f0, transparent); margin: 16px 0; }
+
+  /* ═══════════════════════════════════════════════════════════
+     DARK PANELS — contrast sections within white pages
+     ═══════════════════════════════════════════════════════════ */
+  .dark-panel { background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 12px; padding: 18px 20px; color: #e2e8f0; margin: 12px 0; }
+  .dark-panel h4 { color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; font-size: 9px; margin: 0 0 10px; }
+  .dark-panel p { color: #cbd5e1; } .dark-panel strong { color: #fff; }
+  .dark-panel .dp-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 11px; }
+  .dark-panel .dp-row:last-child { border-bottom: none; }
+  .dark-panel .dp-label { color: #94a3b8; } .dark-panel .dp-value { color: #fff; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+  .dark-panel .dp-value.green { color: #34d399; } .dark-panel .dp-value.gold { color: var(--gold-light); } .dark-panel .dp-value.red { color: #fb7185; }
+
+  /* ═══════════════════════════════════════════════════════════
+     NUMBER HERO — large showcase numbers
+     ═══════════════════════════════════════════════════════════ */
+  .number-hero { display: flex; gap: 0; border-radius: 12px; overflow: hidden; margin: 14px 0; }
+  .nh-item { flex: 1; padding: 16px 12px; text-align: center; }
+  .nh-item:nth-child(1) { background: linear-gradient(135deg, #312e81, #4338ca); color: #fff; }
+  .nh-item:nth-child(2) { background: linear-gradient(135deg, #064e3b, #059669); color: #fff; }
+  .nh-item:nth-child(3) { background: linear-gradient(135deg, #78350f, #d97706); color: #fff; }
+  .nh-item:nth-child(4) { background: linear-gradient(135deg, #881337, #e11d48); color: #fff; }
+  .nh-item:nth-child(5) { background: linear-gradient(135deg, #0c4a6e, #0284c7); color: #fff; }
+  .nh-item:nth-child(6) { background: linear-gradient(135deg, #134e4a, #14b8a6); color: #fff; }
+  .nh-num { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 900; line-height: 1; }
+  .nh-label { font-size: 8px; text-transform: uppercase; letter-spacing: 1.2px; opacity: 0.7; margin-top: 4px; }
+
+  /* ═══════════════════════════════════════════════════════════
+     PULL QUOTE — dramatic quoted text
+     ═══════════════════════════════════════════════════════════ */
+  .pull-quote { position: relative; padding: 16px 22px 16px 32px; margin: 14px 0; border-left: 4px solid; font-family: 'Playfair Display', serif; font-size: 14px; line-height: 1.5; font-weight: 600; font-style: italic; color: #1e293b; background: linear-gradient(135deg, rgba(99,102,241,0.05), rgba(20,184,166,0.05)); border-radius: 0 12px 12px 0; }
+  .pull-quote.pq-gold { border-color: var(--gold); } .pull-quote.pq-indigo { border-color: var(--indigo); }
+  .pull-quote.pq-emerald { border-color: var(--emerald); } .pull-quote.pq-rose { border-color: var(--rose); }
+  .pull-quote .pq-attr { font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 600; font-style: normal; color: #94a3b8; display: block; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* ═══════════════════════════════════════════════════════════
+     PROGRESS BARS — visual metrics
+     ═══════════════════════════════════════════════════════════ */
+  .progress-row { margin: 6px 0; }
+  .progress-header { display: flex; justify-content: space-between; font-size: 10px; font-weight: 600; margin-bottom: 3px; }
+  .progress-track { height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+  .pf-green { background: linear-gradient(90deg, #059669, #34d399); }
+  .pf-gold { background: linear-gradient(90deg, #b45309, var(--gold)); }
+  .pf-indigo { background: linear-gradient(90deg, #4338ca, #818cf8); }
+  .pf-red { background: linear-gradient(90deg, #dc2626, #fb7185); }
+  .pf-sky { background: linear-gradient(90deg, #0284c7, #7dd3fc); }
+  .pf-teal { background: linear-gradient(90deg, #0d9488, #5eead4); }
+
+  /* ═══════════════════════════════════════════════════════════
+     GLASS CARD — frosted glass effect
+     ═══════════════════════════════════════════════════════════ */
+  .glass-card { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,250,252,0.95)); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); border-radius: 14px; padding: 16px 18px; margin: 6px 0; box-shadow: 0 4px 16px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.5); }
+
+  /* ═══════════════════════════════════════════════════════════
+     GRADIENT TEXT — shiny gradient text
+     ═══════════════════════════════════════════════════════════ */
+  .grad-text { background: linear-gradient(135deg, var(--gold), #E8D5A0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .grad-text-indigo { background: linear-gradient(135deg, #4338ca, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .grad-text-emerald { background: linear-gradient(135deg, #059669, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .grad-text-rose { background: linear-gradient(135deg, #e11d48, #fda4af); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+  /* ═══════════════════════════════════════════════════════════
+     ICON FEATURE GRID — tiles with large icons
+     ═══════════════════════════════════════════════════════════ */
+  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }
+  .feature-tile { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 12px; text-align: center; transition: transform 0.2s; }
+  .feature-tile .ft-icon { font-size: 22px; margin-bottom: 6px; }
+  .feature-tile .ft-title { font-size: 11px; font-weight: 700; color: #1e293b; }
+  .feature-tile .ft-desc { font-size: 9px; color: #64748b; margin-top: 2px; line-height: 1.3; }
+
+  /* ═══════════════════════════════════════════════════════════
+     TIMELINE — vertical phase timeline
+     ═══════════════════════════════════════════════════════════ */
+  .timeline { position: relative; padding-left: 28px; margin: 14px 0; }
+  .timeline::before { content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px; width: 2px; background: linear-gradient(180deg, var(--gold), var(--teal), var(--indigo), var(--rose)); }
+  .tl-item { position: relative; padding: 8px 0 16px; }
+  .tl-item::before { content: ''; position: absolute; left: -24px; top: 12px; width: 12px; height: 12px; border-radius: 50%; border: 3px solid; background: #fff; }
+  .tl-item:nth-child(1)::before { border-color: var(--gold); }
+  .tl-item:nth-child(2)::before { border-color: var(--teal); }
+  .tl-item:nth-child(3)::before { border-color: var(--indigo); }
+  .tl-item:nth-child(4)::before { border-color: var(--rose); }
+  .tl-title { font-size: 12px; font-weight: 700; color: #1e293b; } .tl-desc { font-size: 10px; color: #64748b; margin-top: 2px; line-height: 1.4; }
+
+  /* ═══════════════════════════════════════════════════════════
+     METRIC STRIP — compact inline metrics
+     ═══════════════════════════════════════════════════════════ */
+  .metric-strip { display: flex; gap: 0; border-radius: 10px; overflow: hidden; margin: 12px 0; border: 1px solid #e2e8f0; }
+  .ms-item { flex: 1; padding: 10px 8px; text-align: center; border-right: 1px solid #e2e8f0; }
+  .ms-item:last-child { border-right: none; }
+  .ms-num { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; }
+  .ms-label { font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+  .ms-item.ms-green { background: #ecfdf5; } .ms-item.ms-green .ms-num { color: #059669; }
+  .ms-item.ms-gold { background: #fefce8; } .ms-item.ms-gold .ms-num { color: #b45309; }
+  .ms-item.ms-red { background: #fef2f2; } .ms-item.ms-red .ms-num { color: #dc2626; }
+  .ms-item.ms-blue { background: #eff6ff; } .ms-item.ms-blue .ms-num { color: #1d4ed8; }
+  .ms-item.ms-purple { background: #f5f3ff; } .ms-item.ms-purple .ms-num { color: #7c3aed; }
+
+  /* ═══════════════════════════════════════════════════════════
+     ACCENT PAGES — subtle page backgrounds
+     ═══════════════════════════════════════════════════════════ */
+  .page-accent-warm { background: linear-gradient(180deg, #fffbeb 0%, #fff 15%) !important; }
+  .page-accent-cool { background: linear-gradient(180deg, #eff6ff 0%, #fff 15%) !important; }
+  .page-accent-mint { background: linear-gradient(180deg, #ecfdf5 0%, #fff 15%) !important; }
+  .page-accent-blush { background: linear-gradient(180deg, #fff1f2 0%, #fff 15%) !important; }
+  .page-accent-slate { background: linear-gradient(180deg, #f1f5f9 0%, #fff 15%) !important; }
+  .page-accent-violet { background: linear-gradient(180deg, #f5f3ff 0%, #fff 15%) !important; }
+
+  /* ═══════════════════════════════════════════════════════════
+     PRINT BUTTON
+     ═══════════════════════════════════════════════════════════ */
+  .print-btn { position: fixed; top: 16px; right: 16px; z-index: 9999; background: #4338ca; color: #fff; border: none; padding: 12px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(67,56,202,0.3); transition: all 0.2s; }
+  .print-btn:hover { background: #3730a3; transform: translateY(-1px); }
+  .print-hint { position: fixed; top: 56px; right: 16px; z-index: 9998; background: #1e293b; color: #e2e8f0; padding: 10px 18px; border-radius: 8px; font-size: 10px; max-width: 260px; line-height: 1.5; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+  @media print { .no-print { display: none !important; } }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">Save as PDF / Print</button>
+<div class="print-hint no-print">Set margins to <strong>None</strong> and enable <strong>Background graphics</strong> for best results.</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 1: COVER
+     ═══════════════════════════════════════════════════════════ -->
+<div class="cover-page">
+  <div class="cover-badge">Business &amp; Product Report</div>
+  <h1>BonApp<br>Finance Pro</h1>
+  <div class="cover-line"></div>
+  <p class="cover-sub">The financial management platform purpose-built for Swiss hospitality. Track every franc in and out, automate the books, stay tax compliant, and know if the business is making money — in real time.</p>
+  <div class="cover-meta">BonApp Group &nbsp;·&nbsp; February 2026 &nbsp;·&nbsp; Confidential</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 2: TABLE OF CONTENTS
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page" style="background: linear-gradient(180deg, #f8fafc, #fff 30%); padding-top:36px;">
+  <div style="border-left: 4px solid var(--gold); padding-left: 18px; margin-bottom: 14px;">
+    <h3 style="font-size: 20px; margin: 0 0 4px;">Table of Contents</h3>
+    <p style="margin: 0; color: #94a3b8; font-size: 10px;">20 sections — product overview to market positioning</p>
+  </div>
+
+  <div style="display:grid; gap:0; margin-top: 6px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#4338ca; font-size:12px;">01</span><span style="font-weight:600; color:#1e293b; font-size:11px;">What Is Finance Pro?</span></span><span class="badge badge-blue" style="font-size:8px; padding:2px 7px;">Overview</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9; background:#fafafa;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#059669; font-size:12px;">02</span><span style="font-weight:600; color:#1e293b; font-size:11px;">The Daily Revenue Story</span></span><span class="badge badge-green" style="font-size:8px; padding:2px 7px;">Revenue</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#7c3aed; font-size:12px;">03</span><span style="font-weight:600; color:#1e293b; font-size:11px;">The Expense Story</span></span><span class="badge badge-purple" style="font-size:8px; padding:2px 7px;">Cost Control</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9; background:#fafafa;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#d97706; font-size:12px;">04</span><span style="font-weight:600; color:#1e293b; font-size:11px;">The Invoicing Story</span></span><span class="badge badge-amber" style="font-size:8px; padding:2px 7px;">AR</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#e11d48; font-size:12px;">05</span><span style="font-weight:600; color:#1e293b; font-size:11px;">The Bank Reconciliation Story</span></span><span class="badge badge-red" style="font-size:8px; padding:2px 7px;">Protection</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9; background:#fafafa;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#0284c7; font-size:12px;">06</span><span style="font-weight:600; color:#1e293b; font-size:11px;">The Bookkeeping Story</span></span><span class="badge badge-blue" style="font-size:8px; padding:2px 7px;">Accounting</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#14b8a6; font-size:12px;">07</span><span style="font-weight:600; color:#1e293b; font-size:11px;">Reports That Drive Decisions</span></span><span class="badge" style="background:#ccfbf1; color:#0d9488; font-size:8px; padding:2px 7px;">Intelligence</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9; background:#fafafa;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#334155; font-size:12px;">08</span><span style="font-weight:600; color:#1e293b; font-size:11px;">The Executive Dashboard</span></span><span class="badge badge-gray" style="font-size:8px; padding:2px 7px;">KPIs</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#18181b; font-size:12px;">09</span><span style="font-weight:600; color:#1e293b; font-size:11px;">Who Uses Finance Pro</span></span><span class="badge" style="background:#fafafa; color:#18181b; font-size:8px; padding:2px 7px;">Users</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9; background:#fafafa;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#d97706; font-size:12px;">10</span><span style="font-weight:600; color:#1e293b; font-size:11px;">Day-to-Day Scenarios</span></span><span class="badge badge-amber" style="font-size:8px; padding:2px 7px;">Scenario</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#0284c7; font-size:12px;">11</span><span style="font-weight:600; color:#1e293b; font-size:11px;">Three Ways to Use Finance Pro</span></span><span class="badge badge-blue" style="font-size:8px; padding:2px 7px;">Integration</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9; background:#fafafa;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#14b8a6; font-size:12px;">12</span><span style="font-weight:600; color:#1e293b; font-size:11px;">The Integration API</span></span><span class="badge" style="background:#ccfbf1; color:#0d9488; font-size:8px; padding:2px 7px;">API</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#18181b; font-size:12px;">13</span><span style="font-weight:600; color:#1e293b; font-size:11px;">Data Protection &amp; Compliance</span></span><span class="badge" style="background:#fee2e2; color:#991b1b; font-size:8px; padding:2px 7px;">Security</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9; background:#fafafa;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#e11d48; font-size:12px;">14</span><span style="font-weight:600; color:#1e293b; font-size:11px;">Built for Switzerland</span></span><span class="badge badge-red" style="font-size:8px; padding:2px 7px;">Swiss</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#059669; font-size:12px;">15</span><span style="font-weight:600; color:#1e293b; font-size:11px;">Business Impact &amp; ROI</span></span><span class="badge badge-green" style="font-size:8px; padding:2px 7px;">Value</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9; background:#fafafa;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#d97706; font-size:12px;">16</span><span style="font-weight:600; color:#1e293b; font-size:11px;">Multi-Location Support</span></span><span class="badge badge-amber" style="font-size:8px; padding:2px 7px;">Scale</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#18181b; font-size:12px;">17</span><span style="font-weight:600; color:#1e293b; font-size:11px;">Technical Architecture</span></span><span class="badge" style="background:#fafafa; color:#18181b; font-size:8px; padding:2px 7px;">Tech</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9; background:#fafafa;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#f43f5e; font-size:12px;">18</span><span style="font-weight:600; color:#1e293b; font-size:11px;">Vendor &amp; Customer Management</span></span><span class="badge" style="background:#fef2f2; color:#be123c; font-size:8px; padding:2px 7px;">CRM</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f1f5f9;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#14b8a6; font-size:12px;">19</span><span style="font-weight:600; color:#1e293b; font-size:11px;">Product Roadmap</span></span><span class="badge" style="background:#ccfbf1; color:#0d9488; font-size:8px; padding:2px 7px;">Vision</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px;"><span><span style="display:inline-block; width:24px; font-family:'Playfair Display',serif; font-weight:800; color:#059669; font-size:12px;">20</span><span style="font-weight:600; color:#1e293b; font-size:11px;">Competitive Positioning</span></span><span class="badge badge-green" style="font-size:8px; padding:2px 7px;">Market</span></div>
+  </div>
+
+  <div style="margin-top: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 16px;">
+    <p style="margin: 0; font-size: 10px; color: #64748b; line-height: 1.5;"><strong style="color:#1e293b;">About this report:</strong> Generated from a complete analysis of the Finance Pro codebase — backend (.NET 8 / C# 12, ASP.NET Core, PostgreSQL), frontend (React 18 + TypeScript + Ant Design), and infrastructure. Every feature described is built and production-ready.</p>
+  </div>
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 2 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 3: WHAT IS FINANCE PRO?
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-cool">
+  <div class="sh sh-indigo"><div class="sh-num">01</div><div class="sh-title">What Is Bonapp Finance Pro?</div><div class="sh-sub">The financial backbone of the Bonapp ecosystem</div><div class="sh-line"></div></div>
+
+  <p>Bonapp Finance Pro is a <strong>complete financial management platform</strong> within the Bonapp ecosystem. It sits alongside the Bonapp POS, Inventory Pro, Staff Management, and Customer Pro to give restaurant operators one place to <strong>track every franc</strong> that comes in and goes out.</p>
+
+  <div class="number-hero">
+    <div class="nh-item"><div class="nh-num">6</div><div class="nh-label">Core Modules</div></div>
+    <div class="nh-item"><div class="nh-num">4</div><div class="nh-label">VAT Rates</div></div>
+    <div class="nh-item"><div class="nh-num">30+</div><div class="nh-label">Accounts</div></div>
+    <div class="nh-item"><div class="nh-num">10+</div><div class="nh-label">POS Systems</div></div>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-tile"><div class="ft-icon">💰</div><div class="ft-title">Revenue</div><div class="ft-desc">Daily sales from any POS or manual entry</div></div>
+    <div class="feature-tile"><div class="ft-icon">📊</div><div class="ft-title">Expenses</div><div class="ft-desc">Vendor, category, VAT, receipt photo</div></div>
+    <div class="feature-tile"><div class="ft-icon">📄</div><div class="ft-title">Invoicing</div><div class="ft-desc">Swiss QR-bills, payment tracking</div></div>
+    <div class="feature-tile"><div class="ft-icon">🏦</div><div class="ft-title">Bank Recon</div><div class="ft-desc">Match payouts to bank deposits</div></div>
+    <div class="feature-tile"><div class="ft-icon">📚</div><div class="ft-title">Bookkeeping</div><div class="ft-desc">Swiss double-entry, auto journals</div></div>
+    <div class="feature-tile"><div class="ft-icon">📈</div><div class="ft-title">Reports</div><div class="ft-desc">P&L, VAT, trial balance, dashboard</div></div>
+  </div>
+
+  <div class="pull-quote pq-indigo">"Most restaurant operators have a rough sense of revenue but very little real-time visibility into profitability."<span class="pq-attr">— The Problem Finance Pro Solves</span></div>
+
+  <div class="dark-panel">
+    <h4>Why It's Different</h4>
+    <div class="dp-row"><span class="dp-label">Standalone Product</span><span class="dp-value green">Own DB + Auth</span></div>
+    <div class="dp-row"><span class="dp-label">POS Required?</span><span class="dp-value gold">No — works independently</span></div>
+    <div class="dp-row"><span class="dp-label">Addressable Market</span><span class="dp-value green">Every restaurant</span></div>
+  </div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 3 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 4: THE DAILY REVENUE STORY
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-mint">
+  <div class="sh sh-emerald"><div class="sh-num">02</div><div class="sh-title">The Daily Revenue Story</div><div class="sh-sub">How money flows from the register into the books — automatically, every single day</div><div class="sh-line"></div></div>
+
+  <p>Every day, money flows into a restaurant from multiple sources. Guests pay by cash, card, online, or mobile. Without Finance Pro, pulling it together into "how much did we make today?" is a manual exercise most operators skip until month-end.</p>
+
+  <h3>Four Steps to a Closed Day</h3>
+  <div class="flow">
+    <div class="flow-step success">1. Sales Flow In<br><span style="font-size:9px;font-weight:400;">Auto from POS</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step active">2. Summary Built<br><span style="font-size:9px;font-weight:400;">Gross, net, VAT</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step gold">3. Manager Closes<br><span style="font-size:9px;font-weight:400;">Review & confirm</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step locked">4. Books Updated<br><span style="font-size:9px;font-weight:400;">Journal entries auto</span></div>
+  </div>
+
+  <div class="dark-panel">
+    <h4>Close Day Preview — What the Manager Sees</h4>
+    <div class="dp-row"><span class="dp-label">Gross Sales</span><span class="dp-value gold">CHF 4,820</span></div>
+    <div class="dp-row"><span class="dp-label">Cash Received</span><span class="dp-value">CHF 1,200</span></div>
+    <div class="dp-row"><span class="dp-label">Card Received</span><span class="dp-value">CHF 3,620</span></div>
+    <div class="dp-row"><span class="dp-label">Tips</span><span class="dp-value green">CHF 285</span></div>
+    <div class="dp-row"><span class="dp-label">VAT (8.1% + 3.8% + 2.6%)</span><span class="dp-value">CHF 182.36</span></div>
+    <div class="dp-row"><span class="dp-label">Status</span><span class="dp-value green">Ready to Close</span></div>
+  </div>
+
+  <h3>Why This Matters</h3>
+  <div class="metric-strip">
+    <div class="ms-item ms-green"><div class="ms-num">45s</div><div class="ms-label">To Close Day</div></div>
+    <div class="ms-item ms-gold"><div class="ms-num">0</div><div class="ms-label">Manual Entry</div></div>
+    <div class="ms-item ms-blue"><div class="ms-num">100%</div><div class="ms-label">Auto-Booked</div></div>
+    <div class="ms-item ms-purple"><div class="ms-num">Locked</div><div class="ms-label">After Close</div></div>
+  </div>
+
+  <ul class="icon-list check">
+    <li>The owner knows exactly how much the restaurant made today — not next month</li>
+    <li>Accounting happens automatically — no manual entry, no spreadsheet, no human error</li>
+    <li>The day is locked after closing — figures can't be quietly changed after the fact</li>
+    <li>The accountant receives clean, standard double-entry bookkeeping immediately</li>
+  </ul>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 4 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 5: THE EXPENSE STORY
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-violet">
+  <div class="sh sh-violet"><div class="sh-num">03</div><div class="sh-title">The Expense Story</div><div class="sh-sub">Tracking every franc that goes out — from food deliveries to rent to credit card fees</div><div class="sh-line"></div></div>
+
+  <p>Running a restaurant means spending money every day. Food deliveries, bread, wine, rent, utility bills, insurance, marketing, equipment, credit card processing fees. Without a system, expenses live in a shoebox of receipts and a vague memory.</p>
+
+  <div class="pull-quote pq-rose">"At month-end, the bookkeeper spends hours sorting receipts, matching PDFs, and trying to reconstruct what was spent and when."<span class="pq-attr">— The problem Finance Pro eliminates</span></div>
+
+  <div class="dark-panel">
+    <h4>Live Expense Example — Fish Delivery</h4>
+    <div class="dp-row"><span class="dp-label">Vendor</span><span class="dp-value">Fischhandel Meyer AG</span></div>
+    <div class="dp-row"><span class="dp-label">Gross Amount</span><span class="dp-value gold">CHF 850.00</span></div>
+    <div class="dp-row"><span class="dp-label">VAT Rate</span><span class="dp-value">2.6% Reduced</span></div>
+    <div class="dp-row"><span class="dp-label">Net Amount</span><span class="dp-value">CHF 828.43</span></div>
+    <div class="dp-row"><span class="dp-label">Input VAT</span><span class="dp-value green">CHF 21.57</span></div>
+    <div class="dp-row"><span class="dp-label">Category → Account</span><span class="dp-value">Materials → 4000</span></div>
+  </div>
+
+  <h3>Cost Breakdown by Category</h3>
+  <div class="progress-row"><div class="progress-header"><span>Materials (Food, Beverage, Supplies)</span><span style="color:#b45309;">35%</span></div><div class="progress-track"><div class="progress-fill pf-gold" style="width:35%;"></div></div></div>
+  <div class="progress-row"><div class="progress-header"><span>Personnel (Wages, Social Security)</span><span style="color:#4338ca;">28%</span></div><div class="progress-track"><div class="progress-fill pf-indigo" style="width:28%;"></div></div></div>
+  <div class="progress-row"><div class="progress-header"><span>Rent & Utilities</span><span style="color:#0284c7;">12%</span></div><div class="progress-track"><div class="progress-fill pf-sky" style="width:12%;"></div></div></div>
+  <div class="progress-row"><div class="progress-header"><span>Operating & Other</span><span style="color:#0d9488;">8%</span></div><div class="progress-track"><div class="progress-fill pf-teal" style="width:8%;"></div></div></div>
+
+  <div class="two-col">
+    <div class="glass-card"><p style="margin:0; font-size:11px;"><strong>📸 Digital receipts:</strong> Snap a photo of the delivery invoice, upload the PDF bill, or scan the receipt. Stored securely and linked permanently. No more lost receipts.</p></div>
+    <div class="glass-card"><p style="margin:0; font-size:11px;"><strong>🔄 Auto-booking:</strong> Every expense creates journal entries automatically. Expense account debited, input VAT debited, AP credited. Appears in P&L instantly.</p></div>
+  </div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 5 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 6: THE INVOICING STORY
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-warm">
+  <div class="sh sh-amber"><div class="sh-num">04</div><div class="sh-title">The Invoicing Story</div><div class="sh-sub">Billing corporate clients professionally with Swiss QR-invoices and automatic payment tracking</div><div class="sh-line"></div></div>
+
+  <p>Not all revenue comes from walk-in guests. Corporate catering, event hosting, private dining — these customers receive an invoice and pay within 30 days. Every invoice includes <strong>QR-IBAN and QR-Reference</strong> — the Swiss standard payment format.</p>
+
+  <h3>Invoice Lifecycle</h3>
+  <div class="flow">
+    <div class="flow-step">Create<br><span style="font-size:9px;font-weight:400;">Line items + VAT</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step gold">QR-Bill Sent<br><span style="font-size:9px;font-weight:400;">Swiss standard</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step active">Track Payments<br><span style="font-size:9px;font-weight:400;">Partial / full</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step danger">Overdue Flags<br><span style="font-size:9px;font-weight:400;">Auto-detected</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step locked">Books Updated<br><span style="font-size:9px;font-weight:400;">AR ↔ Revenue</span></div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3 style="margin-top:6px;">Invoice Status Tracking</h3>
+      <table class="tbl-amber">
+        <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-gray">Draft</span></td><td>Being prepared, not yet sent</td></tr>
+          <tr><td><span class="badge badge-blue">Sent</span></td><td>Delivered, awaiting payment</td></tr>
+          <tr><td><span class="badge badge-amber">Partial</span></td><td>Some payment received</td></tr>
+          <tr><td><span class="badge badge-green">Paid</span></td><td>Fully settled</td></tr>
+          <tr><td><span class="badge badge-red">Overdue</span></td><td>Past due date</td></tr>
+          <tr><td><span class="badge badge-gray">Cancelled</span></td><td>Voided by the restaurant</td></tr>
+          <tr><td><span class="badge badge-gray">Written Off</span></td><td>Deemed uncollectable</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="dark-panel" style="margin-top:24px;">
+      <h4>Sample QR-Invoice</h4>
+      <div class="dp-row"><span class="dp-label">Customer</span><span class="dp-value">Adler Legal AG</span></div>
+      <div class="dp-row"><span class="dp-label">Event</span><span class="dp-value">Corporate Dinner</span></div>
+      <div class="dp-row"><span class="dp-label">35 guests × CHF 95</span><span class="dp-value gold">CHF 3,325</span></div>
+      <div class="dp-row"><span class="dp-label">Wine Package</span><span class="dp-value">CHF 680</span></div>
+      <div class="dp-row"><span class="dp-label">Total</span><span class="dp-value gold">CHF 4,005</span></div>
+      <div class="dp-row"><span class="dp-label">QR-Reference</span><span class="dp-value" style="font-size:9px;">RF18 5390 0754 7034</span></div>
+      <div class="dp-row"><span class="dp-label">Status</span><span class="dp-value green">Sent → Awaiting</span></div>
+    </div>
+  </div>
+
+  <div class="highlight-box" style="background: linear-gradient(135deg, #78350f, #d97706);">
+    <p style="font-size:11px; margin:0;"><strong>Swiss QR-Invoices:</strong> QR-IBAN and QR-Reference are mandatory for Swiss invoicing. Finance Pro generates compliant QR-bills automatically for every invoice — no third-party tools needed.</p>
+  </div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 6 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 7: BANK RECONCILIATION
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-blush">
+  <div class="sh sh-coral"><div class="sh-num">05</div><div class="sh-title">The Bank Reconciliation Story</div><div class="sh-sub">The problem most restaurant operators don't even know they have</div><div class="sh-line"></div></div>
+
+  <div class="number-hero">
+    <div class="nh-item" style="background:linear-gradient(135deg, #881337, #e11d48);"><div class="nh-num">CHF 100</div><div class="nh-label">Guest Pays</div></div>
+    <div class="nh-item" style="background:linear-gradient(135deg, #78350f, #d97706);"><div class="nh-num">1.5-3%</div><div class="nh-label">Processor Fee</div></div>
+    <div class="nh-item" style="background:linear-gradient(135deg, #0c4a6e, #0284c7);"><div class="nh-num">2-5 days</div><div class="nh-label">Deposit Delay</div></div>
+    <div class="nh-item" style="background:linear-gradient(135deg, #064e3b, #059669);"><div class="nh-num">CHF 3K+</div><div class="nh-label">Lost / Year</div></div>
+  </div>
+
+  <p>The payment processor (Stripe, Worldline, Wallee) collects the payment, deducts fees, batches the rest, and deposits days later. A missing CHF 200 here, an incorrect fee there — across a year, <strong>thousands of francs</strong>.</p>
+
+  <h3>How Finance Pro Catches Missing Money</h3>
+  <div class="flow">
+    <div class="flow-step danger">Track Payouts<br><span style="font-size:9px;font-weight:400;">Expected amounts</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step gold">Import Bank<br><span style="font-size:9px;font-weight:400;">CSV statement</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step active">Auto-Match<br><span style="font-size:9px;font-weight:400;">3 methods</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step danger">Flag Gaps<br><span style="font-size:9px;font-weight:400;">Missing amounts</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step success">Recon Rate<br><span style="font-size:9px;font-weight:400;">Target: 95%+</span></div>
+  </div>
+
+  <h3>Three Matching Methods</h3>
+  <div class="three-col">
+    <div class="glass-card" style="border-bottom:3px solid #10b981; text-align:center;"><div style="font-size:22px; margin-bottom:4px;">✅</div><h4 style="color:#059669; margin-top:0;">Exact Match</h4><p style="font-size:10px; margin:0;">Amount and date match perfectly. <strong>Automatically reconciled.</strong></p></div>
+    <div class="glass-card" style="border-bottom:3px solid #f59e0b; text-align:center;"><div style="font-size:22px; margin-bottom:4px;">🔍</div><h4 style="color:#d97706; margin-top:0;">Probable Match</h4><p style="font-size:10px; margin:0;">Close but not exact. System assigns a <strong>confidence score</strong>.</p></div>
+    <div class="glass-card" style="border-bottom:3px solid #ef4444; text-align:center;"><div style="font-size:22px; margin-bottom:4px;">👤</div><h4 style="color:#dc2626; margin-top:0;">Manual Match</h4><p style="font-size:10px; margin:0;">Can't match automatically. <strong>User reviews and confirms.</strong></p></div>
+  </div>
+
+  <div class="highlight-box" style="background: linear-gradient(135deg, #881337, #e11d48);">
+    <p style="font-size:11px; margin:0;"><strong>Revenue protection:</strong> Without reconciliation, restaurants lose CHF 3,000+ per year in undetected missing payments from processors. Finance Pro surfaces these within days, not months.</p>
+  </div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 7 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 8: BOOKKEEPING
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="sh sh-sky"><div class="sh-num">06</div><div class="sh-title">The Bookkeeping Story</div><div class="sh-sub">Swiss double-entry accounting — happening automatically in the background</div><div class="sh-line"></div></div>
+
+  <p>Behind everything Finance Pro does, there is a proper <strong>double-entry accounting system</strong> — the same standard used by every professional accountant.</p>
+
+  <div class="two-col">
+    <div>
+      <h3 style="margin-top:4px;">Kontenrahmen KMU</h3>
+      <table class="tbl-sky" style="font-size:10px;">
+        <thead><tr><th>Acct</th><th>Name</th><th>Type</th></tr></thead>
+        <tbody>
+          <tr><td><strong>1000</strong></td><td>Kasse / Cash</td><td><span class="badge badge-blue" style="font-size:8px; padding:1px 6px;">Asset</span></td></tr>
+          <tr><td><strong>1020</strong></td><td>Bank Account</td><td><span class="badge badge-blue" style="font-size:8px; padding:1px 6px;">Asset</span></td></tr>
+          <tr><td><strong>1100</strong></td><td>Debitoren / AR</td><td><span class="badge badge-blue" style="font-size:8px; padding:1px 6px;">Asset</span></td></tr>
+          <tr><td><strong>1150</strong></td><td>Settlement Receivables</td><td><span class="badge badge-blue" style="font-size:8px; padding:1px 6px;">Asset</span></td></tr>
+          <tr><td><strong>1170</strong></td><td>Vorsteuer / Input VAT</td><td><span class="badge badge-blue" style="font-size:8px; padding:1px 6px;">Asset</span></td></tr>
+          <tr><td><strong>2000</strong></td><td>Kreditoren / AP</td><td><span class="badge badge-red" style="font-size:8px; padding:1px 6px;">Liability</span></td></tr>
+          <tr><td><strong>2200</strong></td><td>MwSt-Schuld / VAT</td><td><span class="badge badge-red" style="font-size:8px; padding:1px 6px;">Liability</span></td></tr>
+          <tr><td><strong>3000</strong></td><td>Warenertrag / Revenue</td><td><span class="badge badge-green" style="font-size:8px; padding:1px 6px;">Revenue</span></td></tr>
+          <tr><td><strong>4000</strong></td><td>Materialaufwand</td><td><span class="badge badge-amber" style="font-size:8px; padding:1px 6px;">Expense</span></td></tr>
+          <tr><td><strong>5000</strong></td><td>Lohnaufwand / Wages</td><td><span class="badge badge-amber" style="font-size:8px; padding:1px 6px;">Expense</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3 style="margin-top:4px;">Auto-Generated Journal Entry</h3>
+      <div class="code-block"><span class="hl-gold">// Daily Close — Feb 10, 2026</span>
+<span class="hl-gold">// Revenue: CHF 4,820</span>
+
+<span class="hl-teal">DEBIT</span>  1000 Cash        <span class="hl-blue">CHF 1,200.00</span>
+<span class="hl-teal">DEBIT</span>  1150 Card Recv   <span class="hl-blue">CHF 3,620.00</span>
+<span class="hl-teal">CREDIT</span> 3000 Revenue     <span class="hl-blue">CHF 4,637.64</span>
+<span class="hl-teal">CREDIT</span> 2200 VAT (3.8%)  <span class="hl-blue">CHF   182.36</span>
+
+<span class="hl-gold">// Balance: 4,820 = 4,820 ✓</span>
+<span class="hl-gold">// Status: Posted | Locked</span></div>
+      <div class="flow" style="margin-top:8px;">
+        <div class="flow-step" style="flex:1;">Draft</div><div class="flow-arrow">→</div>
+        <div class="flow-step active" style="flex:1;">Posted</div><div class="flow-arrow">→</div>
+        <div class="flow-step locked" style="flex:1;">Locked</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p style="font-size:11px; margin:0;"><strong>How It Works:</strong> Every financial event creates a journal entry. Total debits must equal total credits. Entries progress through <strong>Draft → Posted → Voided</strong>. The accountant finds clean, standard bookkeeping ready for review at any time.</p>
+  </div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 8 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 9: REPORTS
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-slate">
+  <div class="sh sh-teal"><div class="sh-num">07</div><div class="sh-title">Reports That Drive Decisions</div><div class="sh-sub">P&L with hospitality-specific prime cost tracking and Swiss multi-rate VAT reporting</div><div class="sh-line"></div></div>
+
+  <h3>Profit &amp; Loss (P&L) Report</h3>
+  <p>The single most important financial report. It answers: <em>"Did we make money, and where did it go?"</em></p>
+
+  <div class="progress-row"><div class="progress-header"><span>Revenue (100%)</span><span style="color:#059669">CHF 62,000</span></div><div class="progress-track"><div class="progress-fill pf-green" style="width:100%;"></div></div></div>
+  <div class="progress-row"><div class="progress-header"><span>COGS — 31% of revenue</span><span style="color:#b45309">CHF 19,200</span></div><div class="progress-track"><div class="progress-fill pf-gold" style="width:31%;"></div></div></div>
+  <div class="progress-row"><div class="progress-header"><span>Labor — 28% of revenue</span><span style="color:#4338ca">CHF 17,400</span></div><div class="progress-track"><div class="progress-fill pf-indigo" style="width:28%;"></div></div></div>
+  <div class="progress-row"><div class="progress-header"><span style="font-weight:800; color:#1e293b;">Prime Cost — COGS + Labor (59%)</span><span style="color:#059669; font-weight:800;">Below 65% ✓</span></div><div class="progress-track"><div class="progress-fill pf-green" style="width:59%;"></div></div></div>
+  <div class="progress-row"><div class="progress-header"><span>Operating Expenses — 21%</span><span style="color:#0284c7">CHF 13,020</span></div><div class="progress-track"><div class="progress-fill pf-sky" style="width:21%;"></div></div></div>
+  <div class="progress-row"><div class="progress-header"><span style="font-weight:800;">Net Profit — 10%</span><span style="color:#059669; font-weight:800;">CHF 6,200</span></div><div class="progress-track"><div class="progress-fill pf-teal" style="width:10%;"></div></div></div>
+
+  <h3>Swiss VAT Report — 30 Seconds</h3>
+  <div class="metric-strip">
+    <div class="ms-item ms-gold"><div class="ms-num">8.1%</div><div class="ms-label">Standard</div></div>
+    <div class="ms-item ms-green"><div class="ms-num">3.8%</div><div class="ms-label">Hospitality</div></div>
+    <div class="ms-item ms-blue"><div class="ms-num">2.6%</div><div class="ms-label">Reduced</div></div>
+    <div class="ms-item"><div class="ms-num">0%</div><div class="ms-label">Exempt</div></div>
+  </div>
+
+  <div class="dark-panel">
+    <h4>Q1 VAT Summary — Generated in 30 Seconds</h4>
+    <div class="dp-row"><span class="dp-label">Output VAT Collected</span><span class="dp-value gold">CHF 8,445</span></div>
+    <div class="dp-row"><span class="dp-label">Input VAT Paid</span><span class="dp-value">CHF 2,880</span></div>
+    <div class="dp-row"><span class="dp-label">Net VAT Payable to ESTV</span><span class="dp-value red">CHF 5,565</span></div>
+  </div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 9 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 10: EXECUTIVE DASHBOARD
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page" style="background:#0f172a !important; color:#e2e8f0;">
+  <div class="sh sh-dark"><div class="sh-num">08</div><div class="sh-title">The Executive Dashboard</div><div class="sh-sub">What the owner checks first thing every morning — vital signs on one screen</div><div class="sh-line"></div></div>
+
+  <p style="color:#94a3b8;">The dashboard is the <strong style="color:#fff;">first screen</strong> every owner sees — a real-time command center showing the financial health of the restaurant at a glance.</p>
+
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0;">
+    <div style="background:linear-gradient(135deg, #312e81, #4338ca); border-radius:10px; padding:14px 10px; text-align:center;"><div style="font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:#fff;">CHF 6,155</div><div style="font-size:8px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; margin-top:2px;">Today's Revenue</div></div>
+    <div style="background:linear-gradient(135deg, #064e3b, #059669); border-radius:10px; padding:14px 10px; text-align:center;"><div style="font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:#fff;">59%</div><div style="font-size:8px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; margin-top:2px;">Prime Cost</div></div>
+    <div style="background:linear-gradient(135deg, #0c4a6e, #0284c7); border-radius:10px; padding:14px 10px; text-align:center;"><div style="font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:#fff;">98%</div><div style="font-size:8px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; margin-top:2px;">Recon Rate</div></div>
+    <div style="background:linear-gradient(135deg, #78350f, #d97706); border-radius:10px; padding:14px 10px; text-align:center;"><div style="font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:#fff;">10.2%</div><div style="font-size:8px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; margin-top:2px;">Net Margin</div></div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;">
+    <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:14px;">
+      <div style="font-size:9px; color:#64748b; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Revenue KPIs</div>
+      <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155; font-size:11px;"><span style="color:#94a3b8;">Today</span><span style="color:#fff; font-weight:700; font-family:'JetBrains Mono',monospace;">CHF 6,155</span></div>
+      <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155; font-size:11px;"><span style="color:#94a3b8;">This Week</span><span style="color:#fff; font-weight:700; font-family:'JetBrains Mono',monospace;">CHF 28,400</span></div>
+      <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155; font-size:11px;"><span style="color:#94a3b8;">This Month</span><span style="color:#fff; font-weight:700; font-family:'JetBrains Mono',monospace;">CHF 48,200</span></div>
+      <div style="display:flex; justify-content:space-between; padding:5px 0; font-size:11px;"><span style="color:#94a3b8;">60-Day Trend</span><span style="color:#34d399; font-weight:700;">↑ +4.2%</span></div>
+    </div>
+    <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:14px;">
+      <div style="font-size:9px; color:#64748b; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Health Indicators</div>
+      <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155; font-size:11px;"><span style="color:#94a3b8;">Food Cost %</span><span style="color:#34d399; font-weight:700;">31%</span></div>
+      <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155; font-size:11px;"><span style="color:#94a3b8;">Labor Cost %</span><span style="color:#34d399; font-weight:700;">28%</span></div>
+      <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155; font-size:11px;"><span style="color:#94a3b8;">Cash Position</span><span style="color:#E8D5A0; font-weight:700;">CHF 34,200</span></div>
+      <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155; font-size:11px;"><span style="color:#94a3b8;">Outstanding AR</span><span style="color:#fbbf24; font-weight:700;">CHF 8,450</span></div>
+      <div style="display:flex; justify-content:space-between; padding:5px 0; font-size:11px;"><span style="color:#94a3b8;">VAT Liability</span><span style="color:#fb7185; font-weight:700;">CHF 5,565</span></div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;">
+    <div style="background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.05)); border:1px solid rgba(201,168,76,0.3); border-radius:10px; padding:12px 14px;">
+      <p style="margin:0; font-size:11px; color:#E8D5A0;"><strong style="color:#fff;">No manual reports needed.</strong> Open Finance Pro — the numbers are there, updated in real time. Check on your phone before the first coffee.</p>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.05)); border:1px solid rgba(16,185,129,0.3); border-radius:10px; padding:12px 14px;">
+      <p style="margin:0; font-size:11px; color:#86efac;"><strong style="color:#fff;">Charts included:</strong> Revenue trend (60 days), payment method pie chart, daily revenue bars, and prime cost gauge — all auto-updating.</p>
+    </div>
+  </div>
+
+  <div class="page-footer" style="border-top-color:#334155;"><span class="pf-brand" style="color:#64748b;">BonApp Finance Pro</span><span style="color:#64748b;">Page 10 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 11: WHO USES IT
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-slate">
+  <div class="sh sh-slate"><div class="sh-num">09</div><div class="sh-title">Who Uses Finance Pro and How</div><div class="sh-sub">Four distinct user roles with tailored experiences</div><div class="sh-line"></div></div>
+
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:10px 0;">
+    <div style="background:linear-gradient(180deg,#eef2ff,#fff); border:2px solid #c7d2fe; border-radius:14px; padding:14px 10px; text-align:center;">
+      <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#4338ca,#818cf8); margin:0 auto 8px; display:flex; align-items:center; justify-content:center; font-size:18px;">👑</div>
+      <div style="font-family:'Playfair Display',serif; font-size:12px; font-weight:700; color:#312e81;">Owner</div>
+      <p style="font-size:9px; color:#6366f1; font-style:italic; margin:4px 0 8px;">"Am I making money?"</p>
+      <ul class="icon-list arrow" style="text-align:left; font-size:10px;"><li>Morning dashboard</li><li>Weekly P&L</li><li>VAT report</li><li>Multi-location</li></ul>
+    </div>
+    <div style="background:linear-gradient(180deg,#ecfdf5,#fff); border:2px solid #a7f3d0; border-radius:14px; padding:14px 10px; text-align:center;">
+      <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#059669,#34d399); margin:0 auto 8px; display:flex; align-items:center; justify-content:center; font-size:18px;">📋</div>
+      <div style="font-family:'Playfair Display',serif; font-size:12px; font-weight:700; color:#064e3b;">Manager</div>
+      <p style="font-size:9px; color:#059669; font-style:italic; margin:4px 0 8px;">"Close the day"</p>
+      <ul class="icon-list arrow" style="text-align:left; font-size:10px;"><li>Close day (60s)</li><li>Record expenses</li><li>Create invoices</li><li>Import bank</li></ul>
+    </div>
+    <div style="background:linear-gradient(180deg,#f5f3ff,#fff); border:2px solid #ddd6fe; border-radius:14px; padding:14px 10px; text-align:center;">
+      <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#7c3aed,#a78bfa); margin:0 auto 8px; display:flex; align-items:center; justify-content:center; font-size:18px;">🧮</div>
+      <div style="font-family:'Playfair Display',serif; font-size:12px; font-weight:700; color:#4c1d95;">Accountant</div>
+      <p style="font-size:9px; color:#7c3aed; font-style:italic; margin:4px 0 8px;">"Clean books"</p>
+      <ul class="icon-list arrow" style="text-align:left; font-size:10px;"><li>Journal review</li><li>Trial balance</li><li>Fiscal close</li><li>Tax filing</li></ul>
+    </div>
+    <div style="background:linear-gradient(180deg,#fffbeb,#fff); border:2px solid #fde68a; border-radius:14px; padding:14px 10px; text-align:center;">
+      <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#d97706,#fbbf24); margin:0 auto 8px; display:flex; align-items:center; justify-content:center; font-size:18px;">🧑‍🍳</div>
+      <div style="font-family:'Playfair Display',serif; font-size:12px; font-weight:700; color:#78350f;">Staff</div>
+      <p style="font-size:9px; color:#d97706; font-style:italic; margin:4px 0 8px;">"Log delivery"</p>
+      <ul class="icon-list arrow" style="text-align:left; font-size:10px;"><li>Record expense</li><li>Snap receipt</li><li>Limited view</li><li>Basic reports</li></ul>
+    </div>
+  </div>
+
+  <h3>Role Permission Matrix</h3>
+  <table>
+    <thead><tr><th>Module</th><th style="text-align:center;">Owner</th><th style="text-align:center;">Manager</th><th style="text-align:center;">Accountant</th><th style="text-align:center;">Staff</th></tr></thead>
+    <tbody>
+      <tr><td>Dashboard & KPIs</td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-blue">Read</span></td><td style="text-align:center;"><span class="badge badge-gray">—</span></td></tr>
+      <tr><td>Daily Close</td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-blue">Read</span></td><td style="text-align:center;"><span class="badge badge-gray">—</span></td></tr>
+      <tr><td>Expenses</td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-blue">Read</span></td><td style="text-align:center;"><span class="badge badge-amber">Add</span></td></tr>
+      <tr><td>Invoicing</td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-blue">Read</span></td><td style="text-align:center;"><span class="badge badge-gray">—</span></td></tr>
+      <tr><td>Bookkeeping</td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-blue">Read</span></td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-gray">—</span></td></tr>
+      <tr><td>Settings & Config</td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-gray">—</span></td><td style="text-align:center;"><span class="badge badge-gray">—</span></td><td style="text-align:center;"><span class="badge badge-gray">—</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 11 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 12: SCENARIOS
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="sh sh-gold"><div class="sh-num">10</div><div class="sh-title">Day-to-Day Business Scenarios</div><div class="sh-sub">Five scenarios showing Finance Pro in action in a real restaurant</div><div class="sh-line"></div></div>
+
+  <h3>Scenario 1: A Typical Day Close — 11:30 PM</h3>
+  <p>The last guest has left. The manager opens Finance Pro on the tablet.</p>
+  <div class="stats-grid">
+    <div class="stat-card st-gold"><div class="stat-num">6,240</div><div class="stat-label">Gross Sales</div></div>
+    <div class="stat-card st-emerald"><div class="stat-num">6,155</div><div class="stat-label">Net Sales</div></div>
+    <div class="stat-card st-indigo"><div class="stat-num">142</div><div class="stat-label">Guests</div></div>
+    <div class="stat-card st-amber"><div class="stat-num">62.80</div><div class="stat-label">Avg Check</div></div>
+  </div>
+  <p>The manager taps "Close Day." Journal entries proposed. One confirmation. <strong>Total time: 45 seconds.</strong></p>
+
+  <div class="sep"></div>
+
+  <h3>Scenario 2: Finding a Missing Payment</h3>
+  <p>Reconciliation rate shows <strong style="color:#dc2626">92%</strong> instead of 97%. Worldline has CHF 2,840 "Pending." Owner contacts Worldline — system delay. Monday: deposit arrives, rate returns to <strong>98%</strong>. Without Finance Pro, that CHF 2,840 might have been lost forever.</p>
+
+  <div class="sep"></div>
+
+  <h3>Scenario 3: Quarterly VAT Filing</h3>
+  <p>The accountant generates the Q1 VAT report — what used to take days is now a <strong>30-minute task</strong>:</p>
+  <table class="tbl-gold">
+    <thead><tr><th>Component</th><th>Amount</th></tr></thead>
+    <tbody>
+      <tr><td>Output VAT (3.8% + 8.1% + 2.6%)</td><td><strong>CHF 8,445</strong></td></tr>
+      <tr><td>Total Input VAT</td><td>CHF 2,880</td></tr>
+      <tr><td style="background:#fef3c7;"><strong>Net VAT Payable</strong></td><td><strong style="font-size:13px">CHF 5,565</strong></td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 12 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 13: SCENARIOS CONTINUED
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-blush">
+  <div class="sh sh-rose"><div class="sh-num">10</div><div class="sh-title">Scenarios 4 &amp; 5</div><div class="sh-sub">Real-world usage continued — profitability investigation and catering invoicing</div><div class="sh-line"></div></div>
+
+  <h3>Scenario 4: Profitability Drop Investigation</h3>
+  <p>The owner generates a P&L for February and compares it to January:</p>
+
+  <div class="two-col">
+    <div>
+      <table class="tbl-rose">
+        <thead><tr><th></th><th>Jan</th><th>Feb</th><th>Δ</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Revenue</strong></td><td>CHF 62K</td><td>CHF 58K</td><td style="color:#dc2626">-6.5%</td></tr>
+          <tr><td><strong>COGS</strong></td><td>31%</td><td>35%</td><td style="color:#dc2626">+4pts</td></tr>
+          <tr><td><strong>Labor</strong></td><td>28%</td><td>31.4%</td><td style="color:#dc2626">+3.4pts</td></tr>
+          <tr><td style="background:#fef2f2;"><strong>Prime Cost</strong></td><td>59%</td><td><strong style="color:#dc2626">66.4%</strong></td><td style="color:#dc2626">65%!</td></tr>
+          <tr><td><strong>Net Profit</strong></td><td>10%</td><td>4.1%</td><td style="color:#dc2626">-3,800</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div style="font-size:10px; color:#64748b; margin-bottom:6px;">Prime Cost Comparison</div>
+      <div class="progress-row"><div class="progress-header"><span>January — 59%</span><span style="color:#059669;">Safe</span></div><div class="progress-track"><div class="progress-fill pf-green" style="width:59%;"></div></div></div>
+      <div class="progress-row"><div class="progress-header"><span>February — 66.4%</span><span style="color:#dc2626;">Danger!</span></div><div class="progress-track"><div class="progress-fill pf-red" style="width:66.4%;"></div></div></div>
+      <p style="font-size:10px; margin-top:8px;">The owner adjusts food ordering, reviews menu pricing, and optimises staff scheduling.</p>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <h3>Scenario 5: The Catering Invoice</h3>
+  <div class="dark-panel">
+    <h4>Invoice #INV-2026-048 — Adler Legal AG</h4>
+    <div class="dp-row"><span class="dp-label">35 guests × CHF 95 (set menu)</span><span class="dp-value gold">CHF 3,325</span></div>
+    <div class="dp-row"><span class="dp-label">Wine package</span><span class="dp-value">CHF 680</span></div>
+    <div class="dp-row"><span class="dp-label">Total</span><span class="dp-value gold">CHF 4,005</span></div>
+    <div class="dp-row"><span class="dp-label">Status (2 weeks later)</span><span class="dp-value green">Paid ✓</span></div>
+  </div>
+
+  <div class="pull-quote pq-gold">"Finance Pro turns scattered, delayed, invisible data into structured, real-time, actionable intelligence."<span class="pq-attr">— Daily close: 45s | Missing payments: days | VAT filing: 30 min</span></div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 13 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 14: THREE WAYS TO USE FINANCE PRO
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-cool">
+  <div class="sh sh-sky"><div class="sh-num">11</div><div class="sh-title">Three Ways to Use Finance Pro</div><div class="sh-sub">Standalone, connected to any POS, or fully integrated with Bonapp POS</div><div class="sh-line"></div></div>
+
+  <p>Built as an <strong>independent product</strong> with its own database and authentication. No POS system required. Three operating modes serve different customer segments:</p>
+
+  <div class="compare-grid">
+    <div class="compare-card mode-a"><div class="cc-icon">🏠</div><div class="cc-title">Standalone</div><div class="cc-sub">No POS needed. Full engine.</div><p style="font-size:9.5px; color:#166534; margin:8px 0 0;"><strong>For:</strong> ALL restaurants</p></div>
+    <div class="compare-card mode-b"><div class="cc-icon">🔌</div><div class="cc-title">Connected POS</div><div class="cc-sub">Lightspeed, Toast, Square.</div><p style="font-size:9.5px; color:#1e40af; margin:8px 0 0;"><strong>For:</strong> Existing POS users</p></div>
+    <div class="compare-card mode-c"><div class="cc-icon">⚡</div><div class="cc-title">Bonapp POS</div><div class="cc-sub">Seamless native integration.</div><p style="font-size:9.5px; color:#5b21b6; margin:8px 0 0;"><strong>For:</strong> BonApp ecosystem</p></div>
+  </div>
+
+  <table class="tbl-sky">
+    <thead><tr><th>Capability</th><th style="text-align:center;">Standalone</th><th style="text-align:center;">Connected</th><th style="text-align:center;">Bonapp</th></tr></thead>
+    <tbody>
+      <tr><td>Daily sales tracking</td><td style="text-align:center;"><span class="badge badge-amber">Manual</span></td><td style="text-align:center;"><span class="badge badge-green">Auto</span></td><td style="text-align:center;"><span class="badge badge-green">Auto</span></td></tr>
+      <tr><td>Per-transaction detail</td><td style="text-align:center;"><span class="badge badge-red">Totals</span></td><td style="text-align:center;"><span class="badge badge-green">Every tx</span></td><td style="text-align:center;"><span class="badge badge-green">Every tx</span></td></tr>
+      <tr><td>Expense management</td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-green">Full</span></td></tr>
+      <tr><td>Invoicing &amp; QR-Bills</td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-green">Full</span></td></tr>
+      <tr><td>Bookkeeping / P&L / VAT</td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-green">Full</span></td><td style="text-align:center;"><span class="badge badge-green">Full</span></td></tr>
+      <tr><td>One-click integration</td><td style="text-align:center;">—</td><td style="text-align:center;">—</td><td style="text-align:center;"><span class="badge badge-green">✓</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="funnel">
+    <div class="funnel-step">Discover Finance Pro (Standalone) — Every Restaurant<div class="funnel-label">Addressable market: 10–50× larger</div></div>
+    <div class="funnel-step">Love it → Connect existing POS<div class="funnel-label">Deeper automation, per-transaction detail</div></div>
+    <div class="funnel-step">Explore BonApp POS<div class="funnel-label">Seamless one-click integration</div></div>
+    <div class="funnel-step">Full Ecosystem Customer<div class="funnel-label">POS + Finance + Inventory + Staff + CRM</div></div>
+  </div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 14 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 15: INTEGRATION API
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-mint">
+  <div class="sh sh-teal"><div class="sh-num">12</div><div class="sh-title">The Integration API</div><div class="sh-sub">How POS systems connect to Finance Pro — what data flows and how it's secured</div><div class="sh-line"></div></div>
+
+  <h3>Connection Setup</h3>
+  <div class="flow">
+    <div class="flow-step success">1. Create Source<br><span style="font-size:9px;font-weight:400;">Name, type, config</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step gold">2. Get API Key<br><span style="font-size:9px;font-weight:400;">Auto-generated</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step active">3. Configure POS<br><span style="font-size:9px;font-weight:400;">Point to endpoint</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step locked">4. Data Flows<br><span style="font-size:9px;font-weight:400;">Automatic</span></div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3 style="margin-top:4px;">Transaction Data</h3>
+      <div class="code-block"><span class="hl-gold">POST</span> <span class="hl-blue">/api/payments</span>
+{
+  <span class="hl-teal">"externalId"</span>: "POS-4821",
+  <span class="hl-teal">"amount"</span>: <span class="hl-blue">95.00</span>,
+  <span class="hl-teal">"tips"</span>: <span class="hl-blue">8.50</span>,
+  <span class="hl-teal">"vatRate"</span>: <span class="hl-blue">3.8</span>,
+  <span class="hl-teal">"method"</span>: "Card",
+  <span class="hl-teal">"eventType"</span>: "Capture",
+  <span class="hl-teal">"date"</span>: "2026-02-10"
+}</div>
+    </div>
+    <div>
+      <h3 style="margin-top:4px;">Security &amp; Isolation</h3>
+      <div class="glass-card" style="border-left:3px solid var(--teal); margin-bottom:8px;"><div style="font-size:10px; font-weight:700; color:#0d9488; margin-bottom:2px;">Per-Source API Key</div><p style="font-size:10px; margin:0;">Each source has its own key. If compromised, others unaffected.</p></div>
+      <div class="glass-card" style="border-left:3px solid var(--indigo); margin-bottom:8px;"><div style="font-size:10px; font-weight:700; color:#4338ca; margin-bottom:2px;">Organization-Bound</div><p style="font-size:10px; margin:0;">Data can never flow between restaurants.</p></div>
+      <div class="glass-card" style="border-left:3px solid var(--gold);"><div style="font-size:10px; font-weight:700; color:#b45309; margin-bottom:2px;">Deactivation + Audit</div><p style="font-size:10px; margin:0;">Cut off data flow instantly. Every payment logged.</p></div>
+    </div>
+  </div>
+
+  <div class="highlight-box" style="background:linear-gradient(135deg, #134e4a, #14b8a6);">
+    <p style="font-size:11px; margin:0;"><strong>Supported:</strong> Lightspeed, Toast, Square, Orderbird, Stripe, Worldline, Wallee, CSV Import, and any system via generic API. Multiple sources active simultaneously.</p>
+  </div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 15 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 16: DATA PROTECTION & COMPLIANCE
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page" style="background:#0f172a !important; color:#e2e8f0;">
+  <div class="sh sh-dark"><div class="sh-num">13</div><div class="sh-title">Data Protection &amp; Compliance</div><div class="sh-sub">Audit trails, fiscal periods, and data isolation — ready for any tax review</div><div class="sh-line"></div></div>
+
+  <p style="color:#94a3b8;">Financial data demands the highest level of protection. Finance Pro is built with <strong style="color:#fff;">compliance-first architecture</strong> — every action tracked, every period lockable, every organization isolated.</p>
+
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0;">
+    <div style="background:#1e293b; border:1px solid #334155; border-radius:12px; padding:14px; text-align:center;">
+      <div style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg, #78350f, #d97706); margin:0 auto 8px; display:flex; align-items:center; justify-content:center; font-size:16px;">🔒</div>
+      <div style="font-size:11px; font-weight:700; color:#E8D5A0;">Audit Trail</div>
+      <p style="font-size:9px; color:#94a3b8; margin:4px 0 0;">Every action logged: who, when, what changed, IP address.</p>
+    </div>
+    <div style="background:#1e293b; border:1px solid #334155; border-radius:12px; padding:14px; text-align:center;">
+      <div style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg, #312e81, #4338ca); margin:0 auto 8px; display:flex; align-items:center; justify-content:center; font-size:16px;">📅</div>
+      <div style="font-size:11px; font-weight:700; color:#818cf8;">Fiscal Periods</div>
+      <p style="font-size:9px; color:#94a3b8; margin:4px 0 0;">Once closed: no entries, no modifications. Figures are final.</p>
+    </div>
+    <div style="background:#1e293b; border:1px solid #334155; border-radius:12px; padding:14px; text-align:center;">
+      <div style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg, #064e3b, #059669); margin:0 auto 8px; display:flex; align-items:center; justify-content:center; font-size:16px;">🏢</div>
+      <div style="font-size:11px; font-weight:700; color:#5eead4;">Data Isolation</div>
+      <p style="font-size:9px; color:#94a3b8; margin:4px 0 0;">Multi-tenant at DB level. Zero cross-org leakage.</p>
+    </div>
+  </div>
+
+  <div style="font-size:9px; color:var(--gold); text-transform:uppercase; letter-spacing:1.5px; margin:14px 0 6px;">What Gets Audited</div>
+  <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:12px;">
+    <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#E8D5A0; font-weight:600;">Expense Created</span><span style="color:#94a3b8;">Amount, vendor, category, VAT, user, timestamp</span></div>
+    <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#E8D5A0; font-weight:600;">Day Closed</span><span style="color:#94a3b8;">Revenue totals, journal entries, closing user</span></div>
+    <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#E8D5A0; font-weight:600;">Journal Voided</span><span style="color:#94a3b8;">Original entry, reason, approving user</span></div>
+    <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#E8D5A0; font-weight:600;">Invoice Changed</span><span style="color:#94a3b8;">Previous/new status, payment amounts</span></div>
+    <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#E8D5A0; font-weight:600;">Fiscal Period Closed</span><span style="color:#94a3b8;">Period dates, closing user, entry count</span></div>
+    <div style="display:flex; justify-content:space-between; padding:5px 0; font-size:10px;"><span style="color:#E8D5A0; font-weight:600;">User Login / Logout</span><span style="color:#94a3b8;">IP address, device, timestamp</span></div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:12px 0;">
+    <div style="background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.05)); border:1px solid rgba(201,168,76,0.3); border-radius:10px; padding:12px 14px;">
+      <p style="margin:0; font-size:11px; color:#E8D5A0;"><strong style="color:#fff;">Tax Authority Ready:</strong> When the Swiss tax authority reviews the books, Finance Pro provides audit logs, locked fiscal periods, and balanced double-entry bookkeeping.</p>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(99,102,241,0.05)); border:1px solid rgba(99,102,241,0.3); border-radius:10px; padding:12px 14px;">
+      <p style="margin:0; font-size:11px; color:#c4b5fd;"><strong style="color:#fff;">Immutable Records:</strong> Audit log entries cannot be edited or deleted — even by administrators. Ensures integrity for legal and regulatory compliance.</p>
+    </div>
+  </div>
+
+  <div class="page-footer" style="border-top-color:#334155;"><span class="pf-brand" style="color:#64748b;">BonApp Finance Pro</span><span style="color:#64748b;">Page 16 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 17: BUILT FOR SWITZERLAND
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-blush">
+  <div class="sh sh-coral"><div class="sh-num">14</div><div class="sh-title">Built for Switzerland</div><div class="sh-sub">Every detail designed for the Swiss hospitality market</div><div class="sh-line"></div></div>
+
+  <p>Finance Pro isn't a generic accounting tool adapted for Switzerland. It was <strong>built from the ground up</strong> for the Swiss hospitality market — every default, every format, every regulatory requirement is Swiss-native.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0;">
+    <div class="glass-card" style="border-bottom:3px solid #dc2626;">
+      <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;"><span style="font-size:16px;">🇨🇭</span><span style="font-size:11px; font-weight:700; color:#9f1239;">Currency & Format</span></div>
+      <p style="font-size:10px; margin:0;">CHF by default, de-CH locale (CHF 1'234.56), DD.MM.YYYY dates, Swiss address format.</p>
+    </div>
+    <div class="glass-card" style="border-bottom:3px solid #4338ca;">
+      <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;"><span style="font-size:16px;">📊</span><span style="font-size:11px; font-weight:700; color:#4338ca;">Kontenrahmen KMU</span></div>
+      <p style="font-size:10px; margin:0;">Swiss chart of accounts pre-configured (~30 accounts). Industry-standard numbering.</p>
+    </div>
+    <div class="glass-card" style="border-bottom:3px solid #059669;">
+      <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;"><span style="font-size:16px;">💰</span><span style="font-size:11px; font-weight:700; color:#059669;">4 VAT Rates</span></div>
+      <p style="font-size:10px; margin:0;">8.1% Standard, 3.8% Hospitality, 2.6% Reduced, 0% Exempt — auto-tracked.</p>
+    </div>
+    <div class="glass-card" style="border-bottom:3px solid #d97706;">
+      <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;"><span style="font-size:16px;">📄</span><span style="font-size:11px; font-weight:700; color:#d97706;">QR-Invoicing</span></div>
+      <p style="font-size:10px; margin:0;">QR-IBAN and QR-Reference auto-generated for every invoice. Swiss standard compliance.</p>
+    </div>
+    <div class="glass-card" style="border-bottom:3px solid #7c3aed;">
+      <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;"><span style="font-size:16px;">🏛️</span><span style="font-size:11px; font-weight:700; color:#7c3aed;">Tax Authority</span></div>
+      <p style="font-size:10px; margin:0;">Reports aligned with ESTV/AFC filing requirements. Quarterly VAT report in seconds.</p>
+    </div>
+    <div class="glass-card" style="border-bottom:3px solid #0284c7;">
+      <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;"><span style="font-size:16px;">💳</span><span style="font-size:11px; font-weight:700; color:#0284c7;">Processors</span></div>
+      <p style="font-size:10px; margin:0;">Worldline, Stripe, Wallee — all Swiss-market payment processors supported natively.</p>
+    </div>
+  </div>
+
+  <h3>Quadrilingual Support</h3>
+  <div class="number-hero">
+    <div class="nh-item" style="background:linear-gradient(135deg,#881337,#e11d48);"><div class="nh-num">DE</div><div class="nh-label">Deutsch (Zurich)</div></div>
+    <div class="nh-item" style="background:linear-gradient(135deg,#312e81,#4338ca);"><div class="nh-num">FR</div><div class="nh-label">Français (Geneva)</div></div>
+    <div class="nh-item" style="background:linear-gradient(135deg,#064e3b,#059669);"><div class="nh-num">IT</div><div class="nh-label">Italiano (Lugano)</div></div>
+    <div class="nh-item" style="background:linear-gradient(135deg,#78350f,#d97706);"><div class="nh-num">EN</div><div class="nh-label">English</div></div>
+  </div>
+
+  <div class="highlight-box" style="background: linear-gradient(135deg, #9f1239, #e11d48);">
+    <p style="font-size:11px; margin:0;"><strong>Swiss-Native Advantage:</strong> Bexio offers Swiss accounting but <strong>no POS integration</strong>. Restaurant365 offers restaurant accounting but <strong>no Swiss compliance</strong>. Only Finance Pro delivers both — Swiss-grade financials with native POS connectivity.</p>
+  </div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 17 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 18: BUSINESS IMPACT
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-mint">
+  <div class="sh sh-emerald"><div class="sh-num">15</div><div class="sh-title">Business Impact &amp; ROI</div><div class="sh-sub">Financial visibility, revenue protection, cost control, and massive time savings</div><div class="sh-line"></div></div>
+
+  <div class="number-hero">
+    <div class="nh-item"><div class="nh-num">CHF 3K+</div><div class="nh-label">Revenue Protected</div></div>
+    <div class="nh-item"><div class="nh-num">CHF 12K</div><div class="nh-label">Cost Savings / yr</div></div>
+    <div class="nh-item"><div class="nh-num">100%</div><div class="nh-label">Audit-Ready</div></div>
+  </div>
+
+  <h3>Before vs. After Finance Pro</h3>
+  <div class="ba-grid">
+    <div class="ba-before">
+      <h4 style="color:#dc2626; margin-top:0;">Without Finance Pro</h4>
+      <ul class="icon-list cross">
+        <li>"I think last month was okay"</li>
+        <li>VAT filing is a 2-day panic</li>
+        <li>No idea if Stripe paid correctly</li>
+        <li>Accountant spends 2 days fixing books</li>
+        <li>Revenue is "whatever the register says"</li>
+      </ul>
+    </div>
+    <div class="ba-after">
+      <h4 style="color:#059669; margin-top:0;">With Finance Pro</h4>
+      <ul class="icon-list check">
+        <li>Net profit CHF 6,200 (10%), prime cost tracked</li>
+        <li>VAT report generated in 30 seconds</li>
+        <li>Recon rate 98% — CHF 420 flagged</li>
+        <li>Books are clean when accountant opens them</li>
+        <li>Daily: gross, net, cash, card, tips, guests</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Time Savings</h3>
+  <div class="dark-panel">
+    <div class="dp-row"><span class="dp-label">Daily bookkeeping</span><span><span style="text-decoration:line-through; color:#64748b; font-size:10px;">20-30 min manual</span> → <span class="dp-value green">45 seconds</span></span></div>
+    <div class="dp-row"><span class="dp-label">Monthly P&L</span><span><span style="text-decoration:line-through; color:#64748b; font-size:10px;">4-8 hours</span> → <span class="dp-value green">10 seconds</span></span></div>
+    <div class="dp-row"><span class="dp-label">Quarterly VAT</span><span><span style="text-decoration:line-through; color:#64748b; font-size:10px;">1-2 days</span> → <span class="dp-value green">30 seconds</span></span></div>
+    <div class="dp-row"><span class="dp-label">Bank reconciliation</span><span><span style="text-decoration:line-through; color:#64748b; font-size:10px;">Not done</span> → <span class="dp-value green">Continuous</span></span></div>
+    <div class="dp-row"><span class="dp-label">Year-end prep</span><span><span style="text-decoration:line-through; color:#64748b; font-size:10px;">Weeks</span> → <span class="dp-value green">Already done</span></span></div>
+  </div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 18 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 19: MULTI-LOCATION
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-warm">
+  <div class="sh sh-amber"><div class="sh-num">16</div><div class="sh-title">Multi-Location Support</div><div class="sh-sub">Per-location P&L, unified ownership, and configurable fiscal years for restaurant groups</div><div class="sh-line"></div></div>
+
+  <p>Restaurant groups need <strong>per-location visibility</strong> with <strong>unified control</strong>. Finance Pro supports any number of locations with complete data isolation and consolidated reporting.</p>
+
+  <div class="feature-grid">
+    <div class="feature-tile" style="border-bottom:3px solid #1e293b;"><div class="ft-icon">🏢</div><div class="ft-title">Org Isolation</div><div class="ft-desc">Own books, chart of accounts, vendors, reports</div></div>
+    <div class="feature-tile" style="border-bottom:3px solid var(--teal);"><div class="ft-icon">📍</div><div class="ft-title">Location Tags</div><div class="ft-desc">Per-location P&L and drilling</div></div>
+    <div class="feature-tile" style="border-bottom:3px solid var(--gold);"><div class="ft-icon">📅</div><div class="ft-title">Custom Fiscal</div><div class="ft-desc">Any start month (e.g. April-March)</div></div>
+    <div class="feature-tile" style="border-bottom:3px solid var(--indigo);"><div class="ft-icon">👤</div><div class="ft-title">Unified Owner</div><div class="ft-desc">One login, all locations</div></div>
+    <div class="feature-tile" style="border-bottom:3px solid var(--violet);"><div class="ft-icon">🔀</div><div class="ft-title">Mixed Modes</div><div class="ft-desc">Standalone + POS per location</div></div>
+    <div class="feature-tile" style="border-bottom:3px solid var(--emerald);"><div class="ft-icon">📊</div><div class="ft-title">Unified Reports</div><div class="ft-desc">Consolidated P&L, VAT, revenue</div></div>
+  </div>
+
+  <div class="dark-panel">
+    <h4>Example — 3-Location Restaurant Group</h4>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:8px 0;">
+      <div style="text-align:center; padding:10px; background:rgba(255,255,255,0.05); border-radius:8px;">
+        <div style="font-size:14px; font-weight:800; color:#E8D5A0;">Zurich</div>
+        <div style="font-size:9px; color:#94a3b8;">Bonapp POS</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#34d399; margin-top:4px;">CHF 62K/mo</div>
+      </div>
+      <div style="text-align:center; padding:10px; background:rgba(255,255,255,0.05); border-radius:8px;">
+        <div style="font-size:14px; font-weight:800; color:#7dd3fc;">Geneva</div>
+        <div style="font-size:9px; color:#94a3b8;">Lightspeed API</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#34d399; margin-top:4px;">CHF 48K/mo</div>
+      </div>
+      <div style="text-align:center; padding:10px; background:rgba(255,255,255,0.05); border-radius:8px;">
+        <div style="font-size:14px; font-weight:800; color:#c4b5fd;">Basel</div>
+        <div style="font-size:9px; color:#94a3b8;">Standalone</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#34d399; margin-top:4px;">CHF 35K/mo</div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08);">
+      <div style="font-size:10px; color:#94a3b8;">Consolidated Revenue</div>
+      <div style="font-family:'Playfair Display',serif; font-size:22px; font-weight:900; color:var(--gold-light);">CHF 145K / month</div>
+    </div>
+  </div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 19 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 20: TECHNICAL ARCHITECTURE
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page" style="background:#0f172a !important; color:#e2e8f0;">
+  <div class="sh sh-dark"><div class="sh-num">17</div><div class="sh-title">Technical Architecture</div><div class="sh-sub">Enterprise-grade stack built for reliability, security, and scalability</div><div class="sh-line"></div></div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;">
+    <div>
+      <div style="font-size:9px; color:var(--gold); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px;">Backend Stack</div>
+      <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:12px;">
+        <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#94a3b8;">Runtime</span><span style="color:#7dd3fc; font-family:'JetBrains Mono',monospace; font-weight:600;">.NET 8 / C# 12</span></div>
+        <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#94a3b8;">API</span><span style="color:#7dd3fc; font-family:'JetBrains Mono',monospace; font-weight:600;">ASP.NET Core</span></div>
+        <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#94a3b8;">Database</span><span style="color:#7dd3fc; font-family:'JetBrains Mono',monospace; font-weight:600;">PostgreSQL</span></div>
+        <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#94a3b8;">ORM</span><span style="color:#7dd3fc; font-family:'JetBrains Mono',monospace; font-weight:600;">EF Core</span></div>
+        <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#94a3b8;">Auth</span><span style="color:#7dd3fc; font-family:'JetBrains Mono',monospace; font-weight:600;">Identity + JWT</span></div>
+        <div style="display:flex; justify-content:space-between; padding:4px 0; font-size:10px;"><span style="color:#94a3b8;">Architecture</span><span style="color:#7dd3fc; font-family:'JetBrains Mono',monospace; font-weight:600;">Clean (4-layer)</span></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:9px; color:var(--teal); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px;">Frontend Stack</div>
+      <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:12px;">
+        <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#94a3b8;">Framework</span><span style="color:#5eead4; font-family:'JetBrains Mono',monospace; font-weight:600;">React 18 + TS</span></div>
+        <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#94a3b8;">Build</span><span style="color:#5eead4; font-family:'JetBrains Mono',monospace; font-weight:600;">Vite 5</span></div>
+        <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#94a3b8;">UI Library</span><span style="color:#5eead4; font-family:'JetBrains Mono',monospace; font-weight:600;">Ant Design 5</span></div>
+        <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#94a3b8;">State</span><span style="color:#5eead4; font-family:'JetBrains Mono',monospace; font-weight:600;">Redux Toolkit</span></div>
+        <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #334155; font-size:10px;"><span style="color:#94a3b8;">Charts</span><span style="color:#5eead4; font-family:'JetBrains Mono',monospace; font-weight:600;">Chart.js + Recharts</span></div>
+        <div style="display:flex; justify-content:space-between; padding:4px 0; font-size:10px;"><span style="color:#94a3b8;">i18n</span><span style="color:#5eead4; font-family:'JetBrains Mono',monospace; font-weight:600;">DE, FR, IT, EN</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0;">
+    <div style="background:linear-gradient(135deg, #312e81, #4338ca); border-radius:10px; padding:14px 10px; text-align:center;"><div style="font-family:'Playfair Display',serif; font-size:26px; font-weight:900; color:#fff;">16+</div><div style="font-size:8px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; margin-top:2px;">API Modules</div></div>
+    <div style="background:linear-gradient(135deg, #064e3b, #059669); border-radius:10px; padding:14px 10px; text-align:center;"><div style="font-family:'Playfair Display',serif; font-size:26px; font-weight:900; color:#fff;">4</div><div style="font-size:8px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; margin-top:2px;">Arch Layers</div></div>
+    <div style="background:linear-gradient(135deg, #78350f, #d97706); border-radius:10px; padding:14px 10px; text-align:center;"><div style="font-family:'Playfair Display',serif; font-size:26px; font-weight:900; color:#fff;">4</div><div style="font-size:8px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; margin-top:2px;">Languages</div></div>
+    <div style="background:linear-gradient(135deg, #881337, #e11d48); border-radius:10px; padding:14px 10px; text-align:center;"><div style="font-family:'Playfair Display',serif; font-size:26px; font-weight:900; color:#fff;">99.9%</div><div style="font-size:8px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; margin-top:2px;">Uptime Target</div></div>
+  </div>
+
+  <div class="code-block" style="margin-top:10px;"><span class="hl-gold">// Architecture: Clean 4-Layer</span>
+<span class="hl-teal">Domain</span>       → Entities, Value Objects, Interfaces
+<span class="hl-teal">Application</span>  → Use Cases, DTOs, Validators
+<span class="hl-teal">Infrastructure</span> → EF Core, Repos, External APIs
+<span class="hl-blue">API</span>          → Controllers, Middleware, Auth
+
+<span class="hl-gold">// 16+ Modules: Accounts, Journals, Sales,</span>
+<span class="hl-gold">// Expenses, Invoices, Recon, Reports, Audit...</span></div>
+
+  <div class="page-footer" style="border-top-color:#334155;"><span class="pf-brand" style="color:#64748b;">BonApp Finance Pro</span><span style="color:#64748b;">Page 20 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 21: VENDOR & CUSTOMER MANAGEMENT
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-blush">
+  <div class="sh sh-rose"><div class="sh-num">18</div><div class="sh-title">Vendor &amp; Customer Management</div><div class="sh-sub">A built-in directory of everyone the restaurant pays and everyone who pays the restaurant</div><div class="sh-line"></div></div>
+
+  <div class="two-col">
+    <div>
+      <h3 style="margin-top:4px;">Vendor Directory</h3>
+      <div class="dark-panel">
+        <h4>Top Vendor — Fischhandel Meyer AG</h4>
+        <div class="dp-row"><span class="dp-label">Category</span><span class="dp-value">Materials</span></div>
+        <div class="dp-row"><span class="dp-label">Contact</span><span class="dp-value">info@meyer.ch</span></div>
+        <div class="dp-row"><span class="dp-label">This Quarter</span><span class="dp-value red">CHF 12,400</span></div>
+        <div class="dp-row"><span class="dp-label">Linked Expenses</span><span class="dp-value gold">47 entries</span></div>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-top:4px;">Customer Directory</h3>
+      <div class="dark-panel">
+        <h4>Top Customer — Adler Legal AG</h4>
+        <div class="dp-row"><span class="dp-label">Credit Limit</span><span class="dp-value">CHF 10,000</span></div>
+        <div class="dp-row"><span class="dp-label">Payment Terms</span><span class="dp-value">Net 30 days</span></div>
+        <div class="dp-row"><span class="dp-label">This Year Revenue</span><span class="dp-value green">CHF 28,200</span></div>
+        <div class="dp-row"><span class="dp-label">QR-IBAN</span><span class="dp-value" style="font-size:9px;">CH93 0076 2011 ...</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h3>What Each Directory Tracks</h3>
+  <div class="two-col">
+    <div class="glass-card" style="border-top:3px solid #e11d48;">
+      <div style="font-size:10px; font-weight:700; color:#be123c; margin-bottom:4px;">VENDORS — Who You Pay</div>
+      <ul class="icon-list arrow" style="font-size:10px;">
+        <li>Company name, contact, email, phone</li>
+        <li>Spending category assignment</li>
+        <li>All linked expenses with amounts</li>
+        <li>Quarterly/yearly spending totals</li>
+      </ul>
+    </div>
+    <div class="glass-card" style="border-top:3px solid #059669;">
+      <div style="font-size:10px; font-weight:700; color:#059669; margin-bottom:4px;">CUSTOMERS — Who Pays You</div>
+      <ul class="icon-list arrow" style="font-size:10px;">
+        <li>Company name, billing address</li>
+        <li>Credit limit and payment terms</li>
+        <li>QR-IBAN for auto QR-bill generation</li>
+        <li>Full invoice history with status</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box" style="background: linear-gradient(135deg, #881337, #f43f5e);">
+    <p style="font-size:11px; margin:0;"><strong>Relationship Intelligence:</strong> Over time, Finance Pro builds a spending profile for every vendor and a revenue profile for every customer. "How much did we spend with Meyer this year?" — <strong>2 seconds.</strong> Every expense has digital receipt storage — snap, upload, linked permanently.</p>
+  </div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 21 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 22: PRODUCT ROADMAP
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-cool">
+  <div class="sh sh-teal"><div class="sh-num">19</div><div class="sh-title">Product Roadmap</div><div class="sh-sub">From MVP to industry-leading financial intelligence — built in phases</div><div class="sh-line"></div></div>
+
+  <div class="two-col">
+    <div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-title" style="color:var(--gold);">MVP — Now</div><div class="tl-desc">Dashboard, sales, expenses, invoicing, bookkeeping, bank recon, VAT, P&L, close-day wizard. <strong>Complete product (~45 pages).</strong></div></div>
+        <div class="tl-item"><div class="tl-title" style="color:var(--teal);">Phase 2 — Automation</div><div class="tl-desc">Daily flash report, auto recon matching, cash drawer, close-month wizard, recurring expenses, tip summary. <strong>+20 pages.</strong></div></div>
+        <div class="tl-item"><div class="tl-title" style="color:var(--indigo);">Phase 3 — Multi-Unit</div><div class="tl-desc">Delivery platform dashboard (Uber Eats profitability), budget vs. actual, invoice OCR, multi-location switcher, Abacus export. <strong>+25 pages.</strong></div></div>
+        <div class="tl-item"><div class="tl-title" style="color:var(--rose);">Phase 4 — AI Intelligence</div><div class="tl-desc">AI cash flow forecasting (7/30/90 days), AI revenue prediction, gift card management, fixed asset register. <strong>+15 pages.</strong></div></div>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-top:0;">Key Upcoming Features</h3>
+      <div class="glass-card" style="border-left:3px solid var(--teal); margin-bottom:8px;">
+        <div style="font-size:11px; font-weight:700; color:#0d9488; margin-bottom:3px;">AI Cash Flow Forecast</div>
+        <p style="font-size:10px; margin:0;">Predict cash position 7, 30, and 90 days forward. 98-99% accuracy based on historical patterns.</p>
+      </div>
+      <div class="glass-card" style="border-left:3px solid var(--indigo); margin-bottom:8px;">
+        <div style="font-size:11px; font-weight:700; color:#4338ca; margin-bottom:3px;">Invoice OCR Scanner</div>
+        <p style="font-size:10px; margin:0;">Snap a photo of any supplier invoice. AI reads vendor, amount, line items, and VAT — 50% less data entry.</p>
+      </div>
+      <div class="glass-card" style="border-left:3px solid var(--amber); margin-bottom:8px;">
+        <div style="font-size:11px; font-weight:700; color:#d97706; margin-bottom:3px;">Delivery Profitability</div>
+        <p style="font-size:10px; margin:0;">See true margins after Uber Eats (15-30%), DoorDash, and other platform commissions.</p>
+      </div>
+      <div class="metric-strip" style="margin-top:10px;">
+        <div class="ms-item ms-gold"><div class="ms-num">~105</div><div class="ms-label">Total Pages</div></div>
+        <div class="ms-item ms-green"><div class="ms-num">4</div><div class="ms-label">Ship Phases</div></div>
+        <div class="ms-item ms-purple"><div class="ms-num">#1</div><div class="ms-label">Most Comprehensive</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 22 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 23: COMPETITIVE POSITIONING
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page page-accent-mint">
+  <div class="sh sh-emerald"><div class="sh-num">20</div><div class="sh-title">Competitive Positioning</div><div class="sh-sub">How Finance Pro compares to existing solutions</div><div class="sh-line"></div></div>
+
+  <h3>The Competitive Landscape</h3>
+  <table class="tbl-green">
+    <thead><tr><th>Solution</th><th>What It Does</th><th>What It Misses</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Bexio / Abacus</strong></td><td>General Swiss accounting</td><td>No POS integration, no daily close, no prime cost, no bank recon</td></tr>
+      <tr><td><strong>POS Built-in</strong></td><td>Sales reports from Lightspeed, Toast</td><td>No bookkeeping, no expenses, no VAT, no invoicing, no recon</td></tr>
+      <tr><td><strong>Spreadsheets</strong></td><td>Manual tracking in Excel</td><td>No automation, error-prone, no audit trail, no dashboards</td></tr>
+      <tr><td><strong>Restaurant365</strong></td><td>US-focused restaurant accounting</td><td>Not Swiss — wrong VAT, wrong chart, no QR-invoicing</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Finance Pro's Unique Position</h3>
+  <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:10px 0;">
+    <div style="background:linear-gradient(135deg,#ecfdf5,#d1fae5); border:2px solid #86efac; border-radius:12px; padding:14px; text-align:center;">
+      <div style="font-size:20px; margin-bottom:4px;">🇨🇭</div>
+      <div style="font-family:'Playfair Display',serif; font-size:13px; font-weight:700; color:#064e3b;">Swiss-Native + Hospitality-Native</div>
+      <p style="font-size:9.5px; margin:6px 0 0; color:#166534;">Only platform built for Swiss restaurant accounting — KMU, 4 VAT rates, QR-invoicing, CHF, prime cost.</p>
+    </div>
+    <div style="background:linear-gradient(135deg,#eff6ff,#dbeafe); border:2px solid #93c5fd; border-radius:12px; padding:14px; text-align:center;">
+      <div style="font-size:20px; margin-bottom:4px;">🔌</div>
+      <div style="font-family:'Playfair Display',serif; font-size:13px; font-weight:700; color:#1e3a5f;">POS-Agnostic Financial Hub</div>
+      <p style="font-size:9.5px; margin:6px 0 0; color:#1e40af;">Works with ANY POS (or no POS). Bexio can't ingest POS data. Finance Pro bridges the gap.</p>
+    </div>
+    <div style="background:linear-gradient(135deg,#fefce8,#fef3c7); border:2px solid #fcd34d; border-radius:12px; padding:14px; text-align:center;">
+      <div style="font-size:20px; margin-bottom:4px;">🏦</div>
+      <div style="font-family:'Playfair Display',serif; font-size:13px; font-weight:700; color:#78350f;">Bank Recon for Hospitality</div>
+      <p style="font-size:9.5px; margin:6px 0 0; color:#92400e;">No Swiss tool reconciles card processor payouts against deposits. Finance Pro catches missing money.</p>
+    </div>
+    <div style="background:linear-gradient(135deg,#faf5ff,#ede9fe); border:2px solid #c4b5fd; border-radius:12px; padding:14px; text-align:center;">
+      <div style="font-size:20px; margin-bottom:4px;">⚡</div>
+      <div style="font-family:'Playfair Display',serif; font-size:13px; font-weight:700; color:#4c1d95;">Ecosystem Play</div>
+      <p style="font-size:9.5px; margin:6px 0 0; color:#5b21b6;">Standalone value TODAY. With POS, Inventory, Staff, CRM — the complete restaurant OS.</p>
+    </div>
+  </div>
+
+  <div class="page-footer"><span class="pf-brand">BonApp Finance Pro</span><span>Page 23 of 24</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 24: CLOSING
+     ═══════════════════════════════════════════════════════════ -->
+<div class="cover-page" style="background: linear-gradient(135deg, #0f0c29, #302b63 50%, #24243e);">
+  <div style="max-width:620px; position:relative; z-index:1;">
+    <p style="font-size:10px; letter-spacing:5px; text-transform:uppercase; opacity:0.35; margin-bottom:28px;">Finance Pro Answers Five Questions</p>
+    <div style="text-align:left; max-width:520px; margin:0 auto;">
+      <div style="display:flex; gap:14px; align-items:flex-start; margin:14px 0; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+        <div style="font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:var(--gold); min-width:40px;">01</div>
+        <div><div style="font-size:14px; font-weight:700; margin-bottom:2px;">Are we making money?</div><div style="font-size:11px; opacity:0.5;">P&L with prime cost highlighted as the critical metric.</div></div></div>
+      <div style="display:flex; gap:14px; align-items:flex-start; margin:14px 0; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+        <div style="font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:var(--gold); min-width:40px;">02</div>
+        <div><div style="font-size:14px; font-weight:700; margin-bottom:2px;">Where is the money going?</div><div style="font-size:11px; opacity:0.5;">Expenses categorised, linked to vendors, tracked in real time.</div></div></div>
+      <div style="display:flex; gap:14px; align-items:flex-start; margin:14px 0; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+        <div style="font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:var(--gold); min-width:40px;">03</div>
+        <div><div style="font-size:14px; font-weight:700; margin-bottom:2px;">Is all the money arriving?</div><div style="font-size:11px; opacity:0.5;">Bank reconciliation catches missing payments.</div></div></div>
+      <div style="display:flex; gap:14px; align-items:flex-start; margin:14px 0; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+        <div style="font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:var(--gold); min-width:40px;">04</div>
+        <div><div style="font-size:14px; font-weight:700; margin-bottom:2px;">Are we tax compliant?</div><div style="font-size:11px; opacity:0.5;">Swiss VAT tracking is automatic. Quarterly report in seconds.</div></div></div>
+      <div style="display:flex; gap:14px; align-items:flex-start; margin:14px 0; padding:12px 0;">
+        <div style="font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:var(--gold); min-width:40px;">05</div>
+        <div><div style="font-size:14px; font-weight:700; margin-bottom:2px;">Are the books in order?</div><div style="font-size:11px; opacity:0.5;">Automated double-entry bookkeeping. Swiss chart of accounts.</div></div></div>
+    </div>
+    <div style="height:2px; width:60px; background:linear-gradient(90deg, var(--gold), var(--teal)); margin:28px auto;"></div>
+    <h1 style="font-family:'Playfair Display',serif; font-size:26px; line-height:1.35; margin-bottom:10px; background:linear-gradient(135deg, #C9A84C, #E8D5A0); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
+      The system works in the background<br>while the restaurant focuses on<br>what matters most.</h1>
+    <p style="font-size:13px; opacity:0.45; margin-bottom:24px;">Serving great food and taking care of guests.</p>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin:24px 0;">
+      <div><div style="font-size:22px; font-weight:900; color:var(--gold-light);">Standalone</div><div style="font-size:9px; opacity:0.4; margin-top:2px;">Manual entry, full engine</div></div>
+      <div><div style="font-size:22px; font-weight:900; color:#5eead4;">Connected</div><div style="font-size:9px; opacity:0.4; margin-top:2px;">Any POS, automatic feed</div></div>
+      <div><div style="font-size:22px; font-weight:900; color:#7dd3fc;">Integrated</div><div style="font-size:9px; opacity:0.4; margin-top:2px;">Bonapp POS, zero effort</div></div>
+    </div>
+    <p style="opacity:0.2; font-size:9px; margin-top:20px;">Generated from full codebase analysis — February 2026<br>BonApp Group — Confidential</p>
+  </div>
+</div>
+
+</body>
+</html>

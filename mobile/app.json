@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Smart Medication Dispenser",
+    "slug": "smart-medication-dispenser",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "smartdispenser",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.smartdispenser.mobile"
+    },
+    "android": {
+      "package": "com.smartdispenser.mobile"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-notifications",
+      "expo-localization"
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "app": {
+    "name": "Distributeur Intelligent de Médicaments",
+    "tagline": "Vos médicaments, à l'heure, à chaque fois"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "devices": "Appareils",
+    "history": "Historique",
+    "travel": "Mode Voyage",
+    "notifications": "Notifications",
+    "integrations": "Intégrations",
+    "settings": "Paramètres",
+    "logout": "Déconnexion"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "Inscription",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "fullName": "Nom complet",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà un compte ?"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "confirm": "Confirmer",
+    "back": "Retour"
+  }
+}

@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Medication Dispenser — Electronics Engineer Build Guide v2.0</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --primary: #1a365d;
+    --primary-light: #2b6cb0;
+    --primary-lighter: #bee3f8;
+    --accent: #e53e3e;
+    --accent-light: #fed7d7;
+    --success: #38a169;
+    --success-light: #c6f6d5;
+    --warning: #d69e2e;
+    --warning-light: #fefcbf;
+    --info: #3182ce;
+    --info-light: #bee3f8;
+    --gray-50: #f7fafc;
+    --gray-100: #edf2f7;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e0;
+    --gray-500: #718096;
+    --gray-600: #4a5568;
+    --gray-700: #2d3748;
+    --gray-800: #1a202c;
+    --gray-900: #171923;
+    --border-radius: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--gray-800);
+    line-height: 1.6;
+    background: #fff;
+    font-size: 10pt;
+  }
+
+  @media print {
+    body { font-size: 9pt; }
+    .page-break { page-break-before: always; }
+    .no-break { page-break-inside: avoid; }
+    .cover-page { page-break-after: always; }
+    @page { margin: 1.5cm 1.8cm; size: A4; }
+    .phase-header { break-after: avoid; }
+    h3, h4 { break-after: avoid; }
+    table { break-inside: avoid; }
+  }
+
+  /* ── Cover Page ── */
+  .cover-page {
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    min-height: 95vh; text-align: center;
+    background: linear-gradient(135deg, var(--primary) 0%, #2c5282 50%, #2b6cb0 100%);
+    color: white; padding: 60px 40px;
+  }
+  .cover-logo { width: 100px; height: 100px; background: rgba(255,255,255,0.15); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 48px; margin-bottom: 40px; border: 2px solid rgba(255,255,255,0.3); }
+  .cover-page h1 { font-size: 32pt; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; line-height: 1.1; }
+  .cover-page h2 { font-size: 16pt; font-weight: 400; opacity: 0.85; margin-bottom: 40px; }
+  .cover-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 40px; text-align: left; background: rgba(255,255,255,0.1); padding: 24px 32px; border-radius: 12px; margin-top: 20px; font-size: 10pt; }
+  .cover-meta dt { font-weight: 600; opacity: 0.7; font-size: 8pt; text-transform: uppercase; letter-spacing: 1px; }
+  .cover-meta dd { font-weight: 500; margin-bottom: 8px; }
+  .cover-badge { display: inline-block; background: var(--accent); padding: 4px 16px; border-radius: 20px; font-size: 9pt; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 30px; }
+
+  /* ── Content ── */
+  .content { max-width: 800px; margin: 0 auto; padding: 40px 30px; }
+
+  /* ── Section Headers ── */
+  .phase-header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 20px 28px; border-radius: var(--border-radius); margin: 40px 0 20px 0; position: relative; overflow: hidden; }
+  .phase-header::after { content: ''; position: absolute; top: 0; right: 0; width: 120px; height: 100%; background: rgba(255,255,255,0.05); transform: skewX(-15deg); }
+  .phase-header .phase-num { font-size: 11pt; font-weight: 700; opacity: 0.7; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2px; }
+  .phase-header h2 { font-size: 16pt; font-weight: 700; margin: 0; line-height: 1.2; }
+  .phase-header .phase-time { display: inline-block; background: rgba(255,255,255,0.2); padding: 3px 12px; border-radius: 12px; font-size: 9pt; font-weight: 500; margin-top: 8px; }
+  .phase-header.power { background: linear-gradient(135deg, #744210, #b7791f); }
+  .phase-header.mcu { background: linear-gradient(135deg, #22543d, #38a169); }
+  .phase-header.display { background: linear-gradient(135deg, #553c9a, #805ad5); }
+  .phase-header.audio { background: linear-gradient(135deg, #702459, #b83280); }
+  .phase-header.motor { background: linear-gradient(135deg, #7b341e, #c05621); }
+  .phase-header.sensor { background: linear-gradient(135deg, #234e52, #319795); }
+  .phase-header.test { background: linear-gradient(135deg, #1a365d, #2b6cb0); }
+  .phase-header.travel { background: linear-gradient(135deg, #2a4365, #4299e1); }
+  .phase-header.pcb { background: linear-gradient(135deg, #065666, #0987a0); }
+  .phase-header.appendix { background: linear-gradient(135deg, var(--gray-600), var(--gray-500)); }
+
+  /* ── Step Headers ── */
+  h3 { font-size: 12pt; font-weight: 700; color: var(--primary); margin: 24px 0 10px 0; padding-bottom: 6px; border-bottom: 2px solid var(--primary-lighter); }
+  h4 { font-size: 10.5pt; font-weight: 600; color: var(--gray-700); margin: 16px 0 8px 0; }
+  p { margin: 6px 0; }
+  ul, ol { margin: 6px 0 6px 20px; }
+  li { margin-bottom: 2px; font-size: 9.5pt; }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 9pt; }
+  thead th { background: var(--primary); color: white; padding: 8px 10px; text-align: left; font-weight: 600; font-size: 8.5pt; text-transform: uppercase; letter-spacing: 0.5px; }
+  thead th:first-child { border-radius: 6px 0 0 0; }
+  thead th:last-child { border-radius: 0 6px 0 0; }
+  tbody td { padding: 7px 10px; border-bottom: 1px solid var(--gray-200); vertical-align: top; }
+  tbody tr:nth-child(even) { background: var(--gray-50); }
+  table.compact { font-size: 8.5pt; }
+  table.compact td, table.compact th { padding: 5px 8px; }
+  table.power thead th { background: #744210; }
+  table.mcu thead th { background: #22543d; }
+  table.sensor thead th { background: #234e52; }
+  table.test thead th { background: var(--info); }
+  table.bom thead th { background: #553c9a; }
+  table.danger thead th { background: var(--accent); }
+  table.pcb thead th { background: #065666; }
+
+  /* ── Callout Boxes ── */
+  .callout { padding: 14px 18px; border-radius: var(--border-radius); margin: 14px 0; font-size: 9.5pt; border-left: 4px solid; }
+  .callout-danger { background: var(--accent-light); border-color: var(--accent); color: #742a2a; }
+  .callout-warning { background: var(--warning-light); border-color: var(--warning); color: #744210; }
+  .callout-info { background: var(--info-light); border-color: var(--info); color: #2a4365; }
+  .callout-success { background: var(--success-light); border-color: var(--success); color: #22543d; }
+  .callout strong { font-weight: 700; }
+
+  /* ── Checklists ── */
+  .checklist { list-style: none; padding: 0; margin: 8px 0; }
+  .checklist li { padding: 5px 0 5px 28px; position: relative; font-size: 9.5pt; }
+  .checklist li::before { content: ''; position: absolute; left: 0; top: 7px; width: 16px; height: 16px; border: 2px solid var(--gray-300); border-radius: 3px; background: white; }
+
+  /* ── Numbered Steps ── */
+  .steps { counter-reset: step-counter; list-style: none; padding: 0; margin: 10px 0; }
+  .steps li { counter-increment: step-counter; padding: 6px 0 6px 40px; position: relative; font-size: 9.5pt; margin-bottom: 2px; }
+  .steps li::before { content: counter(step-counter); position: absolute; left: 0; top: 4px; width: 26px; height: 26px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8.5pt; font-weight: 700; }
+
+  /* ── Code ── */
+  code { font-family: 'JetBrains Mono', monospace; background: var(--gray-100); padding: 1px 5px; border-radius: 4px; font-size: 8.5pt; color: var(--accent); }
+  pre { background: var(--gray-900); color: #e2e8f0; padding: 16px 20px; border-radius: var(--border-radius); font-family: 'JetBrains Mono', monospace; font-size: 8.5pt; line-height: 1.5; overflow-x: auto; margin: 10px 0; }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  .signoff-table td { height: 40px; border: 1px solid var(--gray-300); }
+  .signoff-table td:first-child { font-weight: 600; background: var(--gray-50); }
+  .toc { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--border-radius); padding: 24px 28px; margin: 20px 0; }
+  .toc h3 { border: none; margin-top: 0; color: var(--primary); }
+  .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 24px; font-size: 9.5pt; }
+  .toc-item { padding: 4px 0; display: flex; align-items: center; gap: 8px; }
+  .toc-num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 5px; font-size: 8pt; font-weight: 700; flex-shrink: 0; }
+  .toc-num.app { background: var(--gray-500); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 7.5pt; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-critical { background: var(--accent-light); color: var(--accent); }
+  .badge-ok { background: var(--success-light); color: var(--success); }
+  hr { border: none; border-top: 2px solid var(--gray-200); margin: 30px 0; }
+  .footer { text-align: center; font-size: 8pt; color: var(--gray-500); padding: 20px 0; border-top: 1px solid var(--gray-200); margin-top: 40px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .fill-line { width: 70px; display: inline-block; border-bottom: 1px dashed #aaa; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ COVER PAGE ═══════════════════ -->
+<div class="cover-page">
+  <div class="cover-logo">&#9881;</div>
+  <h1>Electronics Engineer<br>Build Guide</h1>
+  <h2>Smart Medication Dispenser</h2>
+  <p style="font-size:11pt; opacity:0.8;">SMD-100 Home Device &bull; SMD-200 Travel Device</p>
+  <dl class="cover-meta">
+    <dt>Version</dt><dd>2.0</dd>
+    <dt>Date</dt><dd>February 2026</dd>
+    <dt>Classification</dt><dd>Confidential &mdash; Engineering Team</dd>
+    <dt>Source</dt><dd>Technical Documentation v4.0</dd>
+    <dt>GPIO Authority</dt><dd>Firmware <code style="color:#bee3f8;background:rgba(255,255,255,0.1)">pins.h</code></dd>
+    <dt>Compliance</dt><dd>CE Class IIa, Swissmedic</dd>
+    <dt>Location</dt><dd>Lausanne, Switzerland</dd>
+    <dt>Total Build Time</dt><dd>~8 hours (SMD-100)</dd>
+  </dl>
+  <div class="cover-badge">Step-by-Step Assembly &bull; Testing &bull; Calibration</div>
+</div>
+
+<!-- ═══════════════════ TABLE OF CONTENTS ═══════════════════ -->
+<div class="content">
+
+<div class="toc">
+  <h3>Table of Contents</h3>
+  <div class="toc-grid">
+    <div class="toc-item"><span class="toc-num">0</span> Prototyping Roadmap</div>
+    <div class="toc-item"><span class="toc-num">1</span> Workspace Setup &amp; Equipment</div>
+    <div class="toc-item"><span class="toc-num">2</span> Component Procurement</div>
+    <div class="toc-item"><span class="toc-num">3</span> PCB Design &amp; Ordering</div>
+    <div class="toc-item"><span class="toc-num">4</span> PCB Assembly Strategy</div>
+    <div class="toc-item"><span class="toc-num">5</span> Power Section Build &amp; Verify</div>
+    <div class="toc-item"><span class="toc-num">6</span> ESP32-S3 MCU Assembly</div>
+    <div class="toc-item"><span class="toc-num">7</span> Display Connection</div>
+    <div class="toc-item"><span class="toc-num">8</span> Audio Section</div>
+    <div class="toc-item"><span class="toc-num">9</span> Motor Driver Section</div>
+    <div class="toc-item"><span class="toc-num">10</span> Sensor Section</div>
+    <div class="toc-item"><span class="toc-num">11</span> SD Card Section</div>
+    <div class="toc-item"><span class="toc-num">12</span> Mechanical Sub-Assembly</div>
+    <div class="toc-item"><span class="toc-num">13</span> Battery &amp; BMS</div>
+    <div class="toc-item"><span class="toc-num">14</span> Final Assembly &amp; Enclosure</div>
+    <div class="toc-item"><span class="toc-num">15</span> Firmware Flashing</div>
+    <div class="toc-item"><span class="toc-num">16</span> Testing &amp; Calibration</div>
+    <div class="toc-item"><span class="toc-num">17</span> SMD-200 Travel Device</div>
+    <div class="toc-item"><span class="toc-num">18</span> Production &amp; Quality Sign-Off</div>
+    <div class="toc-item"><span class="toc-num app">A</span> Master GPIO Reference</div>
+    <div class="toc-item"><span class="toc-num app">B</span> Power Budget</div>
+    <div class="toc-item"><span class="toc-num app">C</span> Common Pitfalls</div>
+    <div class="toc-item"><span class="toc-num app">D</span> Troubleshooting</div>
+    <div class="toc-item"><span class="toc-num app">E</span> Second-Source Strategy</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ PHASE 0 ═══════════════════ -->
+<div class="phase-header">
+  <div class="phase-num">Phase 0</div>
+  <h2>Before You Start &mdash; Prototyping Roadmap</h2>
+  <span class="phase-time">Planning Phase</span>
+</div>
+
+<div class="callout callout-danger">
+  <strong>Do NOT jump straight to a custom PCB.</strong> Follow this phased approach to save time and money.
+</div>
+
+<table>
+  <thead><tr><th>Phase</th><th>Duration</th><th>Goal</th><th>Deliverable</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1. Breadboard</strong></td><td>2 weeks</td><td>Prove concept</td><td>Working motor + sensor on breadboard</td></tr>
+    <tr><td><strong>2. Dev Boards</strong></td><td>4 weeks</td><td>Firmware dev</td><td>Complete software on dev kits</td></tr>
+    <tr><td><strong>3. Custom PCB v1</strong></td><td>4 weeks</td><td>Integration test</td><td>First PCB prototype</td></tr>
+    <tr><td><strong>4. Custom PCB v2</strong></td><td>2 weeks</td><td>Fix issues</td><td>Production-ready PCB</td></tr>
+    <tr><td><strong>5. Pilot Build</strong></td><td>4 weeks</td><td>DFM validation</td><td>50 units</td></tr>
+    <tr><td><strong>6. Production</strong></td><td>Ongoing</td><td>Scale</td><td>Mass production</td></tr>
+  </tbody>
+</table>
+
+<h3>Recommended Dev Boards (Phase 1&ndash;2)</h3>
+<table class="compact">
+  <thead><tr><th>Board</th><th>MCU</th><th>Price</th><th>Use For</th></tr></thead>
+  <tbody>
+    <tr><td>ESP32-S3-DevKitC-1</td><td>ESP32-S3</td><td>$10</td><td>Firmware development, sensor testing</td></tr>
+    <tr><td>ESP32-S3-LCD-EV-Board</td><td>ESP32-S3 + 4.3" LCD</td><td>$60</td><td>Display/UI development with LVGL</td></tr>
+    <tr><td>WT32-SC01 Plus</td><td>ESP32-S3 + 3.5" LCD</td><td>$35</td><td>Compact UI testing</td></tr>
+  </tbody>
+</table>
+<p><strong>Start with the $10 DevKit + breadboard to prove motors, sensors, and API connectivity before ordering custom PCBs.</strong></p>
+
+<!-- ═══════════════════ PHASE 1 ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header">
+  <div class="phase-num">Phase 1</div>
+  <h2>Workspace Setup &amp; Equipment</h2>
+  <span class="phase-time">1 day</span>
+</div>
+
+<h3>Step 1.1 &mdash; ESD-Safe Workstation</h3>
+<ul class="checklist">
+  <li>Install ESD mat on bench</li>
+  <li>ESD wrist strap connected to ground (wear at ALL times)</li>
+  <li>Ground all equipment</li>
+  <li>Maintain 40&ndash;60% RH humidity</li>
+</ul>
+
+<h3>Step 1.2 &mdash; Essential Equipment</h3>
+<table class="compact">
+  <thead><tr><th>#</th><th>Tool</th><th>Model</th><th>Price</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Soldering station (temp controlled)</td><td>Hakko FX-888D</td><td>$120</td><td>All soldering</td></tr>
+    <tr><td>2</td><td>Hot air rework station</td><td>Quick 861DW</td><td>$150</td><td>QFN packages (BQ24195, TPS62150, MAX98357A, ESP32 module)</td></tr>
+    <tr><td>3</td><td>Digital multimeter</td><td>Fluke 117</td><td>$200</td><td>Voltage/continuity checks</td></tr>
+    <tr><td>4</td><td>Oscilloscope (50MHz+, 4ch)</td><td>Rigol DS1054Z</td><td>$350</td><td>Signal verification, I2C/SPI/PWM debugging</td></tr>
+    <tr><td>5</td><td>Variable bench power supply</td><td>Korad KA3005D</td><td>$80</td><td>Controlled power during testing (0-30V, 0-5A)</td></tr>
+    <tr><td>6</td><td>USB logic analyzer</td><td>Saleae Logic 8</td><td>$500</td><td>I2C/SPI/UART protocol debugging</td></tr>
+    <tr><td>7</td><td>Stereo microscope</td><td>AmScope SM-4T</td><td>$250</td><td>QFN/FFC solder inspection</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 1.3 &mdash; Hand Tools &amp; Consumables</h3>
+<div class="two-col">
+  <ul class="checklist">
+    <li>Fine ESD tweezers (for 0402/0603)</li>
+    <li>Flush cutters (lead trimming)</li>
+    <li>Wire strippers (22-30 AWG)</li>
+    <li>Solder wick (for rework)</li>
+    <li>Solder paste (SAC305 lead-free)</li>
+    <li>Solder wire 0.5mm</li>
+  </ul>
+  <ul class="checklist">
+    <li>Flux pen (no-clean flux for rework)</li>
+    <li>IPA 99% + lint-free wipes</li>
+    <li>Kapton tape (heat protection)</li>
+    <li>Heat shrink tubing (2mm-10mm)</li>
+    <li>Calibration weights: <strong>10g, 50g, 100g</strong></li>
+    <li>Copper tape (for EMI shielding)</li>
+  </ul>
+</div>
+
+<h3>Step 1.4 &mdash; Software Environment</h3>
+<ul class="checklist">
+  <li>Install <strong>ESP-IDF v5.1+</strong> (official Espressif SDK)
+    <br>&nbsp;&nbsp;&nbsp;Windows: <code>https://dl.espressif.com/dl/esp-idf/</code>
+    <br>&nbsp;&nbsp;&nbsp;Or: <code>git clone -b v5.1.2 --recursive https://github.com/espressif/esp-idf.git</code></li>
+  <li>Install <strong>VS Code</strong> with ESP-IDF extension</li>
+  <li><code>esptool.py</code> (comes with ESP-IDF)</li>
+  <li>Serial terminal: PuTTY / minicom / ESP-IDF monitor</li>
+  <li>Obtain firmware binary from firmware team</li>
+  <li>USB-to-UART adapter (CP2102 or CH340) as backup programming method</li>
+</ul>
+
+<!-- ═══════════════════ PHASE 2 ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header display">
+  <div class="phase-num">Phase 2</div>
+  <h2>Component Procurement &amp; Incoming Inspection</h2>
+  <span class="phase-time">1&ndash;3 weeks</span>
+</div>
+
+<h3>Step 2.1 &mdash; ICs &amp; Modules <span class="badge badge-critical">Order First &mdash; Longest Lead Time</span></h3>
+<table class="compact bom">
+  <thead><tr><th>Ref</th><th>Component</th><th>Manufacturer</th><th>Part Number</th><th>Qty</th><th>Cost</th><th>Supplier</th></tr></thead>
+  <tbody>
+    <tr><td>U1</td><td>MCU Module</td><td>Espressif</td><td>ESP32-S3-WROOM-1-N16R8</td><td>1</td><td>$5.50</td><td>DigiKey</td></tr>
+    <tr><td>U2</td><td>Power Path IC</td><td>TI</td><td>BQ24195RGER</td><td>1</td><td>$3.50</td><td>Mouser</td></tr>
+    <tr><td>U3</td><td>5V Buck Regulator</td><td>TI</td><td>TPS62150RGTR</td><td>1</td><td>$1.80</td><td>DigiKey</td></tr>
+    <tr><td>U4</td><td>3.3V LDO</td><td>Diodes Inc</td><td>AP2112K-3.3TRG1</td><td>2</td><td>$0.50</td><td>LCSC</td></tr>
+    <tr><td>U5-U11</td><td>Motor Drivers</td><td>TI/ST</td><td>ULN2003AN</td><td>7</td><td>$2.10</td><td>LCSC</td></tr>
+    <tr><td>U7</td><td>Audio Amp</td><td>Maxim/ADI</td><td>MAX98357AETE+</td><td>1</td><td>$2.50</td><td>DigiKey</td></tr>
+    <tr><td>U8</td><td>Load Cell ADC</td><td>Avia</td><td>HX711</td><td>1</td><td>$0.80</td><td>LCSC</td></tr>
+    <tr><td>U9</td><td>Temp/Humidity</td><td>Sensirion</td><td>SHT40-AD1B</td><td>1</td><td>$2.50</td><td>DigiKey</td></tr>
+    <tr><td>U10</td><td>Light Sensor</td><td>ROHM</td><td>BH1750FVI</td><td>1</td><td>$1.00</td><td>LCSC</td></tr>
+    <tr><td>U11</td><td>I/O Expander</td><td>Microchip</td><td>MCP23017-E/SO</td><td>1</td><td>$1.50</td><td>DigiKey</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 2.2 &mdash; Display, Motors, Sensors</h3>
+<table class="compact bom">
+  <thead><tr><th>Ref</th><th>Component</th><th>Part</th><th>Qty</th><th>Cost</th><th>Supplier</th></tr></thead>
+  <tbody>
+    <tr><td>LCD1</td><td>4.3" RGB TFT Display</td><td>Waveshare 4.3" RGB (GT911 touch)</td><td>1</td><td>$28.00</td><td>Waveshare</td></tr>
+    <tr><td>M1-M10</td><td>Stepper Motors</td><td>28BYJ-48 5V</td><td>10</td><td>$15.00</td><td>AliExpress</td></tr>
+    <tr><td>M11</td><td>Gate Servo</td><td>SG90 (TowerPro)</td><td>1</td><td>$2.00</td><td>Amazon</td></tr>
+    <tr><td>LS1</td><td>Speaker</td><td>CUI CMS-403288-078 (40mm, 8&Omega;, 2W)</td><td>1</td><td>$1.50</td><td>DigiKey</td></tr>
+    <tr><td>Q1-Q10</td><td>Optical Pill Sensors</td><td>Vishay TCPT1300X01</td><td>10</td><td>$8.00</td><td>DigiKey</td></tr>
+    <tr><td>Q11-Q20</td><td>Hall Effect Sensors</td><td>Allegro A3144</td><td>10</td><td>$3.00</td><td>LCSC</td></tr>
+    <tr><td>PIR1</td><td>Motion Sensor</td><td>AM312 mini PIR</td><td>1</td><td>$1.50</td><td>AliExpress</td></tr>
+    <tr><td>SW1</td><td>Reed Switch + Magnet</td><td>NO reed switch + 10&times;5mm neodymium</td><td>1</td><td>$0.30</td><td>LCSC</td></tr>
+    <tr><td>LC1</td><td>Load Cell</td><td>1kg TAL220</td><td>1</td><td>$3.00</td><td>Amazon</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 2.3 &mdash; Power &amp; Battery</h3>
+<table class="compact power">
+  <thead><tr><th>Component</th><th>Part</th><th>Qty</th><th>Cost</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Battery Cells</td><td>Samsung INR18650-25R (2500mAh, 20A)</td><td>2</td><td>$8.00</td><td>Buy genuine only! (IMRbatteries, Nkon.nl)</td></tr>
+    <tr><td>Battery Holder</td><td>Keystone 1042 (2&times;18650 series)</td><td>1</td><td>$2.00</td><td>Series = 7.4V</td></tr>
+    <tr><td>BMS Board</td><td>2S 7.4V 5A (DW01A + MOSFETs)</td><td>1</td><td>$1.50</td><td>Over/under voltage + short protection</td></tr>
+    <tr><td>AC Adapter</td><td>Mean Well GST25E12-P1J (12V/2A)</td><td>1</td><td>$12.00</td><td><strong>Swiss Type J plug</strong> (SEV 1011) + EU adapter</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 2.4 &mdash; Passives &amp; Connectors</h3>
+<table class="compact">
+  <thead><tr><th>#</th><th>Component</th><th>Spec</th><th>Qty</th><th>Supplier</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Ceramic caps</td><td>100nF 0402, 16V, X7R (decoupling)</td><td>30</td><td>LCSC</td></tr>
+    <tr><td>2</td><td>Ceramic caps</td><td>10&micro;F 0805, 16V, X5R (bulk)</td><td>15</td><td>LCSC</td></tr>
+    <tr><td>3</td><td>Ceramic caps</td><td>22&micro;F 0805, 10V, X5R (regulator output)</td><td>5</td><td>LCSC</td></tr>
+    <tr><td>4</td><td>Ceramic caps</td><td>1&micro;F 0603, 16V, X7R</td><td>10</td><td>LCSC</td></tr>
+    <tr><td>5</td><td>Ceramic caps</td><td>0.1&micro;F 0402 (ESP32 EN pin RC)</td><td>2</td><td>LCSC</td></tr>
+    <tr><td>6</td><td>Resistors</td><td>10K 0603 &plusmn;5% (pull-ups)</td><td>20</td><td>LCSC</td></tr>
+    <tr><td>7</td><td>Resistors</td><td>4.7K 0603 &plusmn;5% (I2C pull-ups)</td><td>4</td><td>LCSC</td></tr>
+    <tr><td>8</td><td>Resistors</td><td>100&Omega; 0603 &plusmn;5% (optical sensor LED current)</td><td>10</td><td>LCSC</td></tr>
+    <tr><td>9</td><td>Inductors</td><td>2.2&micro;H shielded, 1.5A, 4&times;4mm (TPS62150)</td><td>2</td><td>LCSC</td></tr>
+    <tr><td>10</td><td>Ferrite bead</td><td>600&Omega; @ 100MHz, 0805, 500mA</td><td>2</td><td>LCSC</td></tr>
+    <tr><td>11</td><td>N-MOSFET</td><td>2N7002 SOT-23 (backlight PWM driver)</td><td>1</td><td>LCSC</td></tr>
+    <tr><td>12</td><td>TVS diodes</td><td>ESD protection for USB, touch, external lines</td><td>5</td><td>LCSC</td></tr>
+    <tr><td>13</td><td>FFC connector</td><td>40-pin, 0.5mm pitch, bottom-contact, ZIF</td><td>1</td><td>LCSC</td></tr>
+    <tr><td>14</td><td>JST-XH 5-pin</td><td>Motor connectors</td><td>10</td><td>LCSC</td></tr>
+    <tr><td>15</td><td>JST-PH 3-pin</td><td>Sensor connectors (2.0mm pitch)</td><td>12</td><td>LCSC</td></tr>
+    <tr><td>16</td><td>JST-XH 2-pin</td><td>Battery, speaker connectors</td><td>4</td><td>LCSC</td></tr>
+    <tr><td>17</td><td>Barrel jack</td><td>5.5&times;2.1mm, panel mount, center positive</td><td>1</td><td>LCSC</td></tr>
+    <tr><td>18</td><td>SD card socket</td><td>Micro SD push-push type</td><td>1</td><td>LCSC</td></tr>
+    <tr><td>19</td><td>USB connector</td><td>USB-B Mini (programming port)</td><td>1</td><td>LCSC</td></tr>
+    <tr><td>20</td><td>Pin header</td><td>2.54mm 4-pin (UART debug)</td><td>1</td><td>LCSC</td></tr>
+    <tr><td>PCB1</td><td>Main PCB</td><td>4-layer, 150&times;100mm</td><td>1</td><td>JLCPCB ($8)</td></tr>
+    <tr><td>PCB2</td><td>Motor PCB</td><td>2-layer, 80&times;60mm (if separate)</td><td>1</td><td>JLCPCB ($3)</td></tr>
+    <tr><td>ENC1</td><td>Enclosure</td><td>Custom ABS injection molded</td><td>1</td><td>Alibaba ($22)</td></tr>
+    <tr><td>&mdash;</td><td>SD Card</td><td>SanDisk 16GB micro SD</td><td>1</td><td>Amazon ($5)</td></tr>
+    <tr><td>&mdash;</td><td>Packaging</td><td>Box, manual, accessories</td><td>1</td><td>Alibaba ($6)</td></tr>
+  </tbody>
+</table>
+<p style="text-align:right;font-size:12pt;font-weight:700;color:var(--primary);margin-top:12px;">Total BOM Cost: ~$159 per unit (prototype qty)</p>
+
+<h3>Step 2.5 &mdash; Incoming Inspection</h3>
+<ul class="checklist">
+  <li>Verify ALL part numbers match the order (cross-check with BOM above)</li>
+  <li>Visually inspect IC packages for damage (bent/missing pins, cracks)</li>
+  <li><strong>ESP32-S3:</strong> Confirm module marking reads <strong>"N16R8"</strong> (16MB flash + 8MB PSRAM)</li>
+  <li><strong>Batteries:</strong> Verify cells are <strong>genuine Samsung</strong> (holographic label, weight ~45g each)
+    <br>&nbsp;&nbsp;&nbsp;<em>WARNING: Fake 18650 cells are common. Buy ONLY from reputable sources.</em></li>
+  <li><strong>AC Adapter:</strong> Measure output with multimeter: <strong>12V &plusmn;5%</strong>, check CE/UL marking</li>
+  <li>Store moisture-sensitive ICs (QFN, BGA) in dry cabinet or sealed bag with desiccant</li>
+  <li>Verify display FFC cable connector type matches your PCB footprint</li>
+</ul>
+
+<!-- ═══════════════════ PHASE 3 ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header pcb">
+  <div class="phase-num">Phase 3</div>
+  <h2>PCB Design Rules, Ordering &amp; Inspection</h2>
+  <span class="phase-time">3&ndash;10 days</span>
+</div>
+
+<h3>Step 3.1 &mdash; PCB Layer Stack (4-Layer, 1.6mm)</h3>
+<pre><code>Layer 1 (Top):    Signal + Components       — 1.0 oz copper
+Prepreg:          FR-4, 0.2mm
+Layer 2:          GROUND PLANE (solid)       — 1.0 oz copper  *** DO NOT SPLIT ***
+Core:             FR-4, 1.0mm
+Layer 3:          Power Planes (3.3V/5V/12V) — 1.0 oz copper  (split for voltages)
+Prepreg:          FR-4, 0.2mm
+Layer 4 (Bottom): Signal + Components        — 1.0 oz copper</code></pre>
+
+<h3>Step 3.2 &mdash; Trace/Space Rules</h3>
+<table class="compact pcb">
+  <thead><tr><th>Parameter</th><th>Minimum</th><th>Preferred</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Signal trace width</td><td>0.15mm (6mil)</td><td>0.2mm</td><td>Standard signals</td></tr>
+    <tr><td>Power trace width</td><td>0.3mm (12mil)</td><td>0.5mm</td><td>3.3V, 5V rails</td></tr>
+    <tr><td>Motor trace width</td><td>0.5mm (20mil)</td><td>1.0mm</td><td>Handle 500mA per motor</td></tr>
+    <tr><td>Trace spacing</td><td>0.15mm (6mil)</td><td>0.2mm</td><td>Minimum clearance</td></tr>
+    <tr><td>Via diameter</td><td>0.4mm</td><td>0.5mm</td><td>Outer diameter</td></tr>
+    <tr><td>Via drill</td><td>0.2mm</td><td>0.25mm</td><td>Hole diameter</td></tr>
+    <tr><td>Component spacing</td><td>0.2mm</td><td>0.3mm</td><td>Between pads</td></tr>
+    <tr><td>Board edge clearance</td><td>0.3mm</td><td>0.5mm</td><td>Keep-out zone</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 3.3 &mdash; EMC Design Rules</h3>
+<table class="compact pcb">
+  <thead><tr><th>Rule</th><th>Implementation</th></tr></thead>
+  <tbody>
+    <tr><td>Ground plane</td><td>Solid Layer 2 &mdash; <strong>NO splits</strong> under signal traces</td></tr>
+    <tr><td>Power plane</td><td>Split Layer 3 for different voltages, star-point connection</td></tr>
+    <tr><td>Decoupling</td><td><strong>100nF per power pin</strong>, place within <strong>3mm</strong> of pin</td></tr>
+    <tr><td>Bulk capacitors</td><td>10&micro;F at power entry, 22&micro;F at regulator outputs</td></tr>
+    <tr><td>Antenna keep-out</td><td><strong>15mm radius clear</strong>, no ground plane under ESP32 antenna</td></tr>
+    <tr><td>Crystal traces</td><td>Keep &lt;5mm, surround with ground guard ring</td></tr>
+    <tr><td>Motor isolation</td><td><strong>Separate ground return path</strong>, ferrite bead at power entry to motor section</td></tr>
+    <tr><td>ESD protection</td><td>TVS diodes on ALL external connections (USB, barrel jack, touch)</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 3.4 &mdash; Thermal Design</h3>
+<table class="compact">
+  <thead><tr><th>Heat Source</th><th>Dissipation</th><th>Mitigation</th></tr></thead>
+  <tbody>
+    <tr><td>ESP32-S3</td><td>0.5W</td><td>Exposed pad to ground plane, via array underneath</td></tr>
+    <tr><td>BQ24195</td><td>0.8W</td><td><strong>Thermal pad MUST connect to ground</strong> via 3&times;3 via array (0.3mm, 1mm spacing)</td></tr>
+    <tr><td>TPS62150</td><td>0.2W</td><td>Ground pad, adequate copper pour</td></tr>
+    <tr><td>ULN2003A (each)</td><td>0.5W</td><td>Thermal vias, copper pour</td></tr>
+    <tr><td>MAX98357A</td><td>0.2W</td><td>Ground pad</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 3.5 &mdash; Order PCBs</h3>
+<p><strong>Main PCB (150mm &times; 100mm, 4-layer):</strong></p>
+<ul class="checklist">
+  <li>Send Gerber files to JLCPCB (prototype, ~$8) or Eurocircuits (production, ~$80)</li>
+  <li>Specify: 4-layer, 1.6mm, 1oz copper all layers, FR-4, ENIG finish</li>
+  <li>Order minimum <strong>5 pcs</strong> (expect 1-2 for rework during bring-up)</li>
+</ul>
+
+<h3>Step 3.6 &mdash; PCB Incoming Inspection</h3>
+<ul class="checklist">
+  <li>Visual inspection: no scratches, copper shorts, broken traces</li>
+  <li>Check drill holes align with pad centers</li>
+  <li>Verify soldermask openings are correct (especially QFN thermal pads)</li>
+  <li>Verify FFC connector footprint matches your 40-pin 0.5mm connector</li>
+  <li>Measure board dimensions with calipers (150.0 &times; 100.0mm &plusmn;0.1mm)</li>
+  <li>Continuity test: <strong>3.3V plane NOT shorted to GND</strong>, <strong>5V plane NOT shorted to GND</strong></li>
+</ul>
+
+<!-- ═══════════════════ PHASE 4 ═══════════════════ -->
+<div class="phase-header pcb">
+  <div class="phase-num">Phase 4</div>
+  <h2>SMD-100 PCB Assembly Strategy</h2>
+  <span class="phase-time">~2 hours total</span>
+</div>
+
+<h3>Assembly Order (Smallest to Largest)</h3>
+<table class="compact">
+  <thead><tr><th>Order</th><th>Component Type</th><th>Reference</th><th>Method</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>0402 capacitors (100nF decoupling)</td><td>C1-C30</td><td>Solder paste + hot air</td></tr>
+    <tr><td>2</td><td>0603 resistors (10K, 4.7K, 100&Omega;)</td><td>R1-R50</td><td>Solder paste + hot air</td></tr>
+    <tr><td>3</td><td>0805 capacitors (10&micro;F, 22&micro;F bulk)</td><td>C31-C45</td><td>Solder paste + hot air</td></tr>
+    <tr><td>4</td><td>SOT-23/SOT-25 (2N7002, AP2112K)</td><td>Q1-Q5, U4</td><td>Hand solder or hot air</td></tr>
+    <tr><td>5</td><td>QFN-16 (TPS62150, 3&times;3mm)</td><td>U3</td><td><strong>Hot air</strong>, microscope alignment</td></tr>
+    <tr><td>6</td><td>QFN-24 (BQ24195, 4&times;4mm)</td><td>U2</td><td><strong>Hot air</strong>, thermal pad critical</td></tr>
+    <tr><td>7</td><td>QFN-16 (MAX98357A, 3&times;3mm)</td><td>U7</td><td><strong>Hot air</strong>, microscope alignment</td></tr>
+    <tr><td>8</td><td>ESP32-S3 module (25.5&times;18mm)</td><td>U1</td><td><strong>Preheat + hot air</strong> reflow</td></tr>
+    <tr><td>9</td><td>SOIC packages (ULN2003A &times;7, MCP23017, HX711)</td><td>U5-U11</td><td>Hand solder or reflow</td></tr>
+    <tr><td>10</td><td>Through-hole connectors</td><td>J1-J20</td><td>Hand solder</td></tr>
+    <tr><td>11</td><td>FFC connector (40-pin 0.5mm)</td><td>J_LCD</td><td>Fine tip hand solder</td></tr>
+    <tr><td>12</td><td>SD card socket</td><td>J_SD</td><td>Hand solder</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════ PHASE 5 ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header power">
+  <div class="phase-num">Phase 5</div>
+  <h2>Power Section &mdash; Build &amp; Verify</h2>
+  <span class="phase-time">45 min assembly + 15 min testing</span>
+</div>
+
+<div class="callout callout-danger">
+  <strong>CRITICAL: Build and test power FIRST, before installing ESP32.</strong> If there's a voltage issue, you'll fry the $5.50 MCU.
+</div>
+
+<h3>Step 5.1 &mdash; BQ24195 Power Path Controller <span class="badge badge-critical">QFN-24, 4&times;4mm</span></h3>
+<ol class="steps">
+  <li>Apply solder paste to all 24 QFN pads <strong>+ center thermal pad</strong></li>
+  <li><strong>Thermal pad is critical</strong> &mdash; this is the heat sink. Must have solder and thermal vias beneath</li>
+  <li>Place BQ24195RGER with tweezers, align pin 1 dot marking</li>
+  <li>Verify alignment under microscope</li>
+  <li>Hot air reflow: <strong>260&deg;C peak, 30 seconds</strong>, nozzle 2-3mm above</li>
+  <li>IC will "settle" when solder melts &mdash; watch edges</li>
+  <li><strong>Inspect ALL 24 pins under microscope</strong> &mdash; no bridges, no opens</li>
+  <li>Install passives: <strong>10&micro;F</strong> (VIN, within 3mm), <strong>22&micro;F</strong> (SYS &amp; BAT output), NTC resistor (10K for battery temp)</li>
+</ol>
+
+<h3>Step 5.2 &mdash; TPS62150 Buck Regulator <span class="badge badge-critical">QFN-16, 3&times;3mm</span> &rarr; 5V Rail</h3>
+<ol class="steps">
+  <li>Apply solder paste to QFN-16 pads + ground pad</li>
+  <li>Place TPS62150RGTR, align pin 1</li>
+  <li>Hot air reflow at 260&deg;C, 20-30 seconds</li>
+  <li>Install <strong>2.2&micro;H shielded inductor</strong> (L1) &mdash; place close, keep trace short</li>
+  <li>Install input cap: <strong>10&micro;F</strong> close to VIN</li>
+  <li>Install output cap: <strong>22&micro;F</strong> close to VOUT</li>
+  <li>If adjustable output: install feedback resistor divider for 5.0V</li>
+</ol>
+
+<h3>Step 5.3 &mdash; AP2112K-3.3 LDO (SOT-25) &rarr; 3.3V Rail</h3>
+<ol class="steps">
+  <li>Hand solder the 5-pin SOT-25 package</li>
+  <li>Install input cap: <strong>1&micro;F</strong> on input pin</li>
+  <li>Install output cap: <strong>10&micro;F</strong> on output pin</li>
+  <li>Install <strong>ferrite bead</strong> (600&Omega; @ 100MHz) on 3.3V input from 5V rail</li>
+</ol>
+
+<h3>Step 5.4 &mdash; Power Connectors</h3>
+<ol class="steps">
+  <li>Solder 12V <strong>barrel jack</strong> (5.5&times;2.1mm, center positive)</li>
+  <li>Solder <strong>battery connector</strong> (JST-XH 2-pin)</li>
+  <li>Install power input protection (TVS diode for overvoltage, Schottky for reverse polarity if designed)</li>
+</ol>
+
+<h3 style="color:var(--accent);">Step 5.5 &mdash; POWER TEST (Critical Gate &mdash; DO NOT PROCEED until ALL pass)</h3>
+<div class="callout callout-danger">
+  <strong>If ANY test fails: STOP.</strong> Check solder joints under microscope, verify component orientation (pin 1), check for bridges. Fix before proceeding.
+</div>
+<table class="test">
+  <thead><tr><th>#</th><th>Test</th><th>How</th><th>Expected</th><th>Measured</th><th>Pass?</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Apply 12V via bench supply</td><td>Set PSU to 12.0V, limit 500mA</td><td>No smoke, no excess current</td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>2</td><td>SYS output voltage</td><td>Probe BQ24195 SYS pin</td><td>~12V</td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>3</td><td><strong>5V rail</strong></td><td>Probe TPS62150 output</td><td><strong>5.0V &plusmn;2%</strong></td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>4</td><td><strong>3.3V rail</strong></td><td>Probe AP2112K output</td><td><strong>3.3V &plusmn;2%</strong></td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>5</td><td>Quiescent current</td><td>Read bench PSU current</td><td><strong>&lt;10mA</strong> (no load)</td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>6</td><td>Heat check</td><td>Touch ICs after 30s</td><td>No excessive heat</td><td>&mdash;</td><td>&#9744;</td></tr>
+    <tr><td>7</td><td>Short check</td><td>Measure 3.3V to GND resistance</td><td><strong>&gt;1K&Omega;</strong></td><td class="fill-line"></td><td>&#9744;</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════ PHASE 6 ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header mcu">
+  <div class="phase-num">Phase 6</div>
+  <h2>ESP32-S3 MCU Assembly &amp; First Boot</h2>
+  <span class="phase-time">30 minutes</span>
+</div>
+
+<h3>Step 6.1 &mdash; Pre-Installation</h3>
+<ul class="checklist">
+  <li>Verify 3.3V rail is stable at 3.3V &plusmn;2% (from Phase 5)</li>
+  <li>Verify no shorts between 3.3V and GND at ESP32 pad locations</li>
+  <li>Clean PCB pads with IPA</li>
+</ul>
+
+<h3>Step 6.2 &mdash; Solder ESP32-S3-WROOM-1-N16R8</h3>
+<ol class="steps">
+  <li>Apply <strong>flux</strong> generously to all module pads on PCB</li>
+  <li>Apply thin layer of solder paste (stencil method preferred)</li>
+  <li>Place module carefully with tweezers</li>
+  <li><strong>Check alignment under microscope</strong> &mdash; pin 1 marker must match</li>
+  <li><strong>Preheat board</strong> to 150&deg;C on hot plate (prevents thermal shock)</li>
+  <li>Hot air reflow: focus on module at <strong>260&deg;C for 20-30 seconds</strong></li>
+  <li>Watch corner pins &mdash; solder flows there first</li>
+  <li>Let cool <strong>naturally</strong> &mdash; do NOT blow cold air</li>
+  <li><strong>Inspect ALL pins under microscope</strong> &mdash; look for bridges and cold joints</li>
+  <li>Touch up bridges or opens with fine tip iron + flux</li>
+</ol>
+
+<h3>Step 6.3 &mdash; Critical Support Components</h3>
+<ul class="checklist">
+  <li><strong>EN pin:</strong> 10K pull-up to 3.3V <strong>+</strong> 0.1&micro;F cap to GND (RC delay for clean boot)</li>
+  <li><strong>GPIO0 (BOOT):</strong> 10K pull-up to 3.3V + tactile button to GND (for download mode)</li>
+  <li><strong>Reset button:</strong> Tactile button between EN pin and GND</li>
+  <li><strong>Decoupling:</strong> Place <strong>10&micro;F + 0.1&micro;F</strong> within 3mm of EACH VCC pin on module</li>
+  <li><strong>USB pins:</strong> GPIO20 (USB_D-) and GPIO21 (USB_D+) to USB-B Mini connector or pin header</li>
+</ul>
+
+<h3>Step 6.4 &mdash; Antenna Clearance Verification</h3>
+<div class="callout callout-warning">
+  <strong>15mm clearance</strong> around antenna area (top-right of module). <strong>No ground plane</strong> under antenna on ANY layer. <strong>No traces</strong> crossing antenna feed line. No metal enclosure parts within 10mm.
+</div>
+
+<h3>Step 6.5 &mdash; ESP32 First Boot Test</h3>
+<ol class="steps">
+  <li>Connect USB cable (or USB-UART adapter to TX0/RX0 pins)</li>
+  <li>Open serial terminal: <strong>115200 baud, 8N1</strong></li>
+  <li>Apply 12V power &rarr; ESP32 should boot, expect "rst:0x1 (POWERON_RESET)"</li>
+  <li>If <strong>no output:</strong> Hold BOOT &rarr; press RESET &rarr; release BOOT (enters download mode). Check EN=3.3V, GPIO0=HIGH</li>
+  <li>Run <code>esptool.py --port COMx flash_id</code> &rarr; should report <strong>16MB flash</strong></li>
+  <li>If PSRAM test firmware available: boot log shows <strong>"8MB PSRAM initialized"</strong></li>
+</ol>
+
+<!-- ═══════════════════ PHASE 7 ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header display">
+  <div class="phase-num">Phase 7</div>
+  <h2>Display Connection &amp; Test</h2>
+  <span class="phase-time">30 minutes</span>
+</div>
+
+<div class="callout callout-info">
+  <strong>Two separate I2C buses:</strong><br>
+  &bull; <strong>I2C Bus 0 (Touch):</strong> GPIO38 (SDA) + GPIO39 (SCL) &mdash; GT911 at 0x5D<br>
+  &bull; <strong>I2C Bus 1 (Sensors):</strong> GPIO44 (SDA) + GPIO46 (SCL) &mdash; SHT40, BH1750, MCP23017
+</div>
+
+<h3>Step 7.1 &mdash; Solder FFC Connector</h3>
+<ol class="steps">
+  <li>Solder 40-pin, 0.5mm pitch FFC connector (bottom-contact type, ZIF latch)</li>
+  <li>Use fine tip iron at 300&deg;C with flux</li>
+  <li><strong>Inspect EVERY pin under microscope</strong> &mdash; bridges here = dead display</li>
+</ol>
+
+<h3>Step 7.2 &mdash; Install Backlight Driver</h3>
+<ol class="steps">
+  <li>Solder N-MOSFET (2N7002, SOT-23): <strong>Gate</strong> &rarr; GPIO42, <strong>Drain</strong> &rarr; backlight, <strong>Source</strong> &rarr; GND</li>
+  <li>Install TVS diodes on touch I2C lines (ESD protection from user touching screen)</li>
+</ol>
+
+<h3>Step 7.3 &mdash; Display Wiring (from firmware <code>pins.h</code>)</h3>
+<table class="compact">
+  <thead><tr><th>GPIO</th><th>Signal</th><th>GPIO</th><th>Signal</th><th>GPIO</th><th>Signal</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>LCD_R0</td><td>6</td><td>LCD_G0</td><td>12</td><td>LCD_B0</td></tr>
+    <tr><td>2</td><td>LCD_R1</td><td>7</td><td>LCD_G1</td><td>13</td><td>LCD_B1</td></tr>
+    <tr><td>3</td><td>LCD_R2</td><td>8</td><td>LCD_G2</td><td>14</td><td>LCD_B2</td></tr>
+    <tr><td>4</td><td>LCD_R3</td><td>9</td><td>LCD_G3</td><td>15</td><td>LCD_B3</td></tr>
+    <tr><td>5</td><td>LCD_R4</td><td>10</td><td>LCD_G4</td><td>16</td><td>LCD_B4</td></tr>
+    <tr><td>&mdash;</td><td>&mdash;</td><td>11</td><td>LCD_G5</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr><td><strong>45</strong></td><td><strong>LCD_CLK</strong></td><td><strong>48</strong></td><td><strong>LCD_DE</strong></td><td><strong>47</strong></td><td><strong>LCD_VSYNC</strong></td></tr>
+    <tr><td><strong>21</strong></td><td><strong>LCD_HSYNC</strong></td><td>42</td><td>Backlight PWM</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr><td>38</td><td>TOUCH_SDA</td><td>39</td><td>TOUCH_SCL</td><td>40</td><td>TOUCH_INT</td></tr>
+    <tr><td>41</td><td>TOUCH_RST</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 7.4 &mdash; Connect &amp; Test Display</h3>
+<ol class="steps">
+  <li>Insert FFC cable &mdash; <strong>verify orientation</strong> (contacts face down for bottom-contact connector)</li>
+  <li>Close ZIF latch firmly</li>
+  <li>Power on &rarr; backlight should illuminate (GPIO42 HIGH)</li>
+  <li>Flash LVGL test firmware</li>
+  <li><strong>Verify:</strong> All pixels working, correct colors (no swapped R/G/B), no dead lines</li>
+  <li><strong>Touch test:</strong> Tap all 4 corners + center &rarr; verify correct coordinate mapping</li>
+  <li>I2C scan should find GT911 at address <strong>0x5D</strong></li>
+</ol>
+
+<!-- ═══════════════════ PHASE 8 ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header audio">
+  <div class="phase-num">Phase 8</div>
+  <h2>Audio Section</h2>
+  <span class="phase-time">20 minutes</span>
+</div>
+
+<h3>Step 8.1 &mdash; Install MAX98357A (QFN-16, 3&times;3mm)</h3>
+<ol class="steps">
+  <li>Apply solder paste to QFN-16 pads</li>
+  <li>Place with tweezers, align under microscope</li>
+  <li>Hot air reflow at 260&deg;C, 20 seconds</li>
+  <li>Install: <strong>10&micro;F</strong> cap on VDD (bulk) + <strong>100nF</strong> cap on VDD (close to chip)</li>
+</ol>
+
+<h3>Step 8.2 &mdash; I2S Audio Wiring (from firmware <code>pins.h</code>)</h3>
+<table class="compact">
+  <thead><tr><th>ESP32 GPIO</th><th>MAX98357A Pin</th><th>Function</th></tr></thead>
+  <tbody>
+    <tr><td><strong>GPIO17</strong></td><td>BCLK</td><td>I2S bit clock</td></tr>
+    <tr><td><strong>GPIO18</strong></td><td>LRCLK</td><td>I2S left/right clock</td></tr>
+    <tr><td><strong>GPIO15</strong></td><td>DIN</td><td>I2S audio data out</td></tr>
+    <tr><td>&mdash;</td><td>GAIN &rarr; GND</td><td>Sets 15dB gain</td></tr>
+    <tr><td>&mdash;</td><td>SD &rarr; 3.3V</td><td>Enable (always on)</td></tr>
+    <tr><td>&mdash;</td><td>VDD &rarr; 5V</td><td>Power supply</td></tr>
+    <tr><td>&mdash;</td><td>GND &rarr; GND</td><td>Ground</td></tr>
+  </tbody>
+</table>
+<div class="callout callout-warning">
+  <strong>Note:</strong> Firmware <code>pins.h</code> defines GPIO15 for I2S_DOUT, but GPIO15 is also LCD_B3. If using RGB565 (16-bit), fewer blue pins are needed and GPIO15 is freed for audio. <strong>Verify your PCB schematic resolves this conflict.</strong>
+</div>
+
+<h3>Step 8.3 &mdash; Speaker Connection</h3>
+<ol class="steps">
+  <li>Solder 2-pin JST or screw terminal</li>
+  <li>MAX98357A OUT+ &rarr; Speaker +, OUT- &rarr; Speaker -</li>
+  <li>Speaker: <strong>40mm, 8&Omega;, 2W</strong> (no polarity for dynamic speaker)</li>
+</ol>
+
+<h3>Step 8.4 &mdash; Audio Test</h3>
+<ul class="checklist">
+  <li>Flash test firmware with 1kHz tone generator</li>
+  <li>Connect speaker &rarr; should hear <strong>clean 1kHz sine tone</strong></li>
+  <li>Verify volume control works (10 levels via software)</li>
+  <li>Check for distortion at max volume &rarr; should be clean at 8&Omega; load</li>
+</ul>
+
+<!-- ═══════════════════ PHASE 9 ═══════════════════ -->
+<div class="phase-header motor">
+  <div class="phase-num">Phase 9</div>
+  <h2>Motor Driver Section</h2>
+  <span class="phase-time">30 minutes</span>
+</div>
+
+<h3>Step 9.1 &mdash; Install MCP23017 I/O Expander (SOIC-28)</h3>
+<ol class="steps">
+  <li>Solder MCP23017-E/SO</li>
+  <li>Tie address pins: <strong>A0=GND, A1=GND, A2=GND</strong> &rarr; I2C address = <strong>0x20</strong></li>
+  <li>Install 100nF decoupling cap on VDD pin</li>
+  <li>Connect to <strong>I2C Bus 1:</strong> SDA &rarr; GPIO44, SCL &rarr; GPIO46</li>
+  <li><strong>4.7K pull-up resistors</strong> on SDA and SCL (if not already installed)</li>
+  <li><strong>Quick test:</strong> I2C scan &rarr; should detect device at <strong>0x20</strong></li>
+</ol>
+
+<h3>Step 9.2 &mdash; Install ULN2003A Motor Drivers (&times;7)</h3>
+<ol class="steps">
+  <li>Solder all 7&times; ULN2003AN (SOIC-16 or DIP-16)</li>
+  <li>For <strong>each</strong> ULN2003A: <strong>COM pin &rarr; 5V</strong> (critical &mdash; built-in flyback diodes need this)</li>
+  <li>GND pin &rarr; ground</li>
+  <li>Input pins &larr; MCP23017 GPIO outputs (GPA0-7, GPB0-7)</li>
+  <li>Output pins &rarr; motor connector pins</li>
+</ol>
+
+<h3>Step 9.3 &mdash; Motor Connectors</h3>
+<ol class="steps">
+  <li>Solder 10&times; JST-XH 5-pin connectors</li>
+  <li>Wiring per motor (28BYJ-48): Pin 1=<strong style="color:#c00;">Red</strong> (5V common), Pin 2=<span style="color:#2b6cb0;"><strong>Blue</strong></span> (A), Pin 3=<span style="color:#d53f8c;"><strong>Pink</strong></span> (B), Pin 4=<span style="color:#d69e2e;"><strong>Yellow</strong></span> (C), Pin 5=<span style="color:#c05621;"><strong>Orange</strong></span> (D)</li>
+  <li>Gate servo connector (3-pin): VCC(5V), GND, Signal &rarr; <strong>GPIO43</strong></li>
+</ol>
+
+<h3>Step 9.4 &mdash; Motor EMI Mitigation</h3>
+<ul class="checklist">
+  <li>Add <strong>100nF ceramic cap across EACH motor coil</strong> (motor noise causes WiFi interference)</li>
+  <li>Use <strong>ferrite beads</strong> on motor power lines entering the PCB</li>
+  <li>Keep motor traces on separate ground return path from digital signals</li>
+</ul>
+
+<h3>Step 9.5 &mdash; Motor Driver Test</h3>
+<ol class="steps">
+  <li>Connect one 28BYJ-48 motor</li>
+  <li>Flash motor test firmware</li>
+  <li>Run half-step sequence (8-step: 2048 steps = 1 revolution)</li>
+  <li>Motor should rotate smoothly in both directions</li>
+  <li>Measure current: <strong>~200mA active, ~0mA when off</strong></li>
+  <li>Test all 10 motor outputs</li>
+</ol>
+
+<!-- ═══════════════════ PHASE 10 ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header sensor">
+  <div class="phase-num">Phase 10</div>
+  <h2>Sensor Section (I2C, Digital, Analog)</h2>
+  <span class="phase-time">45 minutes</span>
+</div>
+<p><em>Reminder: Sensor I2C Bus 1 = GPIO44 (SDA), GPIO46 (SCL)</em></p>
+
+<h3>Step 10.1 &mdash; I2C Sensors</h3>
+<h4>SHT40 Temp/Humidity (address 0x44)</h4>
+<ol class="steps">
+  <li>Tiny DFN 1.5&times;1.5mm &mdash; requires hot air station</li>
+  <li>Apply solder paste, place with tweezers, reflow at 260&deg;C</li>
+  <li>Add 100nF decoupling cap on VDD</li>
+  <li>Accuracy: &plusmn;0.2&deg;C temperature, &plusmn;1.8% humidity</li>
+</ol>
+
+<h4>BH1750 Light Sensor (address 0x23)</h4>
+<ol class="steps">
+  <li>Small WSOF package, hot air reflow</li>
+  <li>ADDR pin &rarr; GND (sets address to 0x23)</li>
+  <li>Add 100nF decoupling cap</li>
+  <li>Range: 1-65535 lux, 1 lux resolution</li>
+</ol>
+
+<h3>Step 10.2 &mdash; Load Cell + HX711 ADC</h3>
+<ol class="steps">
+  <li>Solder HX711 module (or SOP-16 IC directly on PCB)</li>
+  <li>HX711 DOUT &rarr; <strong>GPIO32</strong>, HX711 SCK &rarr; <strong>GPIO33</strong></li>
+  <li>Load cell: <strong>Red</strong>(E+)&rarr;HX711 E+, <strong>Black</strong>(E-)&rarr;HX711 E-, <strong>White</strong>(A-)&rarr;HX711 A-, <strong>Green</strong>(A+)&rarr;HX711 A+</li>
+  <li>HX711 power: VCC &rarr; 5V, GND &rarr; GND</li>
+  <li><strong>Place HX711 physically close to load cell</strong> (short wires = less noise)</li>
+  <li><strong>Shield from motor EMI</strong> (copper tape, physical distance, or ground guard ring)</li>
+</ol>
+
+<h3>Step 10.3 &mdash; Digital Sensors</h3>
+<h4>PIR Motion Sensor (AM312)</h4>
+<ol class="steps">
+  <li>Solder 3-pin JST-PH connector (VCC, GND, OUT)</li>
+  <li>Signal output &rarr; <strong>GPIO26</strong>. No pull-up needed (push-pull output)</li>
+  <li>3.3V compatible, 20&micro;A standby. Detects motion at 3-5m, 100&deg; angle</li>
+</ol>
+
+<h4>Reed Switch (Door/Tray sensor)</h4>
+<ol class="steps">
+  <li>Solder 2-pin JST connector</li>
+  <li>One wire &rarr; <strong>GPIO27</strong> + <strong>10K pull-up to 3.3V</strong>. Other wire &rarr; GND</li>
+  <li>Mount magnet (10&times;5mm neodymium) on moving part</li>
+  <li>Logic: Door <strong>closed</strong> (magnet near) = GPIO <strong>LOW</strong> / Door <strong>open</strong> = GPIO <strong>HIGH</strong></li>
+</ol>
+
+<h3>Step 10.4 &mdash; Optical Pill Sensors (&times;10)</h3>
+<p>Each TCPT1300X01 sensor circuit:</p>
+<pre><code>5V ──[100R]──►IR LED──► GND     (LED side, current ~30mA)
+5V ──[10K pull-up]──┬──► MCP23017 GPIO  (phototransistor collector)
+                    └──►Phototransistor──► GND (emitter)</code></pre>
+<ul class="checklist">
+  <li>Solder 10&times; 3-pin connectors (VCC, GND, Signal)</li>
+  <li>Route 8 sensors &rarr; MCP23017 Port B (GPB0-GPB7) with interrupt</li>
+  <li>Route 2 remaining &rarr; ESP32 GPIO28, GPIO29 (direct)</li>
+  <li>Logic: <strong>No pill = GPIO HIGH</strong> (light passes) / <strong>Pill passing = GPIO LOW</strong> (blocked)</li>
+  <li>Count <strong>rising edges</strong> for pill count</li>
+</ul>
+
+<h3>Step 10.5 &mdash; Hall Effect Sensors (&times;10, A3144)</h3>
+<ul class="checklist">
+  <li>10&times; A3144 sensors (one per motor position for carousel homing)</li>
+  <li>Each sensor: VCC (5V), GND, Output &rarr; <strong>10K pull-up to 3.3V</strong> &rarr; MCP23017 GPIO</li>
+  <li>Mount near carousel gear teeth, magnet on carousel at home position</li>
+</ul>
+
+<h3>Step 10.6 &mdash; I2C Bus Verification</h3>
+<p>Run I2C scan from ESP32:</p>
+<div class="two-col">
+<table class="compact sensor" style="margin-right:8px;">
+  <thead><tr><th colspan="3">Bus 1 (GPIO44/46)</th></tr></thead>
+  <tbody>
+    <tr><td>0x20</td><td>MCP23017</td><td>&#9744; Found</td></tr>
+    <tr><td>0x23</td><td>BH1750</td><td>&#9744; Found</td></tr>
+    <tr><td>0x44</td><td>SHT40</td><td>&#9744; Found</td></tr>
+  </tbody>
+</table>
+<table class="compact sensor">
+  <thead><tr><th colspan="3">Bus 0 (GPIO38/39)</th></tr></thead>
+  <tbody>
+    <tr><td>0x5D</td><td>GT911 (Touch)</td><td>&#9744; Found</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ═══════════════════ PHASE 11 ═══════════════════ -->
+<div class="phase-header sensor">
+  <div class="phase-num">Phase 11</div>
+  <h2>SD Card Section</h2>
+  <span class="phase-time">10 minutes</span>
+</div>
+
+<h3>Step 11.1 &mdash; Install SD Card Socket</h3>
+<ol class="steps">
+  <li>Solder micro SD push-push socket</li>
+  <li>SPI wiring: <strong>GPIO36</strong>&rarr;SD_CLK, <strong>GPIO35</strong>&rarr;SD_CMD (MOSI), <strong>GPIO37</strong>&rarr;SD_DATA0 (MISO)</li>
+  <li>Add <strong>10K pull-up resistors</strong> on all SD data lines (required by SD spec)</li>
+  <li>VCC &rarr; 3.3V, GND &rarr; GND. Add 100nF decoupling cap on VCC</li>
+</ol>
+
+<h3>Step 11.2 &mdash; SD Card Test</h3>
+<ul class="checklist">
+  <li>Insert 16GB SanDisk micro SD card (formatted FAT32)</li>
+  <li>Flash test firmware that writes/reads a file</li>
+  <li>Verify: write speed &gt;1MB/s, read speed &gt;2MB/s</li>
+  <li>SD card stores: audio files (~5MB for 4 languages), event logs, calibration data</li>
+</ul>
+
+<!-- ═══════════════════ PHASE 12 ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header motor">
+  <div class="phase-num">Phase 12</div>
+  <h2>Motor &amp; Mechanical Sub-Assembly</h2>
+  <span class="phase-time">1 hour</span>
+</div>
+
+<h3>Step 12.1 &mdash; Mount Stepper Motors</h3>
+<ol class="steps">
+  <li>Mount 10&times; 28BYJ-48 motors to bracket (3D printed or CNC aluminum)</li>
+  <li>Use M3 screws (2 per motor). All shafts same direction</li>
+  <li>Verify each motor rotates freely (no binding)</li>
+</ol>
+
+<h3>Step 12.2 &mdash; Carousel Assembly</h3>
+<ol class="steps">
+  <li>Press-fit gear onto each motor's D-shaped shaft</li>
+  <li>Install central carousel with 10 pill compartments</li>
+  <li>Ensure carousel meshes smoothly with motor gears</li>
+  <li>Test full 360&deg; rotation by hand &mdash; must be smooth, no grinding</li>
+</ol>
+
+<h3>Step 12.3 &mdash; Gate Servo (SG90)</h3>
+<ol class="steps">
+  <li>Mount SG90 in gate mechanism</li>
+  <li>Connect: VCC(5V), GND, Signal &rarr; <strong>GPIO43</strong></li>
+  <li>PWM: 50Hz, <strong>1ms pulse = 0&deg; (closed)</strong>, <strong>2ms pulse = 180&deg; (open)</strong></li>
+  <li>Test full open/close &mdash; gate must fully seal</li>
+</ol>
+
+<h3>Step 12.4 &mdash; Optical Sensors in Pill Chutes</h3>
+<ul class="checklist">
+  <li>Mount one TCPT1300X01 in each of 10 pill chutes (3mm sensor gap)</li>
+  <li>IR LED on one side, phototransistor opposite</li>
+  <li>Wire each sensor to its JST connector on main PCB</li>
+</ul>
+
+<h3>Step 12.5 &mdash; Hall Sensors for Homing</h3>
+<ul class="checklist">
+  <li>Mount one A3144 near each motor's gear position</li>
+  <li>Glue small neodymium magnet to carousel at home position for each slot</li>
+  <li>Hall sensor triggers = motor has reached the "home" position</li>
+</ul>
+
+<h3>Step 12.6 &mdash; Load Cell in Output Tray</h3>
+<ul class="checklist">
+  <li>Fix one end of TAL220 1kg load cell rigidly to device frame</li>
+  <li>Attach output tray to free/floating end &mdash; <strong>no mechanical contact with frame</strong></li>
+  <li>Wire to HX711 (Red&rarr;E+, Black&rarr;E-, White&rarr;A-, Green&rarr;A+)</li>
+  <li>Shield HX711 from motor EMI (copper tape or physical distance)</li>
+</ul>
+
+<!-- ═══════════════════ PHASE 13 ═══════════════════ -->
+<div class="phase-header power">
+  <div class="phase-num">Phase 13</div>
+  <h2>Battery &amp; BMS Installation</h2>
+  <span class="phase-time">20 minutes</span>
+</div>
+
+<p><strong>Configuration:</strong> 2S1P (2 cells in series) = <strong>7.4V nominal, 5000mAh</strong></p>
+
+<h3>Step 13.1 &mdash; BMS Protection Requirements (DW01A + MOSFETs)</h3>
+<table class="compact power">
+  <thead><tr><th>Protection</th><th>Threshold</th></tr></thead>
+  <tbody>
+    <tr><td>Overvoltage cutoff</td><td>8.4V (4.2V per cell)</td></tr>
+    <tr><td>Undervoltage cutoff</td><td>6.0V (3.0V per cell)</td></tr>
+    <tr><td>Overcurrent cutoff</td><td>5A</td></tr>
+    <tr><td>Short circuit</td><td>Instant cutoff</td></tr>
+    <tr><td>Balance current</td><td>50-100mA</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 13.2 &mdash; Installation</h3>
+<ol class="steps">
+  <li>Insert 2&times; Samsung INR18650-25R cells into Keystone 1042 holder (series connection)</li>
+  <li><strong>VERIFY POLARITY</strong> &mdash; Cell 1 positive &rarr; Cell 2 negative (series = 7.4V)</li>
+  <li>Connect BMS board between battery and output connector</li>
+  <li>Measure pack voltage: should read <strong>7.0-8.4V</strong> depending on charge state</li>
+  <li>Connect JST-XH 2-pin to PCB battery input</li>
+  <li><strong>Test BQ24195 charging:</strong> Apply 12V, BQ24195 should start charging (monitor via I2C or LED)</li>
+</ol>
+
+<h3>Step 13.3 &mdash; Battery Safety</h3>
+<div class="callout callout-danger">
+  <strong>NEVER</strong> short battery terminals. <strong>NEVER</strong> puncture or deform cells. <strong>NEVER</strong> use screws through or near battery. Secure holder with foam tape or mechanical clip only. Store charged batteries away from flammable materials.
+</div>
+
+<!-- ═══════════════════ PHASE 14 ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header">
+  <div class="phase-num">Phase 14</div>
+  <h2>Final Assembly &amp; Enclosure</h2>
+  <span class="phase-time">1 hour</span>
+</div>
+
+<h3>Step 14.1 &mdash; Prepare Enclosure (305 &times; 203 &times; 254mm)</h3>
+<ul class="checklist">
+  <li>Install heat-set brass inserts: M3 for PCB, M2.5 for display</li>
+  <li>Install cable clips and routing guides</li>
+</ul>
+
+<h3>Step 14.2 &mdash; Install Components</h3>
+<table class="compact">
+  <thead><tr><th>Order</th><th>Component</th><th>Method</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Display</td><td>Foam gasket around edge, insert FFC cable (<strong>check orientation!</strong>), clip secure</td></tr>
+    <tr><td>2</td><td>Main PCB</td><td>M3 standoffs (10mm), screw 4 corners</td></tr>
+    <tr><td>3</td><td>Motor/Carousel</td><td>Mount in position, verify clearance for rotation</td></tr>
+    <tr><td>4</td><td>Speaker</td><td>Hot glue or foam mount in speaker cavity</td></tr>
+    <tr><td>5</td><td>Battery pack</td><td>Foam tape mount (NO screws near battery)</td></tr>
+    <tr><td>6</td><td>PIR sensor</td><td>Mount facing front, detection window clear</td></tr>
+    <tr><td>7</td><td>Reed switch</td><td>Mount on tray rail, magnet on tray</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 14.3 &mdash; Final Wiring</h3>
+<ol class="steps">
+  <li>Connect 10&times; motor cables to JST connectors</li>
+  <li>Connect 10&times; optical sensor cables</li>
+  <li>Connect 10&times; hall sensor cables</li>
+  <li>Connect load cell/HX711 cable</li>
+  <li>Connect PIR sensor cable</li>
+  <li>Connect reed switch cable</li>
+  <li>Connect speaker cable</li>
+  <li>Connect battery pack</li>
+  <li>Connect barrel jack for AC power</li>
+  <li>Insert SD card</li>
+</ol>
+
+<h3>Step 14.4 &mdash; Pre-Close Inspection</h3>
+<ul class="checklist">
+  <li><strong>No pinched or stressed wires</strong></li>
+  <li><strong>All connectors fully seated</strong> (tug test gently)</li>
+  <li><strong>Battery polarity correct</strong> (measure voltage at PCB connector)</li>
+  <li><strong>All moving parts have clearance</strong> (carousel, gates, tray)</li>
+  <li><strong>FFC cable not under stress</strong> (no sharp bends)</li>
+  <li><strong>Antenna area clear</strong> of metal parts</li>
+  <li>Close enclosure with screws (do not overtighten ABS &mdash; it cracks)</li>
+</ul>
+
+<!-- ═══════════════════ PHASE 15 ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header mcu">
+  <div class="phase-num">Phase 15</div>
+  <h2>Firmware Flashing &amp; Configuration</h2>
+  <span class="phase-time">30 minutes</span>
+</div>
+
+<h3>Step 15.1 &mdash; Flash Firmware</h3>
+<h4>Windows (ESP-IDF command prompt):</h4>
+<pre><code>cd %USERPROFILE%\esp\smart_dispenser
+idf.py set-target esp32s3
+idf.py build
+idf.py -p COM3 flash monitor</code></pre>
+
+<h4>Direct flash with esptool:</h4>
+<pre><code>esptool.py --chip esp32s3 --port COM3 --baud 921600 write_flash ^
+  0x0 bootloader.bin ^
+  0x10000 firmware.bin ^
+  0x8000 partition-table.bin</code></pre>
+
+<h3>Step 15.2 &mdash; Verify Boot</h3>
+<p>Serial monitor at <strong>115200 baud</strong>. Expected boot messages:</p>
+<ul class="checklist">
+  <li>ESP32-S3 identified</li>
+  <li>16MB Flash detected</li>
+  <li>8MB PSRAM initialized</li>
+  <li>FreeRTOS tasks started (main, wifi, ui, dispense, sensor, audio)</li>
+  <li>LVGL initialized, Display driver OK</li>
+  <li>I2C devices found (0x20, 0x23, 0x44, 0x5D)</li>
+  <li>WiFi scanning...</li>
+</ul>
+
+<h3>Step 15.3 &mdash; Initial Configuration</h3>
+<ol class="steps">
+  <li>Configure WiFi: via touch screen setup wizard or serial command</li>
+  <li>Verify WiFi connects in <strong>&lt;30 seconds</strong></li>
+  <li>Program device serial number: <strong>SMD-XXXXXXXX</strong> format (stored in NVS)</li>
+  <li>Register device with cloud API: <code>POST /api/v1/devices/register</code></li>
+  <li>Verify heartbeat received by server (every 60 seconds)</li>
+</ol>
+
+<!-- ═══════════════════ PHASE 16 ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header test">
+  <div class="phase-num">Phase 16</div>
+  <h2>Full Testing &amp; Calibration</h2>
+  <span class="phase-time">1&ndash;2 hours</span>
+</div>
+
+<h3>16.1 &mdash; Power System Tests</h3>
+<table class="test compact">
+  <thead><tr><th>Test</th><th>Expected</th><th>Measured</th><th>Pass?</th></tr></thead>
+  <tbody>
+    <tr><td>12V input, idle power</td><td>&lt;5W</td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>5V rail under full load</td><td>5.0V &plusmn;2%</td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>3.3V rail under full load</td><td>3.3V &plusmn;2%</td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>AC&rarr;Battery switchover time</td><td>&lt;100ms (unplug AC)</td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>Battery&rarr;AC switchover time</td><td>&lt;100ms (plug AC)</td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>Battery backup, idle</td><td>&gt;48 hours</td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>Low battery alert</td><td>Triggers at 20%</td><td>&mdash;</td><td>&#9744;</td></tr>
+    <tr><td>Critical shutdown</td><td>At 5%</td><td>&mdash;</td><td>&#9744;</td></tr>
+    <tr><td>Reverse polarity protection</td><td>No damage</td><td>&mdash;</td><td>&#9744;</td></tr>
+  </tbody>
+</table>
+
+<h3>16.2 &mdash; Display &amp; Touch Tests</h3>
+<table class="test compact">
+  <thead><tr><th>Test</th><th>Expected</th><th>Pass?</th></tr></thead>
+  <tbody>
+    <tr><td>Display powers on</td><td>Screen lit in &lt;2s</td><td>&#9744;</td></tr>
+    <tr><td>Full white screen</td><td>All pixels white, no dead pixels</td><td>&#9744;</td></tr>
+    <tr><td>Full black screen</td><td>All pixels black</td><td>&#9744;</td></tr>
+    <tr><td>Color bars (R/G/B)</td><td>Correct colors, no channel swap</td><td>&#9744;</td></tr>
+    <tr><td>Brightness control</td><td>10 PWM levels via GPIO42</td><td>&#9744;</td></tr>
+    <tr><td>Touch: top-left corner</td><td>Responds correctly</td><td>&#9744;</td></tr>
+    <tr><td>Touch: top-right corner</td><td>Responds correctly</td><td>&#9744;</td></tr>
+    <tr><td>Touch: bottom-left corner</td><td>Responds correctly</td><td>&#9744;</td></tr>
+    <tr><td>Touch: bottom-right corner</td><td>Responds correctly</td><td>&#9744;</td></tr>
+    <tr><td>Touch: center</td><td>Responds correctly</td><td>&#9744;</td></tr>
+    <tr><td>Touch response time</td><td>&lt;50ms</td><td>&#9744;</td></tr>
+    <tr><td>Viewing angle</td><td>Readable at &plusmn;45&deg; (IPS)</td><td>&#9744;</td></tr>
+  </tbody>
+</table>
+
+<h3>16.3 &mdash; Motor Tests</h3>
+<table class="test compact">
+  <thead><tr><th>Test</th><th>Expected</th><th>Pass?</th></tr></thead>
+  <tbody>
+    <tr><td>Motor 1: Full CW rotation</td><td>Smooth, 2048 steps = 360&deg;</td><td>&#9744;</td></tr>
+    <tr><td>Motor 2: Full CW rotation</td><td>Smooth</td><td>&#9744;</td></tr>
+    <tr><td>Motor 3: Full CW rotation</td><td>Smooth</td><td>&#9744;</td></tr>
+    <tr><td>Motor 4: Full CW rotation</td><td>Smooth</td><td>&#9744;</td></tr>
+    <tr><td>Motor 5: Full CW rotation</td><td>Smooth</td><td>&#9744;</td></tr>
+    <tr><td>Motor 6: Full CW rotation</td><td>Smooth</td><td>&#9744;</td></tr>
+    <tr><td>Motor 7: Full CW rotation</td><td>Smooth</td><td>&#9744;</td></tr>
+    <tr><td>Motor 8: Full CW rotation</td><td>Smooth</td><td>&#9744;</td></tr>
+    <tr><td>Motor 9: Full CW rotation</td><td>Smooth</td><td>&#9744;</td></tr>
+    <tr><td>Motor 10: Full CW rotation</td><td>Smooth</td><td>&#9744;</td></tr>
+    <tr><td>Direction reversal (all)</td><td>No lost steps</td><td>&#9744;</td></tr>
+    <tr><td>Gate servo: Open (90&deg;)</td><td>Fully opens</td><td>&#9744;</td></tr>
+    <tr><td>Gate servo: Close (0&deg;)</td><td>Fully seals</td><td>&#9744;</td></tr>
+    <tr><td>Motor noise level</td><td>&lt;45 dB @ 1m</td><td>&#9744;</td></tr>
+    <tr><td>Hall sensor homing (all 10)</td><td>Each finds home</td><td>&#9744;</td></tr>
+  </tbody>
+</table>
+
+<h3>16.4 &mdash; Sensor Tests</h3>
+<table class="test compact">
+  <thead><tr><th>Test</th><th>Expected</th><th>Pass?</th></tr></thead>
+  <tbody>
+    <tr><td>SHT40: Temperature</td><td>&plusmn;2&deg;C of reference</td><td>&#9744;</td></tr>
+    <tr><td>SHT40: Humidity</td><td>&plusmn;5% RH of reference</td><td>&#9744;</td></tr>
+    <tr><td>BH1750: Light</td><td>Changes with ambient</td><td>&#9744;</td></tr>
+    <tr><td>PIR: Motion at 1m</td><td>GPIO26 goes HIGH</td><td>&#9744;</td></tr>
+    <tr><td>PIR: No motion 10s</td><td>GPIO26 goes LOW</td><td>&#9744;</td></tr>
+    <tr><td>Reed switch: Magnet near</td><td>GPIO27 LOW (closed)</td><td>&#9744;</td></tr>
+    <tr><td>Reed switch: Magnet away</td><td>GPIO27 HIGH (open)</td><td>&#9744;</td></tr>
+    <tr><td>Optical sensor 1: Pass pill</td><td>Correctly counts 1</td><td>&#9744;</td></tr>
+    <tr><td>Optical sensors 2-10</td><td>All count correctly</td><td>&#9744;</td></tr>
+    <tr><td>Optical: 5 pills consecutive</td><td>Counts exactly 5</td><td>&#9744;</td></tr>
+    <tr><td>SD card: Read/write test</td><td>File created &amp; read back</td><td>&#9744;</td></tr>
+  </tbody>
+</table>
+
+<h3>16.5 &mdash; Load Cell Calibration <span class="badge badge-critical">Critical</span></h3>
+<ol class="steps">
+  <li>Enter calibration: <code>Settings &rarr; Calibration &rarr; Load Cell</code> (or serial: <code>calibrate loadcell</code>)</li>
+  <li>Remove everything from output tray &rarr; press <strong>"Zero"</strong> &rarr; records offset</li>
+  <li>Place <strong>50g calibration weight</strong> &rarr; press <strong>"Calibrate"</strong> &rarr; records scale factor</li>
+  <li><strong>Verify:</strong> Display shows <strong>50.0g &plusmn;1g</strong></li>
+  <li>Remove weight, place <strong>10g</strong> &rarr; should read <strong>10.0g &plusmn;0.5g</strong></li>
+  <li>Remove weight &rarr; should return to <strong>0.0g &plusmn;0.1g</strong></li>
+  <li>Save calibration to NVS</li>
+</ol>
+
+<h3>16.6 &mdash; Touch Screen Calibration</h3>
+<ol class="steps">
+  <li>Enter: <code>Settings &rarr; Calibration &rarr; Touch</code></li>
+  <li>Tap each of 4 corner crosshair targets precisely</li>
+  <li>Tap center target</li>
+  <li>Verify touch accuracy across screen: <strong>&lt;5mm error everywhere</strong></li>
+  <li>Save calibration</li>
+</ol>
+
+<h3>16.7 &mdash; Motor Homing Calibration</h3>
+<ol class="steps">
+  <li>Enter: <code>Settings &rarr; Calibration &rarr; Motors</code></li>
+  <li>For each motor (1-10): Run <strong>"Find Home"</strong> &rarr; motor rotates until Hall sensor triggers</li>
+  <li>Position saved as home (slot 1 position)</li>
+  <li>Verify: command to go to slot N &rarr; carousel stops at correct slot every time</li>
+</ol>
+
+<h3>16.8 &mdash; Full Dispense Integration Test</h3>
+<div class="callout callout-success">
+  <strong>Run <code>dispense 1 2</code></strong> (slot 1, 2 pills) and verify the full sequence:
+</div>
+<ul class="checklist">
+  <li>Carousel rotates to slot 1 (~500ms)</li>
+  <li>Hall sensor confirms correct position</li>
+  <li>Gate opens (servo to 90&deg;)</li>
+  <li>Optical sensor counts exactly 2 pills falling</li>
+  <li>Gate closes (servo to 0&deg;)</li>
+  <li>Load cell verifies weight matches expected (2 pills &times; pill weight)</li>
+  <li>DOSE_DISPENSED event sent to cloud API</li>
+  <li><strong>Repeat for ALL 10 slots</strong></li>
+  <li>Test <strong>jam detection:</strong> deliberately block pill chute &rarr; should generate Error E101</li>
+</ul>
+
+<h3>16.9 &mdash; Connectivity Tests</h3>
+<table class="test compact">
+  <thead><tr><th>Test</th><th>Expected</th><th>Pass?</th></tr></thead>
+  <tbody>
+    <tr><td>WiFi connects (2.4GHz)</td><td>&lt;30 seconds</td><td>&#9744;</td></tr>
+    <tr><td>WiFi connects (5GHz)</td><td>&lt;30 seconds</td><td>&#9744;</td></tr>
+    <tr><td>WiFi auto-reconnect</td><td>Reconnects in &lt;60s after AP off/on</td><td>&#9744;</td></tr>
+    <tr><td>BLE advertising</td><td>Discoverable by phone</td><td>&#9744;</td></tr>
+    <tr><td>API heartbeat</td><td>Every 60s &plusmn;5s</td><td>&#9744;</td></tr>
+    <tr><td>Heartbeat data</td><td>Battery%, temp, WiFi RSSI, slot data</td><td>&#9744;</td></tr>
+    <tr><td>HTTPS/TLS 1.3</td><td>Certificate validated</td><td>&#9744;</td></tr>
+    <tr><td>OTA update</td><td>Firmware downloads and installs</td><td>&#9744;</td></tr>
+  </tbody>
+</table>
+
+<h3>16.10 &mdash; Audio Tests</h3>
+<table class="test compact">
+  <thead><tr><th>Test</th><th>Expected</th><th>Pass?</th></tr></thead>
+  <tbody>
+    <tr><td>1kHz test tone</td><td>Clear, no distortion</td><td>&#9744;</td></tr>
+    <tr><td>Volume: 10 levels</td><td>Each level distinguishable, 60-90 dB</td><td>&#9744;</td></tr>
+    <tr><td>Alert tone</td><td>Distinct and attention-getting</td><td>&#9744;</td></tr>
+    <tr><td>Voice prompt (if loaded)</td><td>Intelligible speech</td><td>&#9744;</td></tr>
+    <tr><td>Quiet hours mode</td><td>Audio fully muted</td><td>&#9744;</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════ PHASE 17 ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header travel">
+  <div class="phase-num">Phase 17</div>
+  <h2>SMD-200 Travel Device Build</h2>
+  <span class="phase-time">2&ndash;3 hours</span>
+</div>
+
+<h3>Step 17.1 &mdash; Travel Device BOM Additions</h3>
+<table class="compact bom">
+  <thead><tr><th>Component</th><th>Part</th><th>Qty</th><th>Price</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>MCU</td><td>ESP32-S3-MINI-1</td><td>1</td><td>$4.00</td><td>Smaller module, single-core 160MHz</td></tr>
+    <tr><td>Cellular</td><td>SIM7080G (SIMCom)</td><td>1</td><td>$12-15</td><td>LTE Cat-M1 + GPS, 17.6&times;15.7mm LGA</td></tr>
+    <tr><td>Display</td><td>SSD1306 2.4" OLED (128&times;64, I2C)</td><td>1</td><td>$8.00</td><td>Address 0x3C</td></tr>
+    <tr><td>Charge IC</td><td>TP4056 + DW01 protection</td><td>1</td><td>$0.50</td><td>USB-C 5V/1A charging</td></tr>
+    <tr><td>Fuel Gauge</td><td>MAX17048</td><td>1</td><td>$2.00</td><td>I2C battery monitor</td></tr>
+    <tr><td>Battery</td><td>Li-Po 3000mAh pouch (3.7V, JST-PH)</td><td>1</td><td>$8.00</td><td>60&times;50&times;8mm</td></tr>
+    <tr><td>Servos</td><td>SG90 micro</td><td>4</td><td>$1.50 ea</td><td>Gate control per slot</td></tr>
+    <tr><td>Optical</td><td>TCPT1300X01</td><td>4</td><td>$0.80 ea</td><td>Pill counting</td></tr>
+    <tr><td>SIM card</td><td>Nano SIM socket (push-push)</td><td>1</td><td>$0.80</td><td></td></tr>
+    <tr><td>Antennas</td><td>u.FL LTE + u.FL GPS antenna</td><td>2</td><td>$5.00 ea</td><td>Connect LAST</td></tr>
+    <tr><td>USB-C</td><td>16-pin connector</td><td>1</td><td>$0.80</td><td>Charging + data</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 17.2 &mdash; Travel PCB Assembly (80&times;60mm, 2-layer)</h3>
+<table class="compact">
+  <thead><tr><th>Order</th><th>Component</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Passives (0603)</td><td>Solder paste + hot air</td></tr>
+    <tr><td>2</td><td>ESP32-S3-MINI-1</td><td>Hot air reflow</td></tr>
+    <tr><td>3</td><td>SIM7080G</td><td><strong>Large LGA (17.6&times;15.7mm)</strong> &mdash; hot air at 270&deg;C</td></tr>
+    <tr><td>4</td><td>TP4056 module</td><td>SOT-23-6 or breakout module</td></tr>
+    <tr><td>5</td><td>MAX17048 fuel gauge</td><td>Tiny package, hot air</td></tr>
+    <tr><td>6</td><td>Connectors</td><td>USB-C, SIM socket, u.FL &mdash; hand solder</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 17.3 &mdash; SIM7080G Installation (Most Challenging)</h3>
+<ol class="steps">
+  <li>Apply solder paste to ALL pads + large ground paddle</li>
+  <li>Place with tweezers (17.6 &times; 15.7mm)</li>
+  <li>Hot air at <strong>270&deg;C</strong> from above &mdash; watch for solder to flow at edges</li>
+  <li>Module "settles" when solder melts</li>
+  <li><strong>Inspect under microscope</strong> for bridges (especially ground paddle area)</li>
+  <li>Attach u.FL antenna connectors <strong>LAST</strong> (cables are fragile)</li>
+</ol>
+
+<h3>Step 17.4 &mdash; Travel Device GPIO Map (Section 11.2 &mdash; authoritative)</h3>
+<table class="compact">
+  <thead><tr><th>GPIO</th><th>Function</th><th>Dir</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>BOOT button</td><td>In</td><td>Pull-up</td></tr>
+    <tr><td>1</td><td>I2C SDA</td><td>Bidir</td><td>Display (SSD1306) + sensors</td></tr>
+    <tr><td>2</td><td>I2C SCL</td><td>Out</td><td>Shared bus</td></tr>
+    <tr><td><strong>3</strong></td><td><strong>Cellular TXD</strong></td><td>Out</td><td>&rarr; SIM7080G RXD</td></tr>
+    <tr><td><strong>4</strong></td><td><strong>Cellular RXD</strong></td><td>In</td><td>&larr; SIM7080G TXD</td></tr>
+    <tr><td><strong>5</strong></td><td><strong>Cellular PWRKEY</strong></td><td>Out</td><td>Power control</td></tr>
+    <tr><td><strong>6</strong></td><td><strong>Cellular STATUS</strong></td><td>In</td><td>Module status</td></tr>
+    <tr><td>7</td><td>Buzzer</td><td>Out</td><td>PWM alert tone</td></tr>
+    <tr><td>8</td><td>Vibration motor</td><td>Out</td><td>On/Off</td></tr>
+    <tr><td>9-12</td><td>Servo PWM 1-4</td><td>Out</td><td>Gate control</td></tr>
+    <tr><td>13-16</td><td>Optical sensors 1-4</td><td>In</td><td>Pill counting</td></tr>
+    <tr><td>17</td><td>Button 1 (Confirm)</td><td>In</td><td>Pull-up</td></tr>
+    <tr><td>18</td><td>Button 2 (Cancel)</td><td>In</td><td>Pull-up</td></tr>
+    <tr><td>19</td><td>Battery voltage ADC</td><td>ADC</td><td>Fuel gauge backup</td></tr>
+    <tr><td>20-21</td><td>USB D-/D+</td><td>Bidir</td><td>Programming</td></tr>
+  </tbody>
+</table>
+
+<h3>Step 17.5 &mdash; Battery Installation</h3>
+<ol class="steps">
+  <li>Connect Li-Po 3000mAh (JST-PH 2-pin)</li>
+  <li><strong>VERIFY POLARITY</strong> (red=+, black=-)</li>
+  <li>Secure with foam tape (<strong>NEVER screws near Li-Po</strong>)</li>
+  <li>TP4056 LED should light when USB-C power connected</li>
+  <li>Full charge time: 3-4 hours at 1A</li>
+</ol>
+
+<h3>Step 17.6 &mdash; Travel Device Test Checklist</h3>
+<table class="test compact">
+  <thead><tr><th>Test</th><th>Expected</th><th>Pass?</th></tr></thead>
+  <tbody>
+    <tr><td>USB-C charging</td><td>LED lights, battery charges</td><td>&#9744;</td></tr>
+    <tr><td>Fuel gauge (MAX17048)</td><td>Accurate battery %</td><td>&#9744;</td></tr>
+    <tr><td>OLED display (SSD1306)</td><td>Shows 128&times;64 UI</td><td>&#9744;</td></tr>
+    <tr><td>Cellular (LTE Cat-M1)</td><td>Network registration &lt;30s</td><td>&#9744;</td></tr>
+    <tr><td>GPS fix</td><td>Gets coordinates (1-3 min cold start)</td><td>&#9744;</td></tr>
+    <tr><td>SIM card detection</td><td>SIM authenticated</td><td>&#9744;</td></tr>
+    <tr><td>Servo 1-4</td><td>All open/close</td><td>&#9744;</td></tr>
+    <tr><td>Optical sensors 1-4</td><td>All detect pills</td><td>&#9744;</td></tr>
+    <tr><td>Buzzer</td><td>Beeps at set frequency</td><td>&#9744;</td></tr>
+    <tr><td>Vibration motor</td><td>Vibrates</td><td>&#9744;</td></tr>
+    <tr><td>API heartbeat via LTE</td><td>Sent and received by server</td><td>&#9744;</td></tr>
+    <tr><td>Battery life (standby)</td><td>&gt;14 days</td><td>&#9744;</td></tr>
+    <tr><td>Battery life (4 doses/day)</td><td>&gt;7 days</td><td>&#9744;</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════ PHASE 18 ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header test">
+  <div class="phase-num">Phase 18</div>
+  <h2>Production Testing &amp; Quality Sign-Off</h2>
+</div>
+
+<h3>18.1 &mdash; In-Circuit Test (ICT)</h3>
+<table class="test compact">
+  <thead><tr><th>Test Point</th><th>Expected</th><th>Min</th><th>Max</th><th>Measured</th><th>Pass?</th></tr></thead>
+  <tbody>
+    <tr><td>VIN (12V input)</td><td>12.0V</td><td>11.4V</td><td>12.6V</td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>VSYS (BQ24195 out)</td><td>12.0V</td><td>11.0V</td><td>13.0V</td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>5V rail</td><td>5.0V</td><td>4.75V</td><td>5.25V</td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>3.3V rail</td><td>3.3V</td><td>3.2V</td><td>3.4V</td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>Battery pack</td><td>7.4V</td><td>6.0V</td><td>8.4V</td><td class="fill-line"></td><td>&#9744;</td></tr>
+    <tr><td>ESP32 VCC</td><td>3.3V</td><td>3.2V</td><td>3.4V</td><td class="fill-line"></td><td>&#9744;</td></tr>
+  </tbody>
+</table>
+
+<h3>18.2 &mdash; Functional Test (5 min/unit)</h3>
+<table class="test compact">
+  <thead><tr><th>Step</th><th>Test</th><th>Pass Criteria</th><th>Pass?</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Power on</td><td>Boots in &lt;10s</td><td>&#9744;</td></tr>
+    <tr><td>2</td><td>WiFi connect</td><td>Connects to test AP</td><td>&#9744;</td></tr>
+    <tr><td>3</td><td>Display test</td><td>All pixels OK, colors correct</td><td>&#9744;</td></tr>
+    <tr><td>4</td><td>Touch test</td><td>4 corners + center</td><td>&#9744;</td></tr>
+    <tr><td>5</td><td>Motor test (all 10)</td><td>All rotate smoothly</td><td>&#9744;</td></tr>
+    <tr><td>6</td><td>Sensor test (all)</td><td>All respond correctly</td><td>&#9744;</td></tr>
+    <tr><td>7</td><td>Audio test</td><td>1kHz tone at 80dB</td><td>&#9744;</td></tr>
+    <tr><td>8</td><td>API heartbeat</td><td>Sent and received</td><td>&#9744;</td></tr>
+    <tr><td>9</td><td>Serial number</td><td>Programmed (SMD-XXXXXXXX)</td><td>&#9744;</td></tr>
+  </tbody>
+</table>
+
+<h3>18.3 &mdash; 24-Hour Burn-In</h3>
+<table class="compact">
+  <thead><tr><th>Phase</th><th>Duration</th><th>Conditions</th><th>Monitoring</th></tr></thead>
+  <tbody>
+    <tr><td>Normal</td><td>8 hours</td><td>25&deg;C room temp</td><td>IC temps, power consumption</td></tr>
+    <tr><td>High temp</td><td>8 hours</td><td>40&deg;C (climate chamber)</td><td>IC temps &lt;60&deg;C</td></tr>
+    <tr><td>Cycling</td><td>8 hours</td><td>Dispense every 10 min</td><td>Accuracy = 100%</td></tr>
+  </tbody>
+</table>
+
+<h3>18.4 &mdash; Quality Sign-Off Checklist</h3>
+<table class="compact test">
+  <thead><tr><th>Checklist Item</th><th>Check</th></tr></thead>
+  <tbody>
+    <tr><td>All components verified</td><td>&#9744;</td></tr>
+    <tr><td>PCB visual inspection (no bridges)</td><td>&#9744;</td></tr>
+    <tr><td>All power tests passed</td><td>&#9744;</td></tr>
+    <tr><td>All functional tests passed</td><td>&#9744;</td></tr>
+    <tr><td>All calibrations saved</td><td>&#9744;</td></tr>
+    <tr><td>Serial number programmed</td><td>&#9744;</td></tr>
+    <tr><td>Firmware version: ___.___.___ </td><td>&#9744;</td></tr>
+    <tr><td>Enclosure sealed, labels applied</td><td>&#9744;</td></tr>
+  </tbody>
+</table>
+
+<h3>18.5 &mdash; Sign-Off</h3>
+<table class="signoff-table" style="width:100%; font-size:9pt;">
+  <thead><tr><th style="background:var(--primary);color:white;padding:8px;">Role</th><th style="background:var(--primary);color:white;padding:8px;width:28%;">Name</th><th style="background:var(--primary);color:white;padding:8px;width:22%;">Signature</th><th style="background:var(--primary);color:white;padding:8px;width:18%;">Date</th></tr></thead>
+  <tbody>
+    <tr><td>Electronics Engineer</td><td></td><td></td><td></td></tr>
+    <tr><td>Firmware Engineer</td><td></td><td></td><td></td></tr>
+    <tr><td>QA Inspector</td><td></td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════ APPENDIX A ═══════════════════ -->
+<div class="page-break"></div>
+<div class="phase-header appendix">
+  <div class="phase-num">Appendix A</div>
+  <h2>Master GPIO Reference &mdash; SMD-100</h2>
+</div>
+<p><em>Source: Firmware <code>pins.h</code> (authoritative) cross-referenced with Technical Documentation Section 11.1</em></p>
+
+<table class="compact" style="font-size:8pt;">
+  <thead><tr><th>GPIO</th><th>Function</th><th>Dir</th><th>Bus/Interface</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>BOOT button / Confirm btn</td><td>In</td><td>&mdash;</td><td>10K pull-up</td></tr>
+    <tr><td>1-5</td><td>LCD R0-R4</td><td>Out</td><td>RGB parallel</td><td>Red channel (5 bits)</td></tr>
+    <tr><td>6-11</td><td>LCD G0-G5</td><td>Out</td><td>RGB parallel</td><td>Green channel (6 bits)</td></tr>
+    <tr><td>12-16</td><td>LCD B0-B4</td><td>Out</td><td>RGB parallel</td><td>Blue channel (5 bits)</td></tr>
+    <tr><td>15</td><td>I2S DOUT</td><td>Out</td><td>I2S</td><td>Audio data (shared with LCD_B3 &mdash; see note)</td></tr>
+    <tr><td>17</td><td>I2S BCLK</td><td>Out</td><td>I2S</td><td>Audio bit clock</td></tr>
+    <tr><td>18</td><td>I2S LRCLK</td><td>Out</td><td>I2S</td><td>Audio L/R clock</td></tr>
+    <tr><td>20</td><td>USB D-</td><td>Bidir</td><td>USB</td><td>USB OTG</td></tr>
+    <tr><td>21</td><td>USB D+ / LCD_HSYNC</td><td>Bidir/Out</td><td>USB / RGB</td><td>Dual function</td></tr>
+    <tr><td>26</td><td>PIR motion</td><td>In</td><td>Digital</td><td>AM312 output</td></tr>
+    <tr><td>27</td><td>Door/tray reed switch</td><td>In</td><td>Digital</td><td>10K pull-up</td></tr>
+    <tr><td>32</td><td>HX711 DOUT</td><td>In</td><td>Custom serial</td><td>Load cell data</td></tr>
+    <tr><td>33</td><td>HX711 SCK</td><td>Out</td><td>Custom serial</td><td>Load cell clock</td></tr>
+    <tr><td>34</td><td>Button Cancel</td><td>In</td><td>Digital</td><td></td></tr>
+    <tr><td>35</td><td>SD CMD (MOSI)</td><td>Bidir</td><td>SPI</td><td>SD card</td></tr>
+    <tr><td>36</td><td>SD CLK</td><td>Out</td><td>SPI</td><td>SD card</td></tr>
+    <tr><td>37</td><td>SD DATA0 (MISO)</td><td>Bidir</td><td>SPI</td><td>SD card</td></tr>
+    <tr><td>38</td><td>Touch SDA</td><td>Bidir</td><td><strong>I2C Bus 0</strong></td><td>GT911 touch</td></tr>
+    <tr><td>39</td><td>Touch SCL</td><td>Out</td><td><strong>I2C Bus 0</strong></td><td>GT911 touch</td></tr>
+    <tr><td>40</td><td>Touch INT</td><td>In</td><td>Digital</td><td>Interrupt from GT911</td></tr>
+    <tr><td>41</td><td>Touch RST</td><td>Out</td><td>Digital</td><td>GT911 reset</td></tr>
+    <tr><td>42</td><td>Backlight PWM</td><td>Out</td><td>LEDC PWM</td><td>Via MOSFET to display</td></tr>
+    <tr><td>43</td><td>Gate servo PWM</td><td>Out</td><td>LEDC PWM</td><td>SG90 control</td></tr>
+    <tr><td>44</td><td>Sensor I2C SDA</td><td>Bidir</td><td><strong>I2C Bus 1</strong></td><td>SHT40, BH1750, MCP23017</td></tr>
+    <tr><td>45</td><td>LCD CLK</td><td>Out</td><td>RGB parallel</td><td>Pixel clock</td></tr>
+    <tr><td>46</td><td>Sensor I2C SCL</td><td>Out</td><td><strong>I2C Bus 1</strong></td><td>Sensor bus clock</td></tr>
+    <tr><td>47</td><td>LCD VSYNC</td><td>Out</td><td>RGB parallel</td><td>Vertical sync</td></tr>
+    <tr><td>48</td><td>LCD DE / LED data</td><td>Out</td><td>RGB parallel</td><td>Data enable</td></tr>
+    <tr><td colspan="5" style="background:var(--gray-100); font-weight:600;">MCP23017 (I2C-Expanded GPIOs via Bus 1)</td></tr>
+    <tr><td>GPA0-7</td><td>Motor control (motors 1-4)</td><td>Out</td><td>I2C-expanded</td><td>4 pins per motor</td></tr>
+    <tr><td>GPB0-7</td><td>Optical sensors 1-8 / Motors 5-8</td><td>In/Out</td><td>I2C-expanded</td><td>Interrupt-capable</td></tr>
+  </tbody>
+</table>
+
+<div class="callout callout-warning">
+  <strong>Note on GPIO15:</strong> Firmware defines GPIO15 as I2S_DOUT, but it is also mapped as LCD_B3. If using RGB565 (16-bit) mode, only 5+6+5=16 data pins are needed. Depending on color depth, GPIO15 may be available for audio. Verify in your specific schematic.
+</div>
+
+<!-- Appendix B -->
+<div class="phase-header appendix">
+  <div class="phase-num">Appendix B</div>
+  <h2>Power Consumption Budget</h2>
+</div>
+<table class="compact power">
+  <thead><tr><th>Component</th><th>Active Current</th><th>Sleep Current</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>ESP32-S3</td><td>240mA</td><td>10&micro;A</td><td>WiFi TX peak</td></tr>
+    <tr><td>Display (4.3" TFT)</td><td>150mA</td><td>0mA</td><td>Backlight at 50%</td></tr>
+    <tr><td>Motors (1 active)</td><td>200mA</td><td>0mA</td><td>During dispense only</td></tr>
+    <tr><td>Sensors (all)</td><td>20mA</td><td>5mA</td><td>I2C polling</td></tr>
+    <tr><td>Audio (MAX98357A)</td><td>300mA</td><td>0mA</td><td>Peak during alert</td></tr>
+    <tr><td>Other (LEDs, misc)</td><td>30mA</td><td>5mA</td><td></td></tr>
+    <tr style="font-weight:700; background:var(--warning-light);"><td>TOTAL</td><td>940mA</td><td>20mA</td><td></td></tr>
+  </tbody>
+</table>
+<p><strong>Battery Life (5000mAh, 7.4V &rarr; 5V via buck):</strong><br>
+Standby: 5000mAh / 20mA = <strong>250 hours &asymp; 10 days</strong><br>
+With 4 dispenses/day: <strong>~48 hours</strong> (meets target)</p>
+
+<!-- Appendix C -->
+<div class="phase-header appendix">
+  <div class="phase-num">Appendix C</div>
+  <h2>Common Pitfalls &amp; Solutions</h2>
+</div>
+<table class="compact danger">
+  <thead><tr><th>Pitfall</th><th>Problem</th><th>Solution</th></tr></thead>
+  <tbody>
+    <tr><td>Motor EMI</td><td>Stepper motors cause WiFi interference</td><td>Add <strong>100nF cap across each coil</strong>, separate power paths, ferrite beads</td></tr>
+    <tr><td>WiFi interference</td><td>Motors running kills WiFi</td><td>Separate motor ground return, add LC filtering on motor power entry</td></tr>
+    <tr><td>Power brown-out</td><td>ESP32 resets when motor starts</td><td>Add <strong>inrush current limiting</strong> (soft-start), ensure supply handles 940mA peak</td></tr>
+    <tr><td>Touch erratic</td><td>Random touch events</td><td><strong>Ground display bezel</strong>, use shielded FFC cable</td></tr>
+    <tr><td>Battery drain</td><td>Won't last 48 hours</td><td>Implement proper <strong>deep sleep modes</strong>, kill power to peripherals when idle</td></tr>
+    <tr><td>Load cell drift</td><td>Readings change over time</td><td><strong>Temperature compensation</strong> (read SHT40 and correct), periodic tare</td></tr>
+    <tr><td>Audio distortion</td><td>Clipping at high volume</td><td>Limit gain to 12dB (GAIN pin), add soft clipping in firmware</td></tr>
+    <tr><td>Optical false counts</td><td>Ambient light triggers sensor</td><td><strong>Shield sensor</strong> from room light, verify 100&Omega; LED resistor value</td></tr>
+  </tbody>
+</table>
+
+<!-- Appendix D -->
+<div class="page-break"></div>
+<div class="phase-header appendix">
+  <div class="phase-num">Appendix D</div>
+  <h2>Troubleshooting Guide</h2>
+</div>
+
+<h3>Power Issues</h3>
+<table class="compact danger">
+  <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>No power</td><td>Barrel jack disconnected / blown fuse</td><td>Check connector continuity, replace fuse</td></tr>
+    <tr><td>5V rail missing</td><td>TPS62150 not soldered / inductor open</td><td>Reflow IC, check inductor continuity</td></tr>
+    <tr><td>3.3V rail low or absent</td><td>AP2112K bad joint / overloaded</td><td>Reflow, check load &lt;600mA</td></tr>
+    <tr><td>BQ24195 overheating</td><td>Thermal pad not connected</td><td>Reflow &mdash; ensure thermal vias filled</td></tr>
+    <tr><td>Battery not charging</td><td>Wrong NTC resistor / BMS tripped</td><td>Check NTC value, check BMS fuse/MOSFETs</td></tr>
+  </tbody>
+</table>
+
+<h3>ESP32 Issues</h3>
+<table class="compact danger">
+  <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Won't boot</td><td>EN pin floating</td><td>Add 10K pull-up to 3.3V</td></tr>
+    <tr><td>Boot loop</td><td>Flash corrupt or brownout</td><td>Re-flash firmware, check power stability</td></tr>
+    <tr><td>Stuck in download mode</td><td>GPIO0 held LOW</td><td>Check 10K pull-up on GPIO0</td></tr>
+    <tr><td>No serial output</td><td>Wrong baud / TX-RX swapped</td><td>Use 115200 baud, swap TX/RX wires</td></tr>
+    <tr><td>WiFi weak/disconnects</td><td>Metal near antenna area</td><td>Ensure 15mm clearance, no ground under antenna</td></tr>
+    <tr><td>PSRAM not detected</td><td>Wrong module variant</td><td>Verify marking shows "N16R8"</td></tr>
+  </tbody>
+</table>
+
+<h3>Display Issues</h3>
+<table class="compact danger">
+  <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Blank screen</td><td>FFC not seated or reversed</td><td>Reseat cable, verify contact orientation</td></tr>
+    <tr><td>No backlight</td><td>2N7002 MOSFET dead / GPIO42 not driven</td><td>Replace MOSFET, check firmware PWM</td></tr>
+    <tr><td>Wrong colors</td><td>R/G/B channels swapped in firmware</td><td>Check <code>pins.h</code> RGB assignments vs FFC pinout</td></tr>
+    <tr><td>Touch not responding</td><td>I2C bus 0 not connected</td><td>Check GPIO38/39 wiring, 4.7K pull-ups</td></tr>
+    <tr><td>Touch erratic/jumpy</td><td>ESD damage or ungrounded bezel</td><td>Install TVS diodes, ground display frame</td></tr>
+  </tbody>
+</table>
+
+<h3>Motor Issues</h3>
+<table class="compact danger">
+  <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Motor doesn't turn</td><td>ULN2003A dead</td><td>Replace driver IC</td></tr>
+    <tr><td>Turns wrong direction</td><td>Coil wires swapped</td><td>Fix order: Blue-Pink-Yellow-Orange</td></tr>
+    <tr><td>Motor stalls under load</td><td>5V not reaching motor</td><td>Check 5V at connector, ULN2003A COM to 5V</td></tr>
+    <tr><td>WiFi interference</td><td>No EMI filtering</td><td>Add 100nF across coils + ferrite on power</td></tr>
+  </tbody>
+</table>
+
+<h3>Sensor Issues</h3>
+<table class="compact danger">
+  <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>I2C device not found</td><td>Pull-ups missing / wrong address</td><td>Add 4.7K pull-ups, verify address pins</td></tr>
+    <tr><td>Load cell drifts</td><td>Temperature / mechanical stress</td><td>Compensate with SHT40, check mount</td></tr>
+    <tr><td>Optical miscounts</td><td>Ambient light leak</td><td>Shield sensor gap, increase LED current</td></tr>
+    <tr><td>PIR false triggers</td><td>Motor EMI / heat source nearby</td><td>Add 100nF filter cap, relocate away from motors</td></tr>
+  </tbody>
+</table>
+
+<h3>Debug Serial Commands</h3>
+<pre><code>&gt; status          System overview (WiFi, battery, temp, API status)
+&gt; motor test 1    Test motor 1 rotation
+&gt; motor test all  Test all motors sequentially
+&gt; sensor test     Read all sensors and display values
+&gt; dispense 1 2    Dispense from slot 1, 2 pills
+&gt; calibrate loadcell   Enter load cell calibration
+&gt; version         Show firmware version and build date
+&gt; i2c scan 0      Scan I2C bus 0 (touch)
+&gt; i2c scan 1      Scan I2C bus 1 (sensors)
+&gt; wifi status     Show WiFi connection details
+&gt; reboot          Restart device</code></pre>
+
+<!-- Appendix E -->
+<div class="phase-header appendix">
+  <div class="phase-num">Appendix E</div>
+  <h2>Second-Source Strategy</h2>
+</div>
+<p><em>Always have a backup supplier for critical components to avoid production delays.</em></p>
+<table class="compact">
+  <thead><tr><th>Critical Component</th><th>Primary</th><th>Second Source</th></tr></thead>
+  <tbody>
+    <tr><td>MCU</td><td>ESP32-S3-WROOM-1-<strong>N16R8</strong></td><td>ESP32-S3-WROOM-1-<strong>N8R8</strong> (less flash, still works)</td></tr>
+    <tr><td>Power Path IC</td><td>BQ24195</td><td>BQ25895 (newer, pin-compatible concept)</td></tr>
+    <tr><td>5V Buck</td><td>TPS62150</td><td>AP62150 (Diodes Inc, $0.80, 93% eff)</td></tr>
+    <tr><td>3.3V LDO</td><td>AP2112K</td><td>XC6220B331MR (lower Iq, $0.40)</td></tr>
+    <tr><td>Motor Driver</td><td>ULN2003AN (TI)</td><td>ULN2003A (ST) &mdash; identical spec</td></tr>
+    <tr><td>Temp Sensor</td><td>SHT40</td><td>SHT31 (slightly larger, $3.50)</td></tr>
+    <tr><td>Optical Sensor</td><td>TCPT1300X01</td><td>GP1A57HRJ00F (Sharp, 5mm gap, $1.20)</td></tr>
+    <tr><td>Load Cell ADC</td><td>HX711</td><td>NAU7802 (I2C, $1.50, smaller)</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════ CONTACTS ═══════════════════ -->
+<hr>
+<h3 style="text-align:center;">Contacts</h3>
+<table class="compact" style="max-width:500px;margin:12px auto;">
+  <thead><tr><th>Issue</th><th>Contact</th></tr></thead>
+  <tbody>
+    <tr><td>Hardware questions</td><td>hardware@[company].ch</td></tr>
+    <tr><td>Firmware questions</td><td>firmware@[company].ch</td></tr>
+    <tr><td>Component sourcing</td><td>procurement@[company].ch</td></tr>
+    <tr><td>Quality issues</td><td>qa@[company].ch</td></tr>
+  </tbody>
+</table>
+<p style="text-align:center;font-size:9pt;"><strong>Slack:</strong> #hardware, #firmware, #production</p>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<div class="footer">
+  <p><strong>Smart Medication Dispenser</strong> &mdash; Electronics Engineer Build Guide v2.0</p>
+  <p>Derived from Technical Documentation v4.0 &bull; GPIO verified against firmware <code>pins.h</code></p>
+  <p>Confidential &mdash; Engineering Team &bull; Lausanne, Switzerland &bull; February 2026</p>
+</div>
+
+</div><!-- end .content -->
+</body>
+</html>
