@@ -106,6 +106,7 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
         { name: 'ASPNETCORE_ENVIRONMENT', value: 'Production' }
         { name: 'Mvp__Enabled', value: 'true' }
         { name: 'Mvp__Label', value: 'azure-mvp' }
+        { name: 'Swagger__Enabled', value: 'true' }
         { name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE', value: 'false' }
       ]
     }

@@ -1,5 +1,6 @@
 # Purpose: publish the .NET API to Azure App Service (zip) and upload the Vite build to Azure Static Web Apps.
-# Trigger: push to main/master when backend, web, or this file changes; also manual (workflow_dispatch).
+# Trigger: manual only (workflow_dispatch). Push trigger removed so pushes do not fail when AZURE_* secrets are unset.
+# To deploy on every push after secrets exist, add a `push:` block back (see comment at bottom of this file).
 # Order: API job first, then web (SWA build uses VITE_API_URL secret).
 # Secrets: AZURE_CREDENTIALS, AZURE_RESOURCE_GROUP, AZURE_WEBAPP_NAME, VITE_API_URL, AZURE_STATIC_WEB_APPS_API_TOKEN.
 # See: azure/README.md and .github/workflows/README.md
@@ -7,12 +8,6 @@ name: Azure — deploy API & static web
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main, master]
-    paths:
-      - "backend/**"
-      - "web/**"
-      - ".github/workflows/azure-deploy-api-static-web.yml"
 
 concurrency:
   group: azure-deploy-${{ github.ref }}
@@ -107,3 +102,10 @@ jobs:
           app_location: web/dist
           api_location: ""
           output_location: ""
+
+# Optional — deploy on push after all Azure secrets are set in repo Settings:
+# on:
+#   workflow_dispatch:
+#   push:
+#     branches: [main, master]
+#     paths: ["backend/**", "web/**", ".github/workflows/azure-deploy-api-static-web.yml"]

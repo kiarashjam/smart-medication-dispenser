@@ -59,7 +59,9 @@ After the **infra** workflow finishes, add:
 2. Run workflow **“Azure — provision infrastructure (Bicep)”** ([`azure-provision-infrastructure.yml`](../.github/workflows/azure-provision-infrastructure.yml)) manually.
 3. Open the job summary: copy outputs into secrets.
 4. Get the Static Web Apps deployment token from the Azure Portal.
-5. Run **“Azure — deploy API & static web”** ([`azure-deploy-api-static-web.yml`](../.github/workflows/azure-deploy-api-static-web.yml)) manually.
+5. In GitHub → **Actions** → **Azure — deploy API & static web** → **Run workflow** (this deploy is **manual only** so pushes do not fail when secrets are missing).
+
+After **`AZURE_CREDENTIALS`** and the other deploy secrets are saved, the run will pass the verification step and continue to publish the API and upload the web build.
 
 ## Troubleshooting: Azure login in GitHub Actions
 
