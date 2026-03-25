@@ -9,7 +9,7 @@ ASP.NET Core 8 Web API with Clean Architecture: Domain, Application, Infrastruct
 - **Domain** – Entities, enums
 - **Application** – DTOs, interfaces, MediatR handlers, FluentValidation
 - **Infrastructure** – EF Core (PostgreSQL), repositories, JWT auth, background job (missed dose + low stock)
-- **Api** – Controllers, Swagger, JWT middleware
+- **Api** – Controllers, Swagger/OpenAPI, JWT middleware
 
 ## Run locally
 
@@ -31,7 +31,10 @@ ASP.NET Core 8 Web API with Clean Architecture: Domain, Application, Infrastruct
    dotnet run --project src/Api
    ```
    - API: http://localhost:5000  
-   - Swagger: http://localhost:5000/swagger  
+   - **Swagger UI:** http://localhost:5000/swagger  
+   - **OpenAPI JSON:** http://localhost:5000/swagger/v1/swagger.json  
+
+**Swagger notes:** Overview text and XML summaries from controllers are included. Use **Authorize → Bearer** with the JWT from **POST /api/auth/login** (paste token only). In non-Development environments, set **`Swagger:Enabled`** to `true` only if you want the UI (e.g. private staging). Full detail: [../software-docs/SWAGGER_AND_OPENAPI.md](../software-docs/SWAGGER_AND_OPENAPI.md).
 
 **MVP mode:** `appsettings.json` → `Mvp:Enabled` / `Mvp:Label`. `GET /health` returns `mvp` and `mvpLabel` for clients.
 

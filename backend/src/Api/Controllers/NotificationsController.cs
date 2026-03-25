@@ -8,6 +8,7 @@ using System.Security.Claims;
 
 namespace SmartMedicationDispenser.Api.Controllers;
 
+/// <summary>In-app notification list and mark-as-read. JWT required.</summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]

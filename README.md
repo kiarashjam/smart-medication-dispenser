@@ -72,7 +72,7 @@ docker-compose up -d
 ```
 
 - API: http://localhost:5000  
-- Swagger: http://localhost:5000/swagger  
+- Swagger: http://localhost:5000/swagger (see [software-docs/SWAGGER_AND_OPENAPI.md](software-docs/SWAGGER_AND_OPENAPI.md))  
 - PostgreSQL: localhost:5432 (user: `dispenser`, db: `dispenser`)
 
 Then run web and mobile locally (see below).

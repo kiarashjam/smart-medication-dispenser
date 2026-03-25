@@ -15,25 +15,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<MvpOptions>(builder.Configuration.GetSection(MvpOptions.SectionName));
 
-// MVC controllers and API explorer for Swagger.
+// MVC controllers and API explorer for Swagger / OpenAPI.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new() { Title = "Smart Medication Dispenser API", Version = "v1" });
-    // Require Bearer token in Swagger UI for protected endpoints.
-    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-    {
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "JWT Bearer token",
-        Name = "Authorization",
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey
-    });
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
-        { new Microsoft.OpenApi.Models.OpenApiSecurityScheme { Reference = new Microsoft.OpenApi.Models.OpenApiReference { Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme, Id = "Bearer" } }, Array.Empty<string>() }
-    });
-});
+builder.Services.AddSmartDispenserSwagger();
 
 // JWT authentication: validate signing key, issuer, audience, and lifetime.
 var jwtKey = builder.Configuration["Jwt:SecretKey"] ?? "SmartMedicationDispenser_MVP_SecretKey_AtLeast32Characters!";
@@ -118,11 +103,11 @@ app.UseMiddleware<CorrelationIdMiddleware>();
 // Global exception handler so all unhandled exceptions return consistent JSON
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Swagger: on in Development, or when Swagger:Enabled is true (e.g. staging). See backend/README.md and software-docs/SWAGGER_AND_OPENAPI.md
+var swaggerEnabled = app.Environment.IsDevelopment()
+    || app.Configuration.GetValue("Swagger:Enabled", false);
+if (swaggerEnabled)
+    app.UseSmartDispenserSwaggerUi();
 
 // CORS: allow all origins for development/MVP; tighten in production.
 app.UseCors(policy =>

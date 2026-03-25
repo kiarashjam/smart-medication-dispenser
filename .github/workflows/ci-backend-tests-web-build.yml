@@ -40,6 +40,10 @@ jobs:
   web:
     name: Web (Vite)
     runs-on: ubuntu-latest
+    env:
+      # Optional: set repo secret VITE_API_URL so CI build matches production API base URL.
+      VITE_API_URL: ${{ secrets.VITE_API_URL }}
+      VITE_MVP_MODE: "true"
     defaults:
       run:
         working-directory: web

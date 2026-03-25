@@ -1,11 +1,22 @@
 # Purpose: publish the .NET API to Azure App Service (zip) and upload the Vite build to Azure Static Web Apps.
-# Trigger: manual only by default. Order: API job first, then web (so SWA build can use VITE_API_URL secret).
+# Trigger: push to main/master when backend, web, or this file changes; also manual (workflow_dispatch).
+# Order: API job first, then web (SWA build uses VITE_API_URL secret).
 # Secrets: AZURE_CREDENTIALS, AZURE_RESOURCE_GROUP, AZURE_WEBAPP_NAME, VITE_API_URL, AZURE_STATIC_WEB_APPS_API_TOKEN.
 # See: azure/README.md and .github/workflows/README.md
 name: Azure — deploy API & static web
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main, master]
+    paths:
+      - "backend/**"
+      - "web/**"
+      - ".github/workflows/azure-deploy-api-static-web.yml"
+
+concurrency:
+  group: azure-deploy-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -53,6 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VITE_API_URL: ${{ secrets.VITE_API_URL }}
+      VITE_MVP_MODE: "true"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

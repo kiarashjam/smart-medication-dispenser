@@ -141,4 +141,18 @@ body {
   .public-legal-h2 {
     @apply font-display text-lg font-semibold text-white;
   }
+
+  /* Home page — readable body copy on dark backgrounds */
+  .home-prose {
+    @apply max-w-[42rem] text-[0.9375rem] leading-[1.75] text-zinc-300 sm:text-base tracking-[0.012em];
+  }
+  .home-prose-wide {
+    @apply max-w-[46rem] text-[0.9375rem] leading-[1.72] text-zinc-300 sm:text-base;
+  }
+  .home-card-text {
+    @apply text-[0.9375rem] leading-[1.7] text-zinc-300 sm:text-sm;
+  }
+  .home-section-label {
+    @apply text-[11px] font-bold uppercase tracking-[0.22em] text-zinc-500;
+  }
 }

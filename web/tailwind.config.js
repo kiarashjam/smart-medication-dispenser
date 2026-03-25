@@ -15,10 +15,55 @@ export default {
           '33%': { transform: 'translate(5%, 4%) scale(1.06)' },
           '66%': { transform: 'translate(-4%, 3%) scale(0.94)' },
         },
+        homeMarquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        homeShimmer: {
+          '0%': { transform: 'translateX(-120%) skewX(-12deg)', opacity: '0' },
+          '40%': { opacity: '0.35' },
+          '100%': { transform: 'translateX(220%) skewX(-12deg)', opacity: '0' },
+        },
+        homePulseSoft: {
+          '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+          '50%': { opacity: '0.75', transform: 'scale(1.03)' },
+        },
+        homeSpinSlow: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+        homeGridDrift: {
+          '0%': { backgroundPosition: '0 0' },
+          '100%': { backgroundPosition: '48px 48px' },
+        },
+        homeGradientX: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
+        homeFloat: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-12px)' },
+        },
+        homeChevron: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '50%': { transform: 'translateX(4px)' },
+        },
       },
       animation: {
         'public-blob': 'publicBlob 20s ease-in-out infinite',
         'public-blob-delayed': 'publicBlob 24s ease-in-out infinite -6s',
+        'home-marquee': 'homeMarquee 38s linear infinite',
+        'home-marquee-rev': 'homeMarquee 44s linear infinite reverse',
+        'home-shimmer': 'homeShimmer 4.5s ease-in-out infinite',
+        'home-pulse-soft': 'homePulseSoft 5s ease-in-out infinite',
+        'home-spin-slow': 'homeSpinSlow 48s linear infinite',
+        'home-grid-drift': 'homeGridDrift 80s linear infinite',
+        'home-gradient-x': 'homeGradientX 10s ease infinite',
+        'home-float': 'homeFloat 5.5s ease-in-out infinite',
+        'home-chevron': 'homeChevron 1.8s ease-in-out infinite',
+      },
+      backgroundSize: {
+        'gradient-wide': '200% 200%',
       },
       colors: {
         /* ── Design System: 3 main colors ── */

@@ -7,6 +7,7 @@ using System.Security.Claims;
 
 namespace SmartMedicationDispenser.Api.Controllers;
 
+/// <summary>CRUD for patient devices (main / portable). Caregiver-scoped via JWT.</summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
