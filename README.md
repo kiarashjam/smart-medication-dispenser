@@ -165,6 +165,10 @@ See [software-docs/MVP_APPLICATION.md](software-docs/MVP_APPLICATION.md) for wha
 
 Git is initialized in this folder with `main` and an initial commit. **Creating the GitHub remote** requires your account: follow **[GITHUB_SETUP.md](GITHUB_SETUP.md)** (HTTPS/SSH push + optional `gh` CLI). After you push, **[GitHub Actions](.github/workflows/ci.yml)** runs backend tests and a web production build. **[Dependabot](.github/dependabot.yml)** opens weekly update PRs for GitHub Actions and npm (web + mobile).
 
+## Azure (optional MVP hosting)
+
+Bicep + workflows provision a **single resource group** with **Linux App Service B1**, **PostgreSQL Flexible B1ms**, and **Static Web Apps Free**. See **[azure/README.md](azure/README.md)** and workflows **[azure-infra.yml](.github/workflows/azure-infra.yml)** (provision) and **[azure-deploy-apps.yml](.github/workflows/azure-deploy-apps.yml)** (deploy API + web). You must use **your** Azure subscription and secrets; nothing is uploaded automatically without you running those workflows.
+
 ---
 
 ## Next Steps

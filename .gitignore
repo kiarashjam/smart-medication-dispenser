@@ -12,6 +12,10 @@ appsettings.*.local.json
 .vs/
 *.DotSettings.user
 
+# Azure local deploy params (never commit secrets)
+azure/deployment-params.json
+deployment-params.json
+
 # Local SQLite (dev); use PostgreSQL or fresh DB in CI
 *.db
 *.db-shm

@@ -1,0 +1,72 @@
+# One-time (or occasional): create resource group + cheapest MVP stack (Bicep).
+# Requires GitHub secrets — see azure/README.md
+name: Azure — provision infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      location:
+        description: Azure region (Static Web Apps Free supports e.g. westeurope, eastus2)
+        required: true
+        default: westeurope
+      resource_group_name:
+        description: New resource group name
+        required: true
+        default: rg-smart-dispenser-mvp
+
+jobs:
+  deploy-bicep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build deployment parameters (secrets injected safely)
+        env:
+          PG_PASS: ${{ secrets.AZURE_POSTGRES_ADMIN_PASSWORD }}
+          JWT: ${{ secrets.AZURE_JWT_SECRET }}
+        run: |
+          jq -n \
+            --arg loc "${{ inputs.location }}" \
+            --arg rg "${{ inputs.resource_group_name }}" \
+            --arg base "smdmvp" \
+            --arg pg "$PG_PASS" \
+            --arg jwt "$JWT" \
+            '{
+              "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentParameters.json",
+              "contentVersion": "1.0.0.0",
+              "parameters": {
+                "location": { "value": $loc },
+                "resourceGroupName": { "value": $rg },
+                "baseName": { "value": $base },
+                "postgresAdminPassword": { "value": $pg },
+                "jwtSecret": { "value": $jwt }
+              }
+            }' > deployment-params.json
+
+      - name: Deploy subscription template (Bicep)
+        uses: azure/cli@v2
+        with:
+          azcliversion: azure-cli/latest
+          inlineScript: |
+            set -e
+            NAME="smd-mvp-${{ github.run_id }}"
+            az deployment sub create \
+              --name "$NAME" \
+              --location "${{ inputs.location }}" \
+              --template-file azure/main.bicep \
+              --parameters @deployment-params.json
+            echo "## Infrastructure outputs" >> "$GITHUB_STEP_SUMMARY"
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            az deployment sub show --name "$NAME" --query properties.outputs -o json >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Add these **GitHub repository secrets** for app deploy:" >> "$GITHUB_STEP_SUMMARY"
+            echo "- \`AZURE_RESOURCE_GROUP\` = ${{ inputs.resource_group_name }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "- \`AZURE_WEBAPP_NAME\` = (value of \`webAppName\` from outputs above)" >> "$GITHUB_STEP_SUMMARY"
+            echo "- \`VITE_API_URL\` = (value of \`apiHttpsUrl\` from outputs above, no trailing slash)" >> "$GITHUB_STEP_SUMMARY"
+            echo "- \`AZURE_STATIC_WEB_APPS_API_TOKEN\` = from Azure Portal → your Static Web App → **Manage deployment token**" >> "$GITHUB_STEP_SUMMARY"
