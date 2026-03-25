@@ -161,6 +161,12 @@ See [software-docs/MVP_APPLICATION.md](software-docs/MVP_APPLICATION.md) for wha
 
 ---
 
+## Source control & GitHub
+
+Git is initialized in this folder with `main` and an initial commit. **Creating the GitHub remote** requires your account: follow **[GITHUB_SETUP.md](GITHUB_SETUP.md)** (HTTPS/SSH push + optional `gh` CLI). After you push, **[GitHub Actions](.github/workflows/ci.yml)** runs backend tests and a web production build.
+
+---
+
 ## Next Steps
 
 - Add push notifications (FCM/APNs) for mobile.
