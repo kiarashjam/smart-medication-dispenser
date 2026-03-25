@@ -12,6 +12,14 @@ appsettings.*.local.json
 .vs/
 *.DotSettings.user
 
+# Local SQLite (dev); use PostgreSQL or fresh DB in CI
+*.db
+*.db-shm
+*.db-wal
+
+# TypeScript incremental build
+**/tsconfig.tsbuildinfo
+
 # Node
 node_modules/
 dist/
