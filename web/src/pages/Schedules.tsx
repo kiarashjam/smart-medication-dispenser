@@ -7,6 +7,7 @@ import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/app/components/ui/alert-dialog';
 import { schedulesApi, type ScheduleDto } from '@/api/client';
+import { appPath } from '@/lib/appRoutes';
 import { toast } from 'sonner';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -80,7 +81,7 @@ export default function Schedules() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="space-y-6">
       <div>
-        <Link to="/devices"><Button variant="ghost" className="mb-4 border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg transition-colors"><ArrowLeft className="w-4 h-4 mr-2" />Back</Button></Link>
+        <Link to={appPath('/devices')}><Button variant="ghost" className="mb-4 border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg transition-colors"><ArrowLeft className="w-4 h-4 mr-2" />Back</Button></Link>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Schedules</h1>

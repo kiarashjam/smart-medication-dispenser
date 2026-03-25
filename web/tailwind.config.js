@@ -6,6 +6,19 @@ export default {
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
         mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        display: ['Syne', 'system-ui', 'sans-serif'],
+        public: ['Outfit', 'system-ui', 'sans-serif'],
+      },
+      keyframes: {
+        publicBlob: {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '33%': { transform: 'translate(5%, 4%) scale(1.06)' },
+          '66%': { transform: 'translate(-4%, 3%) scale(0.94)' },
+        },
+      },
+      animation: {
+        'public-blob': 'publicBlob 20s ease-in-out infinite',
+        'public-blob-delayed': 'publicBlob 24s ease-in-out infinite -6s',
       },
       colors: {
         /* ── Design System: 3 main colors ── */

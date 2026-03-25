@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Clock, Package, ArrowLeft, Loader2 } from 'lucide-react';
 import { devicesApi, containersApi, schedulesApi, type DeviceDto, type ContainerDto, type TodayScheduleItemDto } from '@/api/client';
+import { appPath } from '@/lib/appRoutes';
 
 export default function DeviceDetail() {
   const { deviceId } = useParams();
@@ -36,7 +37,7 @@ export default function DeviceDetail() {
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-semibold text-gray-900">Device not found</h2>
-        <Link to="/devices" className="inline-block mt-4 text-sm font-medium text-brand-600 hover:text-brand-700">
+        <Link to={appPath('/devices')} className="inline-block mt-4 text-sm font-medium text-brand-600 hover:text-brand-700">
           Back to Devices
         </Link>
       </div>
@@ -68,7 +69,7 @@ export default function DeviceDetail() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <div className="space-y-6">
         <div>
-          <Link to="/devices" className="inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700 mb-4">
+          <Link to={appPath('/devices')} className="inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700 mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back to Devices
           </Link>
@@ -114,7 +115,7 @@ export default function DeviceDetail() {
             )}
           </div>
           <div className="mt-6">
-            <Link to={`/devices/${device.id}/containers`}>
+            <Link to={appPath(`/devices/${device.id}/containers`)}>
               <button className="w-full bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
                 <Package className="w-4 h-4" />
                 Manage Containers

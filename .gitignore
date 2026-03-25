@@ -14,6 +14,8 @@ appsettings.*.local.json
 
 # Azure local deploy params (never commit secrets)
 azure/deployment-params.json
+azure/deployment-secrets.local.json
+azure/main.json
 deployment-params.json
 
 # Local SQLite (dev); use PostgreSQL or fresh DB in CI
@@ -53,3 +55,11 @@ coverage/
 
 # Docker (optional local overrides)
 docker-compose.override.yml
+
+# Local publish bundles & log dumps (do not commit)
+api.zip
+publish-api/
+azure/webapp-logs.zip
+azure/webapp-logs2.zip
+azure/webapp-logs-extract/
+azure/webapp-logs2-extract/

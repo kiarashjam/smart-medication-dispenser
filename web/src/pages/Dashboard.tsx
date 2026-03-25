@@ -13,6 +13,7 @@ import {
   Target,
   Loader2,
 } from 'lucide-react';
+import { appPath } from '@/lib/appRoutes';
 import {
   devicesApi,
   containersApi,
@@ -231,7 +232,7 @@ export default function Dashboard() {
           </div>
 
           {/* Active Devices */}
-          <Link to="/devices" className="bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 transition-colors">
+          <Link to={appPath('/devices')} className="bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 transition-colors">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Devices</p>
@@ -259,7 +260,7 @@ export default function Dashboard() {
           </div>
 
           {/* Notifications */}
-          <Link to="/notifications" className="bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 transition-colors">
+          <Link to={appPath('/notifications')} className="bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 transition-colors">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Notifications</p>

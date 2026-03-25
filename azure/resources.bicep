@@ -33,7 +33,7 @@ resource plan 'Microsoft.Web/serverfarms@2023-12-01' = {
   }
 }
 
-resource postgres 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01' = {
+resource postgres 'Microsoft.DBforPostgreSQL/flexibleServers@2024-08-01' = {
   name: pgServerName
   location: location
   sku: {
@@ -64,7 +64,7 @@ resource postgres 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01' = {
   }
 }
 
-resource pgDb 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2023-12-01' = {
+resource pgDb 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2024-08-01' = {
   parent: postgres
   name: 'dispenser'
   properties: {
@@ -74,7 +74,7 @@ resource pgDb 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2023-12-01' =
 }
 
 // Dev/MVP only: allows access from anywhere. Replace with scoped rules + private link for production.
-resource pgFw 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2023-12-01' = {
+resource pgFw 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2024-08-01' = {
   parent: postgres
   name: 'AllowAllMvpDevOnly'
   properties: {

@@ -7,6 +7,7 @@ import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/app/components/ui/alert-dialog';
 import { devicesApi, containersApi, type DeviceDto, type ContainerDto } from '@/api/client';
+import { appPath } from '@/lib/appRoutes';
 import { toast } from 'sonner';
 
 export default function Containers() {
@@ -33,7 +34,7 @@ export default function Containers() {
   useEffect(() => { load(); }, [deviceId]);
 
   if (loading) return <div className="flex items-center justify-center py-12"><Loader2 className="w-5 h-5 text-gray-400 animate-spin" /></div>;
-  if (!device) return (<div className="text-center py-12"><h2 className="text-sm font-medium text-gray-900">Device not found</h2><Link to="/devices"><Button className="mt-4">Back to Devices</Button></Link></div>);
+  if (!device) return (<div className="text-center py-12"><h2 className="text-sm font-medium text-gray-900">Device not found</h2><Link to={appPath('/devices')}><Button className="mt-4">Back to Devices</Button></Link></div>);
 
   const handleAdd = () => {
     setEditingContainer(null);
@@ -78,7 +79,7 @@ export default function Containers() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="space-y-6">
       <div>
-        <Link to="/devices"><Button variant="ghost" className="mb-4 border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg transition-colors"><ArrowLeft className="w-4 h-4 mr-2" />Back to Devices</Button></Link>
+        <Link to={appPath('/devices')}><Button variant="ghost" className="mb-4 border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg transition-colors"><ArrowLeft className="w-4 h-4 mr-2" />Back to Devices</Button></Link>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Containers</h1>
@@ -144,7 +145,7 @@ export default function Containers() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Link to={`/containers/${container.id}/schedules`} className="flex-1">
+                <Link to={appPath(`/containers/${container.id}/schedules`)} className="flex-1">
                   <Button variant="outline" className="w-full border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg transition-colors">
                     <Calendar className="w-4 h-4 mr-2" />Schedules
                   </Button>

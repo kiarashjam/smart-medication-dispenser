@@ -27,3 +27,118 @@ body {
     @apply bg-gradient-to-r from-brand-600 to-brand-400 bg-clip-text text-transparent;
   }
 }
+
+/* ── Public marketing site (dark) — shared chrome for Home, auth, inner pages ── */
+@layer components {
+  .public-page-wrap {
+    @apply w-full flex justify-center px-4 sm:px-6 lg:px-10 xl:px-14 py-12 md:py-20;
+  }
+  .public-page-wrap-auth {
+    @apply w-full flex justify-center px-4 sm:px-6 lg:px-10 xl:px-14 py-10 md:py-16;
+  }
+  .public-inner {
+    @apply w-full max-w-[min(100%,1920px)];
+  }
+  .public-inner-prose {
+    @apply w-full max-w-[min(100%,720px)];
+  }
+  .public-inner-wide {
+    @apply w-full max-w-[min(100%,1100px)];
+  }
+  .public-kicker {
+    @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-teal-500/25 bg-teal-500/[0.07] text-teal-300/95 text-xs font-medium tracking-wide;
+  }
+  .public-title-rule {
+    @apply mt-6 h-1 w-16 rounded-full bg-gradient-to-r from-teal-400 via-emerald-400 to-violet-500 opacity-90;
+  }
+  .public-h1 {
+    @apply font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight;
+  }
+  .public-hero-h1 {
+    @apply font-display text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-[3.5rem];
+  }
+  .public-feature-card {
+    @apply relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition-colors duration-300;
+  }
+  .public-btn-light {
+    @apply inline-flex items-center gap-2 rounded-2xl bg-white px-8 py-4 font-semibold text-[#06060a] shadow-lg shadow-black/20 transition-transform hover:scale-[1.02];
+  }
+  .public-h2-section {
+    @apply font-display text-3xl md:text-4xl font-bold text-white tracking-tight;
+  }
+  .public-h3-card {
+    @apply font-display text-lg font-semibold text-white;
+  }
+  .public-subtitle {
+    @apply mt-4 text-lg text-zinc-400 leading-relaxed;
+  }
+  .public-body {
+    @apply text-zinc-400 leading-relaxed;
+  }
+  .public-body-muted {
+    @apply text-zinc-500 text-sm leading-relaxed;
+  }
+  .public-body-emphasis {
+    @apply text-zinc-300;
+  }
+  .public-link {
+    @apply text-teal-400 hover:text-teal-300 font-medium transition-colors;
+  }
+  .public-border-t-section {
+    @apply border-t border-white/10;
+  }
+  .public-scroll-anchor {
+    @apply scroll-mt-24;
+  }
+  .public-card {
+    @apply rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl shadow-xl shadow-black/30;
+  }
+  .public-card-quiet {
+    @apply rounded-2xl border border-white/10 bg-white/[0.03];
+  }
+  .public-glass-panel {
+    @apply relative rounded-[2rem] border border-white/10 bg-white/[0.03] backdrop-blur-xl overflow-hidden;
+  }
+  .public-glow-teal {
+    @apply pointer-events-none absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-teal-500/20 to-violet-600/10 blur-2xl;
+  }
+  .public-glow-violet {
+    @apply pointer-events-none absolute -inset-4 rounded-[2rem] bg-gradient-to-bl from-fuchsia-600/20 to-violet-900/20 blur-2xl;
+  }
+  .public-select-trigger {
+    @apply mt-2 flex h-auto w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white focus:ring-2 focus:ring-teal-500/35 data-[placeholder]:text-zinc-500;
+  }
+  .public-icon-tile {
+    @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-teal-400;
+  }
+  .public-icon-tile-lg {
+    @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-teal-400;
+  }
+  .public-input {
+    @apply mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 transition-shadow focus:border-teal-500/45 focus:outline-none focus:ring-2 focus:ring-teal-500/35;
+  }
+  .public-label {
+    @apply text-sm font-medium text-zinc-300;
+  }
+  .public-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-teal-300 via-emerald-400 to-teal-400 px-6 py-3.5 font-semibold text-[#06060a] shadow-lg shadow-teal-500/20;
+  }
+  .public-btn-ghost {
+    @apply inline-flex items-center justify-center rounded-2xl border border-white/15 px-6 py-3.5 font-medium text-white transition-colors hover:bg-white/[0.06];
+  }
+  .public-btn-outline-header {
+    @apply inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium transition-all duration-300;
+  }
+  .public-callout {
+    @apply rounded-xl border border-white/10 bg-white/[0.04] p-4 text-xs text-zinc-500;
+  }
+  .public-pill-badge {
+    @apply absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-teal-500/35 bg-[#06060a] px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-teal-300;
+  }
+  .public-legal-block {
+    @apply border-t border-white/10 pt-8 first:border-t-0 first:pt-0;
+  }
+  .public-legal-h2 {
+    @apply font-display text-lg font-semibold text-white;
+  }
+}

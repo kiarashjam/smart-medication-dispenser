@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Box, Play, Pause, Package, Wifi, Battery, Signal, Loader2 } from 'lucide-react';
 import { devicesApi, type DeviceDto } from '@/api/client';
+import { appPath } from '@/lib/appRoutes';
 import { toast } from 'sonner';
 
 export default function Devices() {
@@ -94,7 +95,7 @@ export default function Devices() {
                       <Box className="w-5 h-5 text-brand-600" />
                     </div>
                     <div>
-                      <Link to={`/devices/${device.id}`} className="text-lg font-semibold text-gray-900 hover:text-brand-600 transition-colors">
+                      <Link to={appPath(`/devices/${device.id}`)} className="text-lg font-semibold text-gray-900 hover:text-brand-600 transition-colors">
                         {device.name}
                       </Link>
                       <p className="text-sm text-gray-500">{device.type === 'Main' ? 'Main Dispenser' : 'Portable Dispenser'}</p>
@@ -131,12 +132,12 @@ export default function Devices() {
                 </div>
 
                 <div className="flex gap-2 mb-2">
-                  <Link to={`/devices/${device.id}`} className="flex-1">
+                  <Link to={appPath(`/devices/${device.id}`)} className="flex-1">
                     <button className="w-full border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg transition-colors">
                       View Details
                     </button>
                   </Link>
-                  <Link to={`/devices/${device.id}/containers`}>
+                  <Link to={appPath(`/devices/${device.id}/containers`)}>
                     <button className="border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg transition-colors">
                       <Package className="w-4 h-4" />
                     </button>
