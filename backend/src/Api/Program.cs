@@ -103,8 +103,9 @@ app.UseMiddleware<CorrelationIdMiddleware>();
 // Global exception handler so all unhandled exceptions return consistent JSON
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-// Swagger: on in Development, or when Swagger:Enabled is true (e.g. staging). See backend/README.md and software-docs/SWAGGER_AND_OPENAPI.md
+// Swagger: Development; or explicit Swagger:Enabled / Swagger__Enabled (Azure App Service). See software-docs/SWAGGER_AND_OPENAPI.md
 var swaggerEnabled = app.Environment.IsDevelopment()
+    || string.Equals(Environment.GetEnvironmentVariable("Swagger__Enabled"), "true", StringComparison.OrdinalIgnoreCase)
     || app.Configuration.GetValue("Swagger:Enabled", false);
 if (swaggerEnabled)
     app.UseSmartDispenserSwaggerUi();
