@@ -76,3 +76,15 @@ Adjust visibility (`--public`) or name as needed.
 ## 5. Secrets (production)
 
 Never commit `.env` files with real JWT secrets or DB passwords. This repo’s `.gitignore` excludes `.env`. Use GitHub **Actions secrets** or your host’s env config for production.
+
+## 6. Push error: `Permission denied` / `403` / wrong username
+
+If Git says permission is denied to **another** account (e.g. you want `kiarashjam` but it uses `kiajambonapp`), Windows cached the wrong GitHub login.
+
+1. Open **Control Panel → Credential Manager → Windows Credentials**.
+2. Find **`git:https://github.com`** (or entries for `github.com`).
+3. **Remove** them.
+4. Run `git push -u origin main` again.
+5. When prompted: **Username** = the repo owner (`kiarashjam`), **Password** = a [Personal Access Token](https://github.com/settings/tokens) with `repo` scope — create it while logged in as **kiarashjam**. **Never paste tokens into chat or commit them.**
+
+Do **not** put tokens in the remote URL if that string could be copied or logged.
