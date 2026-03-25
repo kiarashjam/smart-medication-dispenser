@@ -1,33 +1,33 @@
 # Publish this project to GitHub
 
-Your machine has **no Git repo** and **no `gh` CLI** by default. Follow one path below.
+**Local Git is already initialized** on `main` with commits. You only need to **create the empty repo on GitHub** (in the browser) and **push**.
+
+Repositories live under **your GitHub username**, not your email. Use the GitHub account where **kiarash.jam@gmail.com** is verified (Settings → Emails).
 
 ## 1. Create the empty repository on GitHub
 
-1. Open [github.com/new](https://github.com/new).
-2. **Repository name:** e.g. `smart-medication-dispenser` (or any name you like).
-3. Choose **Public** or **Private**.
-4. **Do not** add README, .gitignore, or license (this repo already has files).
-5. Click **Create repository**.
+1. Sign in at [github.com](https://github.com) with the account that owns **kiarash.jam@gmail.com**.
+2. Open **[github.com/new](https://github.com/new)**.
+3. **Owner:** your user (or an organization you control).
+4. **Repository name:** e.g. `smart-medication-dispenser`.
+5. **Public** or **Private**.
+6. **Do not** add README, .gitignore, or license (this project already has them).
+7. Click **Create repository**.
 
-Copy the URL GitHub shows, e.g. `https://github.com/YOUR_USER/smart-medication-dispenser.git`.
+Copy the URL GitHub shows, e.g. `https://github.com/YOUR_GITHUB_USERNAME/smart-medication-dispenser.git`.
 
-## 2. Initialize Git and push (first time)
+## 2. Add remote and push (this machine)
 
-In PowerShell, from **this folder** (`smart-medication-dispenser` — the one that contains `backend/`, `web/`, `mobile/`):
+In PowerShell, from **this folder** (`smart-medication-dispenser`):
 
 ```powershell
 cd "c:\Users\KiaJamishidi\Documents\repo\dispenser\smart-medication-dispenser"
 
-git init
-git branch -M main
-git add .
-git status
-git commit -m "Initial commit: Smart Medication Dispenser MVP"
-
-git remote add origin https://github.com/YOUR_USER/YOUR_REPO.git
+git remote add origin https://github.com/YOUR_GITHUB_USERNAME/smart-medication-dispenser.git
 git push -u origin main
 ```
+
+If `origin` already exists, use `git remote set-url origin https://github.com/...` instead.
 
 Use **SSH** instead if you prefer:
 
