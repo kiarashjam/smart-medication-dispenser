@@ -11,7 +11,7 @@ Repositories live under **your GitHub username**, not your email. Use the GitHub
 | Git repo + `main` + history | Done |
 | `.gitignore` (secrets, `node_modules`, local `*.db`, `dist`, etc.) | Done |
 | Commit author for **this repo**: `Kiarash Jamishidi <kiarash.jam@gmail.com>` | Done (`git config --local`) |
-| GitHub Actions **CI** (backend test + web build) | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
+| GitHub Actions **CI** (backend test + web build) | [`.github/workflows/ci-backend-tests-web-build.yml`](.github/workflows/ci-backend-tests-web-build.yml) · [workflows README](.github/workflows/README.md) |
 | **Dependabot** (weekly PRs: Actions, web/mobile npm) | [`.github/dependabot.yml`](.github/dependabot.yml) |
 | MVP product/docs/code (earlier work) | In tree |
 | CI parity check | Backend `dotnet test -c Release` + web `npm run build` succeed locally |
@@ -55,7 +55,7 @@ git push -u origin main
 
 ## 3. What runs on GitHub after you push
 
-The workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on pushes and PRs to `main` / `master`:
+The workflow [`.github/workflows/ci-backend-tests-web-build.yml`](.github/workflows/ci-backend-tests-web-build.yml) runs on pushes and PRs to `main` / `master`:
 
 - **backend:** `dotnet restore`, `build`, `test`
 - **web:** `npm ci`, `npm run build`

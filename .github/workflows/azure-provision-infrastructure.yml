@@ -1,6 +1,8 @@
-# One-time (or occasional): create resource group + cheapest MVP stack (Bicep).
-# Requires GitHub secrets — see azure/README.md
-name: Azure — provision infrastructure
+# Purpose: create or update Azure MVP stack (resource group, App Service, PostgreSQL, Static Web App) via Bicep.
+# Trigger: manual only (workflow_dispatch). Requires AZURE_CREDENTIALS, AZURE_POSTGRES_ADMIN_PASSWORD, AZURE_JWT_SECRET.
+# Output: job summary lists template outputs — use them to set secrets for the deploy workflow.
+# See: azure/README.md and .github/workflows/README.md
+name: Azure — provision infrastructure (Bicep)
 
 on:
   workflow_dispatch:
@@ -14,18 +16,23 @@ on:
         required: true
         default: rg-smart-dispenser-mvp
 
+permissions:
+  contents: read
+
 jobs:
   deploy-bicep:
+    name: Subscription deployment
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Azure login
+      - name: Azure login (service principal)
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Build deployment parameters (secrets injected safely)
+      - name: Build parameter file (secrets not logged)
         env:
           PG_PASS: ${{ secrets.AZURE_POSTGRES_ADMIN_PASSWORD }}
           JWT: ${{ secrets.AZURE_JWT_SECRET }}
@@ -48,7 +55,7 @@ jobs:
               }
             }' > deployment-params.json
 
-      - name: Deploy subscription template (Bicep)
+      - name: Deploy azure/main.bicep at subscription scope
         uses: azure/cli@v2
         with:
           azcliversion: azure-cli/latest

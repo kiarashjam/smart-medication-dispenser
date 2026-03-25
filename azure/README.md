@@ -54,10 +54,10 @@ After the **infra** workflow finishes, add:
 ## Option A — Provision from GitHub Actions
 
 1. Add the secrets above (except SWA token can wait until after first deploy).
-2. Run workflow **“Azure — provision infrastructure”** (`azure-infra.yml`) manually.
+2. Run workflow **“Azure — provision infrastructure (Bicep)”** ([`azure-provision-infrastructure.yml`](../.github/workflows/azure-provision-infrastructure.yml)) manually.
 3. Open the job summary: copy outputs into secrets.
 4. Get the Static Web Apps deployment token from the Azure Portal.
-5. Run **“Azure — deploy apps”** (`azure-deploy-apps.yml`) manually.
+5. Run **“Azure — deploy API & static web”** ([`azure-deploy-api-static-web.yml`](../.github/workflows/azure-deploy-api-static-web.yml)) manually.
 
 ## Option B — Provision locally
 

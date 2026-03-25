@@ -1,34 +1,41 @@
-# Deploy API (App Service zip) + web (Azure Static Web Apps) after infra exists.
-# Runs manually by default. To deploy on every push to main, add:
-#   push: { branches: [main] }
-name: Azure — deploy apps
+# Purpose: publish the .NET API to Azure App Service (zip) and upload the Vite build to Azure Static Web Apps.
+# Trigger: manual only by default. Order: API job first, then web (so SWA build can use VITE_API_URL secret).
+# Secrets: AZURE_CREDENTIALS, AZURE_RESOURCE_GROUP, AZURE_WEBAPP_NAME, VITE_API_URL, AZURE_STATIC_WEB_APPS_API_TOKEN.
+# See: azure/README.md and .github/workflows/README.md
+name: Azure — deploy API & static web
 
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   api:
+    name: API — publish & zip deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Azure login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - uses: actions/setup-dotnet@v4
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 
-      - name: Publish API
+      - name: Publish API (Release)
         run: dotnet publish src/Api/Api.csproj -c Release -o "${{ github.workspace }}/publish-api"
         working-directory: backend
 
-      - name: Zip package
+      - name: Zip published output
         run: (cd "${{ github.workspace }}/publish-api" && zip -r "${{ github.workspace }}/api.zip" .)
 
-      - name: Deploy to Web App
+      - name: Deploy zip to App Service
         uses: azure/cli@v2
         with:
           azcliversion: azure-cli/latest
@@ -41,24 +48,27 @@ jobs:
               --timeout 600000
 
   web:
+    name: Web — build & Static Web Apps
     needs: api
     runs-on: ubuntu-latest
     env:
       VITE_API_URL: ${{ secrets.VITE_API_URL }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      - name: Build web (API URL baked in)
+      - name: Install & build (VITE_API_URL from secrets)
         run: npm ci && npm run build
         working-directory: web
 
-      - name: Deploy to Azure Static Web Apps
+      - name: Upload dist to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}

@@ -1,4 +1,6 @@
-# Keep dependencies reasonably fresh (weekly PRs)
+# Dependabot (filename must stay dependabot.yml). Opens weekly PRs to bump:
+# - GitHub Actions in /.github/workflows
+# - npm in /web and /mobile
 version: 2
 updates:
   - package-ecosystem: github-actions
