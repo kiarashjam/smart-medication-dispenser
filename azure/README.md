@@ -32,7 +32,9 @@ az ad sp create-for-rbac \
   --sdk-auth
 ```
 
-Copy the JSON output into GitHub secret **`AZURE_CREDENTIALS`**.
+Copy the **entire JSON output** into GitHub secret **`AZURE_CREDENTIALS`** (one secret, one paste — do not split into separate variables unless you use the alternative below).
+
+The JSON must include these **camelCase** keys (as in the CLI output): `clientId`, `clientSecret`, `subscriptionId`, `tenantId`. If any are missing, `azure/login` will fail with errors about `client-id` / `tenant-id`.
 
 4. GitHub repository secrets:
 
@@ -58,6 +60,18 @@ After the **infra** workflow finishes, add:
 3. Open the job summary: copy outputs into secrets.
 4. Get the Static Web Apps deployment token from the Azure Portal.
 5. Run **“Azure — deploy API & static web”** ([`azure-deploy-api-static-web.yml`](../.github/workflows/azure-deploy-api-static-web.yml)) manually.
+
+## Troubleshooting: Azure login in GitHub Actions
+
+**Error:** `Login failed ... Ensure 'client-id' and 'tenant-id' are supplied` (or similar from `azure/login`).
+
+| Cause | What to do |
+|--------|------------|
+| Secret **`AZURE_CREDENTIALS`** not created in **this** repository | Repo → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**. Forks do **not** inherit secrets from the upstream repo. |
+| Secret is empty or placeholder | Paste the full JSON from `az ad sp create-for-rbac ... --sdk-auth` again. |
+| Wrong JSON shape | Use camelCase: `clientId`, `clientSecret`, `subscriptionId`, `tenantId` (see [Azure login — service principal](https://github.com/Azure/login#login-with-a-service-principal-secret)). |
+
+**Alternative (four separate secrets):** create `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_SUBSCRIPTION_ID`, `AZURE_TENANT_ID`, then set workflow `creds` to a single-line JSON (see [Azure/login README](https://github.com/Azure/login#login-with-a-service-principal-secret)) — or keep one secret `AZURE_CREDENTIALS` with the combined JSON (simplest).
 
 ## Option B — Provision locally
 

@@ -9,3 +9,5 @@
 **Dependabot** is configured in [`.github/dependabot.yml`](../dependabot.yml) (fixed filename; do not rename). It opens weekly PRs for GitHub Actions, `web` npm, and `mobile` npm.
 
 **Docker Compose** for local stacks is [`docker-compose.yml`](../../docker-compose.yml) at the repo root (standard name for `docker compose`).
+
+**Azure deploy failures (`client-id` / `tenant-id`):** the repo must define secret **`AZURE_CREDENTIALS`** (full service-principal JSON). Forks do not inherit secrets. See [azure/README.md — Troubleshooting](../../azure/README.md#troubleshooting-azure-login-in-github-actions).
