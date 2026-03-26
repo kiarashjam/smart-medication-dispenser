@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { isAdminRole } from '@/lib/roles';
 import { motion } from 'motion/react';
 import { Loader2 } from 'lucide-react';
 
@@ -9,7 +10,7 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
 
   if (loading) {
     return (
@@ -36,5 +37,16 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to="/login" replace />;
   }
 
+  if (isAdminRole(user.role)) {
+    return <AdminBlocked logout={logout} />;
+  }
+
   return <>{children}</>;
+}
+
+function AdminBlocked({ logout }: { logout: () => void }) {
+  useEffect(() => {
+    logout();
+  }, [logout]);
+  return <Navigate to="/login" replace />;
 }

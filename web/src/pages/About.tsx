@@ -26,6 +26,7 @@ const cards = [
 export default function About() {
   return (
     <PublicPageShell
+      contentWidth="full"
       kicker="Project"
       title={`About ${PRODUCT.name}`}
       subtitle="Open-source MVP monorepo documented in README.md and software-docs/MVP_APPLICATION.md—patients miss doses; caregivers need adherence and device status in one place."

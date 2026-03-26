@@ -9,25 +9,33 @@ namespace SmartMedicationDispenser.Application.Schedules;
 public class GetTodayScheduleQueryHandler : IRequestHandler<GetTodayScheduleQuery, IReadOnlyList<TodayScheduleItemDto>>
 {
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
     private readonly IDateTimeProvider _dateTime;
     private readonly IMemoryCache _cache;
 
-    public GetTodayScheduleQueryHandler(IDeviceRepository deviceRepository, IDateTimeProvider dateTime, IMemoryCache cache)
+    public GetTodayScheduleQueryHandler(
+        IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess,
+        IDateTimeProvider dateTime,
+        IMemoryCache cache)
     {
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
         _dateTime = dateTime;
         _cache = cache;
     }
 
     public async Task<IReadOnlyList<TodayScheduleItemDto>> Handle(GetTodayScheduleQuery request, CancellationToken cancellationToken)
     {
-        // Cache today's schedule for 2 minutes per device+timezone to reduce DB queries
-        var cacheKey = $"today_schedule_{request.DeviceId}_{request.TimeZoneId ?? "UTC"}";
+        var cacheKey = $"today_schedule_{request.UserId}_{request.DeviceId}_{request.TimeZoneId ?? "UTC"}";
         if (_cache.TryGetValue<IReadOnlyList<TodayScheduleItemDto>>(cacheKey, out var cached) && cached != null)
             return cached;
 
+        if (!await _deviceAccess.CanAccessDeviceAsync(request.UserId, request.DeviceId, cancellationToken))
+            return Array.Empty<TodayScheduleItemDto>();
+
         var device = await _deviceRepository.GetByIdWithContainersAndSchedulesAsync(request.DeviceId, cancellationToken);
-        if (device == null || device.UserId != request.UserId)
+        if (device == null)
             return Array.Empty<TodayScheduleItemDto>();
 
         var tz = string.IsNullOrWhiteSpace(request.TimeZoneId) ? TimeZoneInfo.Utc : TimeZoneInfo.FindSystemTimeZoneById(request.TimeZoneId);

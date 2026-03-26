@@ -8,17 +8,20 @@ public class DeleteScheduleCommandHandler : IRequestHandler<DeleteScheduleComman
     private readonly IScheduleRepository _scheduleRepository;
     private readonly IContainerRepository _containerRepository;
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
     private readonly IUnitOfWork _unitOfWork;
 
     public DeleteScheduleCommandHandler(
         IScheduleRepository scheduleRepository,
         IContainerRepository containerRepository,
         IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess,
         IUnitOfWork unitOfWork)
     {
         _scheduleRepository = scheduleRepository;
         _containerRepository = containerRepository;
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
         _unitOfWork = unitOfWork;
     }
 
@@ -31,7 +34,7 @@ public class DeleteScheduleCommandHandler : IRequestHandler<DeleteScheduleComman
         if (container == null)
             return false;
         var device = await _deviceRepository.GetByIdAsync(container.DeviceId, cancellationToken);
-        if (device == null || device.UserId != request.UserId)
+        if (device == null || !await _deviceAccess.CanAccessDeviceAsync(request.UserId, device.Id, cancellationToken))
             return false;
         await _scheduleRepository.DeleteAsync(schedule, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

@@ -5,12 +5,11 @@ using BCryptNet = BCrypt.Net.BCrypt;
 
 namespace SmartMedicationDispenser.Infrastructure.Persistence;
 
-/// <summary>Seeds demo users (patient, caregiver, admin), devices, containers, and schedules if DB is empty.</summary>
+/// <summary>Seeds demo users (patient, caregiver), devices, containers, and schedules if DB is empty.</summary>
 public static class SeedData
 {
     public const string DemoPatientEmail = "patient@demo.com";
     public const string DemoCaregiverEmail = "caregiver@demo.com";
-    public const string DemoAdminEmail = "admin@demo.com";
     public const string DemoPassword = "Demo123!";
 
     public static async Task SeedAsync(AppDbContext db, CancellationToken cancellationToken = default)
@@ -20,7 +19,6 @@ public static class SeedData
 
         var patientId = Guid.NewGuid();
         var caregiverId = Guid.NewGuid();
-        var adminId = Guid.NewGuid();
         var mainDeviceId = Guid.NewGuid();
         var portableDeviceId = Guid.NewGuid();
 
@@ -43,16 +41,7 @@ public static class SeedData
             Role = UserRole.Caregiver,
             CreatedAtUtc = DateTime.UtcNow
         };
-        var admin = new User
-        {
-            Id = adminId,
-            Email = DemoAdminEmail,
-            PasswordHash = BCryptNet.HashPassword(DemoPassword),
-            FullName = "Demo Admin",
-            Role = UserRole.Admin,
-            CreatedAtUtc = DateTime.UtcNow
-        };
-        db.Users.AddRange(patient, caregiver, admin);
+        db.Users.AddRange(patient, caregiver);
 
         var mainDevice = new Device
         {

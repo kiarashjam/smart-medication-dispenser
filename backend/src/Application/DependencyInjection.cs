@@ -2,6 +2,8 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using SmartMedicationDispenser.Application.Common.Behaviors;
+using SmartMedicationDispenser.Application.Common.Interfaces;
+using SmartMedicationDispenser.Application.Common.Services;
 using SmartMedicationDispenser.Application.Validators;
 using System.Reflection;
 
@@ -12,6 +14,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        services.AddScoped<IDeviceAccessService, DeviceAccessService>();
+
         services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());

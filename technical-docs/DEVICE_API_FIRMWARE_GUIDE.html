@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Device API & JSON Reference</title>
+    <style>
+    @page {
+        size: A4;
+        margin: 2cm 2.2cm;
+        @bottom-center {
+            content: counter(page);
+            font-size: 9pt;
+            color: #666;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+    }
+
+    body {
+        font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+        font-size: 10pt;
+        line-height: 1.55;
+        color: #1a1a1a;
+    }
+
+    h1 {
+        font-size: 20pt;
+        color: #1b4332;
+        border-bottom: 3px solid #1b4332;
+        padding-bottom: 8px;
+        margin-top: 0;
+        page-break-after: avoid;
+    }
+
+    h2 {
+        font-size: 14pt;
+        color: #2d6a4f;
+        border-bottom: 1px solid #40916c;
+        margin-top: 22px;
+        page-break-after: avoid;
+    }
+
+    h3 {
+        font-size: 11.5pt;
+        color: #344e41;
+        margin-top: 16px;
+        page-break-after: avoid;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0;
+        font-size: 8.5pt;
+        page-break-inside: auto;
+    }
+
+    thead { display: table-header-group; }
+
+    th {
+        background-color: #1b4332;
+        color: white;
+        padding: 6px 7px;
+        text-align: left;
+        border: 1px solid #1b4332;
+    }
+
+    td {
+        padding: 5px 7px;
+        border: 1px solid #ddd;
+        vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background-color: #f0f7f4; }
+
+    pre {
+        background-color: #1e1e1e;
+        border-radius: 5px;
+        padding: 12px;
+        font-family: Consolas, 'Courier New', monospace;
+        font-size: 7.5pt;
+        line-height: 1.4;
+        color: #e8e8e8;
+        page-break-inside: avoid;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    code {
+        font-family: Consolas, 'Courier New', monospace;
+        font-size: 8.5pt;
+        background: #f0f4f0;
+        padding: 1px 4px;
+        border-radius: 2px;
+    }
+
+    pre code {
+        background: transparent;
+        padding: 0;
+        color: inherit;
+        font-size: 7.5pt;
+    }
+
+    hr { border: none; border-top: 1px solid #ccc; margin: 18px 0; }
+
+    ul, ol { padding-left: 22px; }
+
+    .cover-page {
+        text-align: center;
+        padding-top: 100px;
+        page-break-after: always;
+    }
+
+    .cover-page h1 {
+        font-size: 26pt;
+        border: none;
+    }
+
+    .cover-page .subtitle { font-size: 14pt; color: #555; margin: 16px 0 32px; }
+
+    .cover-page .badge {
+        display: inline-block;
+        background: #1b4332;
+        color: #fff;
+        padding: 6px 18px;
+        border-radius: 4px;
+        font-size: 10pt;
+    }
+
+    .cover-page .details { font-size: 10.5pt; color: #666; line-height: 1.9; margin-top: 40px; }
+
+    /* Summary tables (Method / Path / Auth) — first column emphasis */
+    .main table tr td:first-child {
+        font-weight: 600;
+        color: #2d4a3e;
+        white-space: nowrap;
+        width: 28%;
+    }
+
+    .main h2 { page-break-after: avoid; }
+    .main h3 { page-break-after: avoid; }
+    </style>
+</head>
+<body>
+    
+    <div class="cover-page">
+        <h1>Device API &amp; JSON Reference</h1>
+        <div class="subtitle">Smart Medication Dispenser — Firmware / Electronics</div>
+        <div class="badge">ENGINEERING HANDOFF</div>
+        <div class="details">
+            <strong>Document:</strong> DEVICE_API_FIRMWARE_GUIDE.md<br>
+            <strong>Content:</strong> Per-endpoint <em>what it does</em>, <em>why</em>, <em>when to call</em>; JSON examples; field tables<br>
+            <strong>Regenerate:</strong> <code>python generate_device_api_pdf.py</code> (updates this HTML + PDF)
+        </div>
+    </div>
+    
+    <section class="main"><h1 id="device-api-json-reference-firmware-electronics">Device API &amp; JSON Reference — Firmware / Electronics</h1>
+<p><strong>Smart Medication Dispenser Platform (MVP)</strong><br>
+<strong>Audience:</strong> Electronics engineers, firmware developers<br>
+<strong>JSON convention:</strong> Device endpoints under <code>/api/v1</code> use <strong>snake_case</strong> property names in JSON (matches backend <code>JsonPropertyName</code> attributes). Incoming integration webhooks use <strong>camelCase</strong> (<code>eventType</code>, <code>deviceId</code>).</p>
+<hr>
+<h2 id="0-base-url-and-authentication">0. Base URL and authentication</h2>
+<p><strong>What this section covers:</strong> How to address the API and prove the device identity on each request.</p>
+<p><strong>Why it matters:</strong> Wrong base URL or missing headers produce <strong>401/404</strong> and silent failures in the field; firmware should treat auth as mandatory on every protected call.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Item</th>
+<th style="text-align: left;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>API root</strong></td>
+<td style="text-align: left;"><code>https://&lt;your-host&gt;</code> (local MVP: <code>http://localhost:5000</code>)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Device API base</strong></td>
+<td style="text-align: left;"><code>{root}/api/v1</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth option A</strong></td>
+<td style="text-align: left;">Header <code>Authorization: Bearer &lt;device_token&gt;</code> (from registration)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth option B</strong></td>
+<td style="text-align: left;">Header <code>X-API-Key: &lt;key&gt;</code> (created in Web → Integrations → Device API keys; device must already exist in portal, identified by GUID)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note:</strong> <code>POST /api/v1/devices/register</code> has <strong>no</strong> auth. All other device routes below require <strong>A</strong> or <strong>B</strong> unless noted.</p>
+<p><strong>Security:</strong> Firmware should <strong>always</strong> send <code>X-API-Key</code> or <code>Bearer</code> on protected routes. Do not rely on the path <code>{deviceId}</code> alone.</p>
+<h3 id="how-auth-works-mental-model">How auth works (mental model)</h3>
+<ul>
+<li><strong><code>Authorization: Bearer …</code></strong> — JWT issued by <strong><code>POST /devices/register</code></strong> (or equivalent auth service). The token carries the device identity the server trusts.</li>
+<li><strong><code>X-API-Key: sk_…</code></strong> — Created in the caregiver <strong>Integrations</strong> screen for a <strong>specific</strong> device (GUID). The server maps the key → device; use this when the device was created in the portal first.</li>
+<li><strong>Path <code>{deviceId}</code></strong> — Should be the same cloud GUID as your device record. Always pair it with Bearer or API key so the call is authenticated.</li>
+</ul>
+<hr>
+<h2 id="1-get-apiv1ping">1. <code>GET /api/v1/ping</code></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Method</strong></td>
+<td style="text-align: left;"><code>GET</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Path</strong></td>
+<td style="text-align: left;"><code>/api/v1/ping</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth</strong></td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>What it does:</strong> Returns static health JSON (<code>status</code>, <code>server_time</code>). <strong>No database writes</strong> — it only proves the HTTP stack and routing work.</p>
+<p><strong>Why use it:</strong> Cheap way to confirm <strong>network + TLS + correct API hostname</strong> before heartbeats, registration, or OTA logic. Avoids sending large payloads while debugging connectivity.</p>
+<p><strong>When to call:</strong> After Wi‑Fi join, in factory test mode, or before retrying a failed sync.</p>
+<h3 id="response-json">Response JSON</h3>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;server_time&quot;: &quot;2026-03-26T14:30:00.0000000Z&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>status</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Always <code>"ok"</code> when the service is reachable.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>server_time</code></td>
+<td style="text-align: left;">string (ISO 8601 UTC)</td>
+<td style="text-align: left;">Server clock; use for rough time sync checks only.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="2-post-apiv1devicesregister">2. <code>POST /api/v1/devices/register</code></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Method</strong></td>
+<td style="text-align: left;"><code>POST</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Path</strong></td>
+<td style="text-align: left;"><code>/api/v1/devices/register</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth</strong></td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>What it does:</strong> Inserts a <strong>new</strong> <code>Device</code> row in the database (new internal GUID), stores type/firmware/hardware/MAC, marks the unit online, and returns a <strong>device JWT</strong> (<code>device_token</code>) plus suggested <code>heartbeat_interval</code> (typically <strong>60</strong> seconds) and <code>api_endpoint</code>.</p>
+<p><strong>Why use it:</strong> Gives firmware a <strong>Bearer token</strong> without a prior portal step — suited to “device calls home first, user links later” flows <strong>if</strong> product uses the <strong><code>SMD-</code> + 8 hex</strong> id scheme.</p>
+<p><strong>When <em>not</em> to use it:</strong> If the caregiver <strong>already created</strong> the device in the web app and you have a <strong>GUID + API key</strong>, skip registration and use <strong><code>X-API-Key</code></strong> on all <code>/api/v1/...</code> calls instead.</p>
+<p><strong>Validation:</strong> <code>device_id</code> must match <strong><code>SMD-</code> + exactly 8 hexadecimal characters</strong> (e.g. <code>SMD-A1B2C3D4</code>). Other formats return <strong><code>success: false</code></strong> (no token).</p>
+<h3 id="request-json">Request JSON</h3>
+<pre><code class="language-json">{
+  &quot;device_id&quot;: &quot;SMD-A1B2C3D4&quot;,
+  &quot;device_type&quot;: &quot;main&quot;,
+  &quot;firmware_version&quot;: &quot;1.0.0&quot;,
+  &quot;hardware_version&quot;: &quot;revB&quot;,
+  &quot;mac_address&quot;: &quot;AA:BB:CC:DD:EE:FF&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>device_id</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Hardware id: <code>SMD-</code> + 8 hex chars.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>device_type</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;"><code>main</code>, <code>portable</code>, <code>smd-100</code>, <code>smd-200</code>, <code>travel</code>, etc. Mapped server-side to device type.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>firmware_version</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Running firmware version string.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>hardware_version</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">PCB / product revision.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>mac_address</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Wi‑Fi MAC for support / inventory.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="response-json-success">Response JSON (success)</h3>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;device_token&quot;: &quot;eyJhbGciOiJIUzI1NiIs...&quot;,
+  &quot;token_expires_at&quot;: &quot;2027-03-26T14:30:00.0000000Z&quot;,
+  &quot;api_endpoint&quot;: &quot;https://your-host/api/v1&quot;,
+  &quot;heartbeat_interval&quot;: 60
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>success</code></td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;"><code>true</code> when registration succeeded.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>device_token</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">JWT — send as <code>Authorization: Bearer ...</code> on later calls.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>token_expires_at</code></td>
+<td style="text-align: left;">string (ISO 8601)</td>
+<td style="text-align: left;">Token expiry (MVP: long-lived, e.g. ~365 days).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>api_endpoint</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Base URL for <code>/api/v1</code> (server fills host).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>heartbeat_interval</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Suggested seconds between heartbeats (e.g. <code>60</code>).</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="3-post-apiv1devicesdeviceidheartbeat">3. <code>POST /api/v1/devices/{deviceId}/heartbeat</code></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Method</strong></td>
+<td style="text-align: left;"><code>POST</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Path</strong></td>
+<td style="text-align: left;"><code>/api/v1/devices/{deviceId}/heartbeat</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth</strong></td>
+<td style="text-align: left;">Bearer or <code>X-API-Key</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>What it does:</strong> Updates the device row: <strong>last heartbeat</strong>, <strong>online</strong> flags, optional <strong>battery / Wi‑Fi / temperature / humidity / firmware</strong> fields. If <code>slots</code> is sent, matching <strong>container quantities</strong> are updated by slot number. Very low battery may create <strong>in-app notifications</strong> for the patient.</p>
+<p><strong>Why use it:</strong> Keeps the cloud (and caregivers) aware the dispenser is <strong>alive</strong>, within <strong>environmental limits</strong>, and shows <strong>inventory</strong> without a separate inventory call. Response includes <code>next_heartbeat</code> so firmware can align cadence with server expectations.</p>
+<p><strong>When to call:</strong> On a <strong>fixed interval</strong> (e.g. every <strong>60</strong> s after registration, or whatever <code>heartbeat_interval</code> returned). Also after waking from sleep or reconnecting after outage.</p>
+<p><strong>Path <code>{deviceId}</code>:</strong> Use the cloud <strong>GUID</strong> string when the device exists from the portal (API key flow).</p>
+<h3 id="request-json_1">Request JSON</h3>
+<pre><code class="language-json">{
+  &quot;device_id&quot;: &quot;550e8400-e29b-41d4-a716-446655440000&quot;,
+  &quot;timestamp&quot;: &quot;2026-03-26T14:30:00.0000000Z&quot;,
+  &quot;battery&quot;: 87,
+  &quot;wifi_signal&quot;: -52,
+  &quot;temperature&quot;: 22.5,
+  &quot;humidity&quot;: 45,
+  &quot;firmware&quot;: &quot;1.0.0&quot;,
+  &quot;slots&quot;: [
+    {
+      &quot;slot&quot;: 1,
+      &quot;medication&quot;: &quot;Metformin 500mg&quot;,
+      &quot;pills&quot;: 14
+    },
+    {
+      &quot;slot&quot;: 2,
+      &quot;medication&quot;: &quot;Aspirin 100mg&quot;,
+      &quot;pills&quot;: 30
+    }
+  ]
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>device_id</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Identifier string for the device (typically same GUID as path).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>timestamp</code></td>
+<td style="text-align: left;">string / datetime</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Device-side time of sample (ISO 8601).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>battery</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Percentage <strong>0–100</strong>. Low values may trigger server-side notifications.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>wifi_signal</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">RSSI in dBm (e.g. <code>-65</code>).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>temperature</code></td>
+<td style="text-align: left;">number</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Celsius (or as agreed with product).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>humidity</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Relative humidity %.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>firmware</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Current firmware version reported to cloud.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>slots</code></td>
+<td style="text-align: left;">array</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Per-compartment inventory snapshot.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>slots[].slot</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes (in object)</td>
+<td style="text-align: left;">Slot index matching cloud container slot.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>slots[].medication</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Human-readable name (informational).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>slots[].pills</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes (in object)</td>
+<td style="text-align: left;">Count remaining in that slot; updates cloud inventory.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="response-json_1">Response JSON</h3>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;server_time&quot;: &quot;2026-03-26T14:30:01.0000000Z&quot;,
+  &quot;commands&quot;: [],
+  &quot;next_heartbeat&quot;: 60
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>success</code></td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;"><code>true</code> if heartbeat applied.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>server_time</code></td>
+<td style="text-align: left;">string (ISO 8601)</td>
+<td style="text-align: left;">Server UTC time after processing.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>commands</code></td>
+<td style="text-align: left;">array</td>
+<td style="text-align: left;">Reserved for future <strong>remote commands</strong> (MVP often empty).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>next_heartbeat</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Suggested interval in seconds until next heartbeat.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="4-get-apiv1devicesdeviceidschedule">4. <code>GET /api/v1/devices/{deviceId}/schedule</code></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Method</strong></td>
+<td style="text-align: left;"><code>GET</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Path</strong></td>
+<td style="text-align: left;"><code>/api/v1/devices/{deviceId}/schedule</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth</strong></td>
+<td style="text-align: left;">Bearer or <code>X-API-Key</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>What it does:</strong> Reads <strong>containers + schedules</strong> from the database for this device, filters to schedules <strong>active today</strong> (start/end date), and returns a flat list of <strong>schedule rows</strong> (each row = one time-of-day + weekday bitmask expanded to <code>mon</code>…<code>sun</code>).</p>
+<p><strong>Why use it:</strong> Firmware needs authoritative <strong>when to dispense</strong>, <strong>how many pills</strong>, and <strong>which slot</strong> — everything the caregiver configured in the app. Without this, local timers cannot match cloud truth.</p>
+<p><strong>When to call:</strong> After pairing/linking, after <strong>pull-to-refresh</strong> or a “schedule changed” signal (if you add one later), and periodically (e.g. daily) to pick up edits. Compare count or hash locally to avoid redundant work.</p>
+<h3 id="response-json_2">Response JSON</h3>
+<p>The backend returns <strong>one time string per schedule row</strong> (<code>TimeOfDay</code> → <code>"HH:mm"</code>). If the patient has the <strong>same medication twice daily</strong>, you will typically see <strong>two <code>schedules</code> entries</strong> (same <code>slot</code> / <code>medication</code>, different <code>id</code> / <code>times</code>).</p>
+<p><code>days</code> are <strong>lowercase three-letter</strong> codes from the server’s bitmask (<code>GetDeviceScheduleQueryHandler</code>): <code>mon</code>, <code>tue</code>, <code>wed</code>, <code>thu</code>, <code>fri</code>, <code>sat</code>, <code>sun</code>.</p>
+<pre><code class="language-json">{
+  &quot;schedules&quot;: [
+    {
+      &quot;id&quot;: &quot;3fa85f64-5717-4562-b3fc-2c963f66afa6&quot;,
+      &quot;medication&quot;: &quot;Metformin 500mg&quot;,
+      &quot;slot&quot;: 1,
+      &quot;pills&quot;: 2,
+      &quot;times&quot;: [&quot;08:00&quot;],
+      &quot;days&quot;: [&quot;mon&quot;, &quot;wed&quot;, &quot;fri&quot;]
+    },
+    {
+      &quot;id&quot;: &quot;4fa85f64-5717-4562-b3fc-2c963f66afa7&quot;,
+      &quot;medication&quot;: &quot;Metformin 500mg&quot;,
+      &quot;slot&quot;: 1,
+      &quot;pills&quot;: 2,
+      &quot;times&quot;: [&quot;20:00&quot;],
+      &quot;days&quot;: [&quot;mon&quot;, &quot;wed&quot;, &quot;fri&quot;]
+    }
+  ]
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>schedules</code></td>
+<td style="text-align: left;">array</td>
+<td style="text-align: left;">Active schedule rows for this device (today within each row’s start/end dates).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>schedules[].id</code></td>
+<td style="text-align: left;">string (GUID)</td>
+<td style="text-align: left;">That schedule row’s id in the database.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>schedules[].medication</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">From container <code>MedicationName</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>schedules[].slot</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Container slot number on the device.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>schedules[].pills</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;"><strong>Pills per dose</strong> for this row (<code>container.PillsPerDose</code>), not total stock.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>schedules[].times</code></td>
+<td style="text-align: left;">array of strings</td>
+<td style="text-align: left;">Usually <strong>one</strong> local time <code>"HH:mm"</code> per row.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>schedules[].days</code></td>
+<td style="text-align: left;">array of strings</td>
+<td style="text-align: left;"><strong>Lowercase</strong> weekday codes: <code>mon</code> … <code>sun</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="5-post-apiv1devicesdeviceidscheduleconfirm">5. <code>POST /api/v1/devices/{deviceId}/schedule/confirm</code></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Method</strong></td>
+<td style="text-align: left;"><code>POST</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Path</strong></td>
+<td style="text-align: left;"><code>/api/v1/devices/{deviceId}/schedule/confirm</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth</strong></td>
+<td style="text-align: left;">Bearer or <code>X-API-Key</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>What it does:</strong> MVP implementation <strong>logs</strong> confirmation and returns <code>confirmed_at</code>. Use it as an <strong>audit hook</strong> that the device applied a given schedule snapshot.</p>
+<p><strong>Why use it:</strong> Support and compliance: proves the dispenser <strong>received</strong> the same number/version of schedule entries the cloud intended — useful when debugging “device didn’t dispense” reports.</p>
+<p><strong>When to call:</strong> Right after a successful <strong><code>GET .../schedule</code></strong> parse and NVM write, optionally with a hash or version string in <code>schedule_version</code>.</p>
+<h3 id="request-json_2">Request JSON</h3>
+<pre><code class="language-json">{
+  &quot;schedule_version&quot;: &quot;2026-03-26T1&quot;,
+  &quot;schedule_count&quot;: 4
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>schedule_version</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Your version tag (hash, date, or server-provided id).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>schedule_count</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Number of schedule items applied locally.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="response-json_3">Response JSON</h3>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;confirmed_at&quot;: &quot;2026-03-26T14:35:00.0000000Z&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>success</code></td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Acknowledgement stored.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>confirmed_at</code></td>
+<td style="text-align: left;">string (ISO 8601)</td>
+<td style="text-align: left;">Server time of confirmation.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="6-post-apiv1events">6. <code>POST /api/v1/events</code></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Method</strong></td>
+<td style="text-align: left;"><code>POST</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Path</strong></td>
+<td style="text-align: left;"><code>/api/v1/events</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth</strong></td>
+<td style="text-align: left;">Bearer or <code>X-API-Key</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>What it does:</strong> Accepts a single <strong>domain event</strong> from the device. The server <strong>logs</strong> it (<code>DeviceEventLog</code>), runs the matching handler (update <strong>dispense events</strong>, <strong>container quantities</strong>, <strong>device online/error fields</strong>, <strong>notifications</strong> for patient/caregiver, etc.), then may fire <strong>outgoing webhooks</strong> registered by the user (<code>device.&lt;event&gt;</code> style payload). Responds <strong><code>202 Accepted</code></strong> with an <code>event_id</code>.</p>
+<p><strong>Why use it:</strong> This is the <strong>primary channel</strong> for <strong>semantic</strong> behaviour: “pills dropped”, “patient took dose”, “missed dose”, “refill soon”, motor faults, travel mode, etc. Heartbeat alone does not replace these — events drive adherence logic and integrations.</p>
+<p><strong>When to call:</strong> At the moment the <strong>physical state</strong> changes (motor finished, door opened, timeout expired), not on a fixed timer — except avoid sending <strong><code>HEARTBEAT</code></strong> here; use <strong><code>POST .../heartbeat</code></strong> for periodic telemetry.</p>
+<p><strong>Note:</strong> Unknown <code>event</code> strings yield <strong>400</strong>; auth failure <strong>401</strong>.</p>
+<h3 id="envelope-all-events">Envelope (all events)</h3>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;DOSE_DISPENSED&quot;,
+  &quot;device_id&quot;: &quot;550e8400-e29b-41d4-a716-446655440000&quot;,
+  &quot;timestamp&quot;: &quot;2026-03-26T08:00:15.0000000Z&quot;,
+  &quot;data&quot;: {}
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>event</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Event type (see table below). <strong>Case-insensitive</strong> on server; uppercase recommended.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>device_id</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Must match authenticated device.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>timestamp</code></td>
+<td style="text-align: left;">string / datetime</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">When the event occurred (UTC).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>data</code></td>
+<td style="text-align: left;">object</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Payload; shape depends on <code>event</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="supported-event-values">Supported <code>event</code> values</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><code>event</code></th>
+<th style="text-align: left;">What the server does (summary)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>DOSE_DISPENSED</code></td>
+<td style="text-align: left;">Creates <strong>dispense</strong> record, updates <strong>inventory</strong>, may match <strong>schedule</strong> by time; notifies user.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>DOSE_TAKEN</code></td>
+<td style="text-align: left;">Finds recent <strong>Dispensed</strong> event → <strong>Confirmed</strong>; adherence / notifications.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>DOSE_MISSED</code></td>
+<td style="text-align: left;">Marks matching event <strong>Missed</strong>; notifies patient + caregiver.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>REFILL_NEEDED</code> / <code>REFILL_CRITICAL</code></td>
+<td style="text-align: left;">Updates container qty if present; <strong>low-stock</strong> notifications (critical vs normal).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>DEVICE_ONLINE</code> / <code>DEVICE_OFFLINE</code></td>
+<td style="text-align: left;">Sets online flags / timestamps; notifications (incl. caregiver on offline).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>DEVICE_ERROR</code></td>
+<td style="text-align: left;">Stores last error on device; <strong>error</strong> notification.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>BATTERY_LOW</code> / <code>BATTERY_CRITICAL</code></td>
+<td style="text-align: left;">Updates battery field; battery notifications.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>TRAVEL_MODE_ON</code> / <code>TRAVEL_MODE_OFF</code></td>
+<td style="text-align: left;">MVP: mainly <strong>travel started/ended</strong> notifications (payload logged for webhooks).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note:</strong> Prefer <strong><code>POST .../heartbeat</code></strong> for periodic telemetry, not <code>event: HEARTBEAT</code> on this endpoint.</p>
+<h3 id="data-for-dose_dispensed"><code>data</code> for <code>DOSE_DISPENSED</code></h3>
+<pre><code class="language-json">{
+  &quot;medication&quot;: &quot;Metformin 500mg&quot;,
+  &quot;slot&quot;: 1,
+  &quot;pills_dispensed&quot;: 2,
+  &quot;pills_remaining&quot;: 12,
+  &quot;scheduled_time&quot;: &quot;2026-03-26T08:00:00.0000000Z&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>medication</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Medication name.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>slot</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Slot index.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>pills_dispensed</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Count dispensed this cycle.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>pills_remaining</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Count left after dispense (updates cloud).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>scheduled_time</code></td>
+<td style="text-align: left;">string / datetime</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Intended dose time (helps match schedule).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-for-dose_taken"><code>data</code> for <code>DOSE_TAKEN</code></h3>
+<pre><code class="language-json">{
+  &quot;medication&quot;: &quot;Metformin 500mg&quot;,
+  &quot;pills_taken&quot;: 2,
+  &quot;seconds_to_take&quot;: 120,
+  &quot;on_time&quot;: true
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>medication</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Medication name.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>pills_taken</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Count taken.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>seconds_to_take</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Seconds from dispense to intake.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>on_time</code></td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Whether within expected window.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-for-dose_missed"><code>data</code> for <code>DOSE_MISSED</code></h3>
+<pre><code class="language-json">{
+  &quot;medication&quot;: &quot;Metformin 500mg&quot;,
+  &quot;scheduled_time&quot;: &quot;2026-03-26T08:00:00.0000000Z&quot;,
+  &quot;pills_not_taken&quot;: 2
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>medication</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Medication name.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>scheduled_time</code></td>
+<td style="text-align: left;">string / datetime</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">When dose was due.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>pills_not_taken</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Missed count.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-for-refill_needed-refill_critical"><code>data</code> for <code>REFILL_NEEDED</code> / <code>REFILL_CRITICAL</code></h3>
+<pre><code class="language-json">{
+  &quot;medication&quot;: &quot;Metformin 500mg&quot;,
+  &quot;slot&quot;: 1,
+  &quot;pills_remaining&quot;: 4,
+  &quot;days_remaining&quot;: 2,
+  &quot;daily_usage&quot;: 2
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>medication</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Medication name.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>slot</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Slot index.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>pills_remaining</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Pills left.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>days_remaining</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Estimated days until empty.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>daily_usage</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Pills per day estimate.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-for-device_online"><code>data</code> for <code>DEVICE_ONLINE</code></h3>
+<pre><code class="language-json">{
+  &quot;firmware&quot;: &quot;1.0.0&quot;,
+  &quot;battery&quot;: 90,
+  &quot;wifi_signal&quot;: -55
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>firmware</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Firmware version string.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>battery</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Percentage.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>wifi_signal</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">RSSI dBm.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-for-device_offline"><code>data</code> for <code>DEVICE_OFFLINE</code></h3>
+<pre><code class="language-json">{
+  &quot;last_seen&quot;: &quot;2026-03-26T07:59:00.0000000Z&quot;,
+  &quot;reason&quot;: &quot;user_power_off&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>last_seen</code></td>
+<td style="text-align: left;">string / datetime</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Last known online time.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>reason</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Short reason code or text.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-for-device_error-inside-events"><code>data</code> for <code>DEVICE_ERROR</code> (inside <code>/events</code>)</h3>
+<pre><code class="language-json">{
+  &quot;error_code&quot;: &quot;MOTOR_TIMEOUT&quot;,
+  &quot;error_type&quot;: &quot;hardware&quot;,
+  &quot;slot&quot;: 1,
+  &quot;message&quot;: &quot;Stepper did not reach home sensor&quot;,
+  &quot;severity&quot;: &quot;high&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>error_code</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Machine-readable code.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>error_type</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Category (e.g. <code>hardware</code>, <code>sensor</code>).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>slot</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Affected slot if any.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>message</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Human-readable description.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>severity</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">e.g. <code>low</code>, <code>medium</code>, <code>high</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-for-battery_low-battery_critical"><code>data</code> for <code>BATTERY_LOW</code> / <code>BATTERY_CRITICAL</code></h3>
+<pre><code class="language-json">{
+  &quot;battery_level&quot;: 12,
+  &quot;estimated_hours&quot;: 4
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>battery_level</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Percentage 0–100.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>estimated_hours</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Estimated runtime remaining.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-for-travel_mode_on"><code>data</code> for <code>TRAVEL_MODE_ON</code></h3>
+<pre><code class="language-json">{
+  &quot;portable_device_id&quot;: &quot;660e8400-e29b-41d4-a716-446655440001&quot;,
+  &quot;medications_transferred&quot;: [&quot;Metformin 500mg&quot;, &quot;Aspirin 100mg&quot;],
+  &quot;days_loaded&quot;: 7
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>portable_device_id</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Portable unit id.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>medications_transferred</code></td>
+<td style="text-align: left;">array of strings</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Names transferred.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>days_loaded</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Travel supply duration.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-for-travel_mode_off"><code>data</code> for <code>TRAVEL_MODE_OFF</code></h3>
+<pre><code class="language-json">{
+  &quot;portable_device_id&quot;: &quot;660e8400-e29b-41d4-a716-446655440001&quot;,
+  &quot;days_away&quot;: 5,
+  &quot;doses_taken&quot;: 10,
+  &quot;doses_missed&quot;: 1
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>portable_device_id</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Portable unit id.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>days_away</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Days in travel mode.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>doses_taken</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Doses confirmed.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>doses_missed</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Doses missed.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="response-json-202-accepted">Response JSON (<code>202 Accepted</code>)</h3>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;event_id&quot;: &quot;8fa85f64-5717-4562-b3fc-2c963f66afa7&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>success</code></td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Event accepted for processing.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>event_id</code></td>
+<td style="text-align: left;">string (GUID)</td>
+<td style="text-align: left;">Server log id for this event.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="7-post-apiv1devicesdeviceidinventory">7. <code>POST /api/v1/devices/{deviceId}/inventory</code></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Method</strong></td>
+<td style="text-align: left;"><code>POST</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Path</strong></td>
+<td style="text-align: left;"><code>/api/v1/devices/{deviceId}/inventory</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth</strong></td>
+<td style="text-align: left;">Bearer or <code>X-API-Key</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>What it does:</strong> For each slot in the body, finds the matching <strong>container</strong> by slot number and sets <strong><code>Quantity</code></strong> from <code>pills</code>; optionally updates <strong><code>MedicationName</code></strong> if <code>medication</code> is non-empty. (<code>capacity</code> in JSON is <strong>ignored</strong> by the current MVP handler — reserved for future use.)</p>
+<p><strong>Why use it:</strong> When you do a <strong>full tray recount</strong> (user refill, calibration, or reconciliation) and want to push <strong>all slots at once</strong> without duplicating that data on every heartbeat.</p>
+<p><strong>When to call:</strong> After <strong>manual refill</strong> flow completes, after <strong>inventory calibration</strong>, or on a <strong>nightly reconciliation</strong> if product requires it.</p>
+<h3 id="request-json_3">Request JSON</h3>
+<pre><code class="language-json">{
+  &quot;slots&quot;: [
+    { &quot;slot&quot;: 1, &quot;medication&quot;: &quot;Metformin 500mg&quot;, &quot;pills&quot;: 20, &quot;capacity&quot;: 30 },
+    { &quot;slot&quot;: 2, &quot;medication&quot;: &quot;Aspirin 100mg&quot;, &quot;pills&quot;: 45, &quot;capacity&quot;: 60 }
+  ]
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>slots</code></td>
+<td style="text-align: left;">array</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Omit or <code>[]</code> if nothing to sync.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>slots[].slot</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Slot index.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>slots[].medication</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Label.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>slots[].pills</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Current count.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>slots[].capacity</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;"><strong>Not applied</strong> in current <code>SyncInventoryCommandHandler</code>; safe to omit.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="response-json_4">Response JSON</h3>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;synced_at&quot;: &quot;2026-03-26T14:40:00.0000000Z&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>success</code></td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Sync applied.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>synced_at</code></td>
+<td style="text-align: left;">string (ISO 8601)</td>
+<td style="text-align: left;">Server processing time.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="8-post-apiv1devicesdeviceiderror">8. <code>POST /api/v1/devices/{deviceId}/error</code></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Method</strong></td>
+<td style="text-align: left;"><code>POST</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Path</strong></td>
+<td style="text-align: left;"><code>/api/v1/devices/{deviceId}/error</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth</strong></td>
+<td style="text-align: left;">Bearer or <code>X-API-Key</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>What it does:</strong> Records a <strong>device fault</strong> in persistence (event log + device last-error fields), raises <strong>notifications</strong> (patient / caregiver paths per handler), similar outcome to sending <strong><code>DEVICE_ERROR</code></strong> on <code>/events</code> but via a <strong>dedicated URL</strong> (easier to route in some firmware stacks).</p>
+<p><strong>Why use it:</strong> Clear separation: <strong>normal events</strong> vs <strong>fault pipeline</strong> (retries, different logging, critical alerts).</p>
+<p><strong>When to call:</strong> On <strong>non-recoverable</strong> or <strong>user-visible</strong> errors (motor stall, sensor failure, door jam) as soon as detected.</p>
+<h3 id="request-json_4">Request JSON</h3>
+<p>Uses the same shape as <code>DEVICE_ERROR</code> <code>data</code> (snake_case):</p>
+<pre><code class="language-json">{
+  &quot;error_code&quot;: &quot;SENSOR_FAULT&quot;,
+  &quot;error_type&quot;: &quot;sensor&quot;,
+  &quot;slot&quot;: 2,
+  &quot;message&quot;: &quot;IR beam blocked&quot;,
+  &quot;severity&quot;: &quot;medium&quot;
+}
+</code></pre>
+<p>(Field meanings: same as <strong>§6 <code>DEVICE_ERROR</code></strong>.)</p>
+<h3 id="response-json_5">Response JSON</h3>
+<pre><code class="language-json">{
+  &quot;success&quot;: true
+}
+</code></pre>
+<hr>
+<h2 id="9-get-apiv1devicesdeviceidfirmwarecurrent_version100">9. <code>GET /api/v1/devices/{deviceId}/firmware?current_version=1.0.0</code></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Method</strong></td>
+<td style="text-align: left;"><code>GET</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Path</strong></td>
+<td style="text-align: left;"><code>/api/v1/devices/{deviceId}/firmware</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Query</strong></td>
+<td style="text-align: left;">Optional <code>current_version</code> — firmware string you are running</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth</strong></td>
+<td style="text-align: left;">Bearer or <code>X-API-Key</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>What it does:</strong> Returns whether an <strong>OTA package</strong> is available, and metadata (<code>download_url</code>, <code>checksum</code>, <code>size_bytes</code>, <code>mandatory</code>, etc.). <strong>MVP controller</strong> currently returns <strong><code>update_available: false</code></strong> always (placeholder until a firmware registry is wired).</p>
+<p><strong>Why use it:</strong> Standard <strong>pull</strong> pattern: device asks “is there newer firmware?” before downloading — supports staged rollouts and mandatory updates later.</p>
+<p><strong>When to call:</strong> After boot, after heartbeat reconnect, or on a <strong>daily</strong> timer — policy is product-specific.</p>
+<h3 id="response-json-mvp-typical">Response JSON (MVP typical)</h3>
+<pre><code class="language-json">{
+  &quot;update_available&quot;: false,
+  &quot;current_version&quot;: &quot;1.0.0&quot;,
+  &quot;new_version&quot;: null,
+  &quot;download_url&quot;: null,
+  &quot;checksum&quot;: null,
+  &quot;size_bytes&quot;: null,
+  &quot;release_notes&quot;: null,
+  &quot;mandatory&quot;: false
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>update_available</code></td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;"><code>true</code> if a build is offered (MVP often <code>false</code>).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>current_version</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Echo / resolved baseline version.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>new_version</code></td>
+<td style="text-align: left;">string / null</td>
+<td style="text-align: left;">Target version if update exists.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>download_url</code></td>
+<td style="text-align: left;">string / null</td>
+<td style="text-align: left;">HTTPS URL to firmware image.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>checksum</code></td>
+<td style="text-align: left;">string / null</td>
+<td style="text-align: left;">Integrity hash (algorithm per product policy).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>size_bytes</code></td>
+<td style="text-align: left;">integer / null</td>
+<td style="text-align: left;">Image size.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>release_notes</code></td>
+<td style="text-align: left;">string / null</td>
+<td style="text-align: left;">Text for UI or logs.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>mandatory</code></td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">If <code>true</code>, device should prioritize update.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="10-post-apiv1devicesdeviceidfirmwarestatus">10. <code>POST /api/v1/devices/{deviceId}/firmware/status</code></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Method</strong></td>
+<td style="text-align: left;"><code>POST</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Path</strong></td>
+<td style="text-align: left;"><code>/api/v1/devices/{deviceId}/firmware/status</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth</strong></td>
+<td style="text-align: left;">Bearer or <code>X-API-Key</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>What it does:</strong> Accepts <strong>progress</strong> updates for an in-flight OTA. When <code>status</code> is <strong><code>completed</code></strong>, MVP code updates the device’s <strong><code>FirmwareVersion</code></strong> in the database to <code>version</code>. Failures are <strong>logged</strong> with optional <code>error</code> text.</p>
+<p><strong>Why use it:</strong> Support and dashboards need <strong>visibility</strong> (stuck at 40 %, bricked, etc.) without polling the device.</p>
+<p><strong>When to call:</strong> At state transitions: start download, verify, install, success/fail — throttle high-frequency posts if needed.</p>
+<h3 id="request-json_5">Request JSON</h3>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;downloading&quot;,
+  &quot;version&quot;: &quot;1.1.0&quot;,
+  &quot;progress&quot;: 35,
+  &quot;error&quot;: null
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>status</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;"><code>downloading</code>, <code>verifying</code>, <code>installing</code>, <code>completed</code>, <code>failed</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>version</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Firmware version being installed.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>progress</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">0–100 % complete.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>error</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Set when <code>status</code> is <code>failed</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="response-json_6">Response JSON</h3>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;received_at&quot;: &quot;2026-03-26T14:45:00.0000000Z&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>success</code></td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Server accepted the status report.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>received_at</code></td>
+<td style="text-align: left;">string (ISO 8601)</td>
+<td style="text-align: left;">UTC time the API recorded the update.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="11-post-apiwebhooksincoming-integration-minimal-firmware">11. <code>POST /api/webhooks/incoming</code> (integration / minimal firmware)</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Method</strong></td>
+<td style="text-align: left;"><code>POST</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Path</strong></td>
+<td style="text-align: left;"><code>/api/webhooks/incoming</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth</strong></td>
+<td style="text-align: left;"><strong><code>X-API-Key</code> only</strong> (Bearer not used here)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>JSON</strong></td>
+<td style="text-align: left;"><strong>camelCase</strong> top-level: <code>eventType</code>, <code>deviceId</code>, <code>data</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>What it does:</strong> Same <strong>business events</strong> as parts of <code>/api/v1/events</code> and heartbeat telemetry, but through a <strong>single integration endpoint</strong> used with a <strong>device API key</strong>. Handler updates <strong>device state</strong>, <strong>inventory/dispense</strong> (for dispense types), and <strong>notifications</strong> depending on <code>eventType</code>.</p>
+<p><strong>Why use it:</strong> Minimal JSON parser on MCU, <strong>gateway</strong> that only knows API key, or third-party <strong>bridge</strong> that maps vendor format → our <code>eventType</code> + <code>data</code>.</p>
+<p><strong>When to use vs <code>/api/v1/events</code>:</strong> Prefer <strong><code>/api/v1/events</code></strong> for full device protocol (schedule, heartbeat response fields, richer auth). Use <strong>incoming webhook</strong> when you want <strong>one URL</strong> and <strong>camelCase</strong> envelope.</p>
+<p><strong>Caveat:</strong> Does <strong>not</strong> replace <strong><code>GET .../schedule</code></strong> — still call Device API for schedules if the firmware needs them.</p>
+<h3 id="request-json_6">Request JSON</h3>
+<pre><code class="language-json">{
+  &quot;eventType&quot;: &quot;heartbeat&quot;,
+  &quot;deviceId&quot;: null,
+  &quot;data&quot;: {}
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>eventType</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Compared <strong>case-insensitively</strong> then uppercased. Supported in <code>ProcessIncomingWebhookCommandHandler</code> includes: <code>HEARTBEAT</code>, <code>DEVICE_ONLINE</code>, <code>DEVICE_OFFLINE</code>, <code>DEVICE_ERROR</code>, <code>DOSE_DISPENSED</code>, <code>DOSE_TAKEN</code>, <code>DOSE_MISSED</code>, <code>REFILL_NEEDED</code>, <code>REFILL_CRITICAL</code>, <code>BATTERY_LOW</code>, <code>BATTERY_CRITICAL</code>, <code>TRAVEL_MODE_ON</code>, <code>TRAVEL_MODE_OFF</code>, plus legacy aliases <strong><code>DEVICE_STATUS</code></strong>, <strong><code>DISPENSE_COMPLETED</code></strong> (same handling as dose dispensed), <strong><code>LOW_STOCK</code></strong>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>deviceId</code></td>
+<td style="text-align: left;">string (GUID)</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Omit to use device bound to API key; if set, must match that device (<code>WebhooksController</code> → <code>403</code> on mismatch).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>data</code></td>
+<td style="text-align: left;">object</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Shape depends on <code>eventType</code>. Telemetry uses <strong>snake_case</strong> keys inside <code>data</code> (see below).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-shapes-for-common-incoming-types"><code>data</code> shapes for common incoming types</h3>
+<p><strong><code>heartbeat</code> / <code>HEARTBEAT</code></strong> — optional telemetry (read by <code>UpdateDeviceFromData</code>):</p>
+<pre><code class="language-json">{
+  &quot;battery&quot;: 87,
+  &quot;wifi_signal&quot;: -52,
+  &quot;temperature&quot;: 22.5,
+  &quot;humidity&quot;: 45,
+  &quot;firmware&quot;: &quot;1.0.0&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>battery</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">0–100 %.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>wifi_signal</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">RSSI (e.g. dBm).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>temperature</code></td>
+<td style="text-align: left;">number</td>
+<td style="text-align: left;">Device-reported temperature.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>humidity</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Relative humidity %.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>firmware</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Firmware version string.</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>dispense_completed</code> / <code>DISPENSE_COMPLETED</code> / <code>DOSE_DISPENSED</code></strong> — either <strong>legacy</strong> (GUIDs) or <strong>slot-based</strong> format:</p>
+<pre><code class="language-json">{
+  &quot;containerId&quot;: &quot;770e8400-e29b-41d4-a716-446655440002&quot;,
+  &quot;scheduleId&quot;: &quot;880e8400-e29b-41d4-a716-446655440003&quot;
+}
+</code></pre>
+<p>or</p>
+<pre><code class="language-json">{
+  &quot;medication&quot;: &quot;Metformin 500mg&quot;,
+  &quot;slot&quot;: 1,
+  &quot;pills_dispensed&quot;: 2,
+  &quot;pills_remaining&quot;: 12
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>containerId</code></td>
+<td style="text-align: left;">string (GUID)</td>
+<td style="text-align: left;">With <code>scheduleId</code>, legacy path: creates dispense event and decrements stock.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>scheduleId</code></td>
+<td style="text-align: left;">string (GUID)</td>
+<td style="text-align: left;">Must belong to that container.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>medication</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Used in slot-based path.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>slot</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">Slot index; server finds container and first matching schedule.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>pills_dispensed</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">If <code>pills_remaining</code> omitted, stock decreases by this amount.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>pills_remaining</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">If set, container quantity set to this value.</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>low_stock</code> / <code>LOW_STOCK</code> / refill types</strong> — <code>ProcessRefillNeededAsync</code> reads:</p>
+<pre><code class="language-json">{
+  &quot;medication&quot;: &quot;Metformin 500mg&quot;,
+  &quot;pills_remaining&quot;: 4,
+  &quot;days_remaining&quot;: 2,
+  &quot;slot&quot;: 1,
+  &quot;containerId&quot;: &quot;770e8400-e29b-41d4-a716-446655440002&quot;
+}
+</code></pre>
+<p>(<code>containerId</code> is <strong>camelCase</strong> in JSON; other keys are <strong>snake_case</strong> as in the handler.)</p>
+<p><strong><code>device_status</code> / <code>DEVICE_STATUS</code></strong> — <code>data.status</code>: <code>"Active"</code> or <code>"Paused"</code> (case-insensitive).</p>
+<h3 id="response">Response</h3>
+<p><strong><code>202 Accepted</code></strong> on success (<code>WebhooksController.Incoming</code>). <strong><code>401</code></strong> invalid/missing key; <strong><code>403</code></strong> <code>deviceId</code> in body does not match key’s device; <strong><code>400</code></strong> unknown <code>eventType</code> or handler returned failure.</p>
+<hr>
+<h2 id="12-post-apiintegrationssync-bulk-gateway">12. <code>POST /api/integrations/sync</code> (bulk / gateway)</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Method</strong></td>
+<td style="text-align: left;"><code>POST</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Path</strong></td>
+<td style="text-align: left;"><code>/api/integrations/sync</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth</strong></td>
+<td style="text-align: left;"><strong><code>X-API-Key</code></strong> only</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>JSON</strong></td>
+<td style="text-align: left;"><strong>camelCase</strong> (<code>deviceId</code>, <code>device</code>, <code>events</code>, …)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>What it does:</strong> <strong>Batch</strong> operation: optionally patches <strong>device</strong> fields (<code>Active</code>/<code>Paused</code>, time zone, last heartbeat). Each valid <strong><code>events[]</code></strong> row inserts a <strong><code>DispenseEvent</code></strong> and may <strong>decrement container quantity</strong> when status is <strong>Confirmed</strong>. Invalid rows are <strong>skipped</strong> silently.</p>
+<p><strong>Why use it:</strong> <strong>Store-and-forward</strong> when the device or gateway is <strong>offline for hours</strong> — replay many doses in one HTTPS session instead of hundreds of <code>/events</code> calls.</p>
+<p><strong>When to use:</strong> LTE/Wi‑Fi intermittent, <strong>hub</strong> architecture, or migration tooling — <strong>not</strong> required for real-time dispensers that are always online.</p>
+<p><strong>Limitation:</strong> <code>containers</code> array in the DTO is <strong>not consumed</strong> by current handler — do not rely on it.</p>
+<h3 id="request-json_7">Request JSON</h3>
+<pre><code class="language-json">{
+  &quot;deviceId&quot;: &quot;550e8400-e29b-41d4-a716-446655440000&quot;,
+  &quot;device&quot;: {
+    &quot;status&quot;: &quot;Active&quot;,
+    &quot;timeZoneId&quot;: &quot;Europe/Zurich&quot;,
+    &quot;lastHeartbeatAtUtc&quot;: &quot;2026-03-26T14:00:00.0000000Z&quot;
+  },
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: null,
+      &quot;containerId&quot;: &quot;770e8400-e29b-41d4-a716-446655440002&quot;,
+      &quot;scheduleId&quot;: &quot;880e8400-e29b-41d4-a716-446655440003&quot;,
+      &quot;scheduledAtUtc&quot;: &quot;2026-03-26T08:00:00.0000000Z&quot;,
+      &quot;status&quot;: &quot;Confirmed&quot;,
+      &quot;dispensedAtUtc&quot;: &quot;2026-03-26T08:01:00.0000000Z&quot;,
+      &quot;confirmedAtUtc&quot;: &quot;2026-03-26T08:05:00.0000000Z&quot;
+    }
+  ]
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>deviceId</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">GUID string; <strong>must equal</strong> <code>deviceId</code> resolved from <code>X-API-Key</code> (<code>IntegrationsController</code> else <code>400</code>).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>device</code></td>
+<td style="text-align: left;">object</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">If present, updates <code>Status</code>, <code>TimeZoneId</code>, <code>LastHeartbeatAtUtc</code> on the device entity.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>device.status</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;"><code>Active</code> or <code>Paused</code> (case-insensitive per <code>SyncFromCloudCommandHandler</code>).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>device.timeZoneId</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">IANA time zone id.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>device.lastHeartbeatAtUtc</code></td>
+<td style="text-align: left;">string / datetime</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Stored on device.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>events</code></td>
+<td style="text-align: left;">array</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Each valid row creates a <code>DispenseEvent</code>. Rows with bad GUIDs, wrong device, or missing container/schedule are <strong>skipped</strong> (no error for that row).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>events[].id</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Present on DTO; <strong>not</strong> used to deduplicate in current handler (server always generates new event id).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>events[].containerId</code></td>
+<td style="text-align: left;">string (GUID)</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Must exist and belong to this device.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>events[].scheduleId</code></td>
+<td style="text-align: left;">string (GUID)</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Must exist for that container.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>events[].scheduledAtUtc</code></td>
+<td style="text-align: left;">string / datetime</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Stored as scheduled time.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>events[].status</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Parsed case-insensitively: <code>dispensed</code>, <code>confirmed</code>, <code>missed</code>, <code>delayed</code>, else treated as <code>pending</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>events[].dispensedAtUtc</code></td>
+<td style="text-align: left;">string / datetime</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">If omitted for non-pending, server may set dispense time to “now”.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>events[].confirmedAtUtc</code></td>
+<td style="text-align: left;">string / datetime</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">When marked confirmed.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>containers</code></td>
+<td style="text-align: left;">array</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;"><strong>Not read</strong> by <code>SyncFromCloudCommandHandler</code> in the current codebase — omit; reserved for future use.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="response_1">Response</h3>
+<p><strong><code>202 Accepted</code></strong> when <code>SyncFromCloudCommandHandler</code> succeeds. <strong><code>401</code></strong> invalid key. <strong><code>400</code></strong> if body <code>deviceId</code> ≠ key’s device, or sync handler returns false (e.g. device id not found in DB).</p>
+<hr>
+<h2 id="recommended-firmware-call-order">Recommended firmware call order</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Step</th>
+<th style="text-align: left;">Call</th>
+<th style="text-align: left;">Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;"><code>GET /api/v1/ping</code> (optional)</td>
+<td style="text-align: left;">Confirm network path before heavier traffic.</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;"><code>POST /api/v1/devices/register</code> <strong>or</strong> use portal GUID + API key</td>
+<td style="text-align: left;">Obtain <strong>Bearer</strong> <em>or</em> skip if key-only flow.</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: left;"><code>GET .../schedule</code></td>
+<td style="text-align: left;">Load <strong>truth</strong> for alarms and dispense times from cloud.</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: left;"><code>POST .../schedule/confirm</code> (optional)</td>
+<td style="text-align: left;">Audit that NVM matches downloaded schedule.</td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: left;"><code>POST .../heartbeat</code> every <code>heartbeat_interval</code></td>
+<td style="text-align: left;">Liveness + telemetry + slot counts (if not using separate inventory sync).</td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td style="text-align: left;"><code>POST /api/v1/events</code> (as things happen)</td>
+<td style="text-align: left;">Adherence, dispense, faults — drives notifications and webhooks.</td>
+</tr>
+<tr>
+<td style="text-align: center;">7</td>
+<td style="text-align: left;"><code>POST .../inventory</code></td>
+<td style="text-align: left;">After refill / full recount.</td>
+</tr>
+<tr>
+<td style="text-align: center;">8</td>
+<td style="text-align: left;"><code>POST .../error</code></td>
+<td style="text-align: left;">Structured fault reporting.</td>
+</tr>
+<tr>
+<td style="text-align: center;">9</td>
+<td style="text-align: left;"><code>GET .../firmware</code> + <code>POST .../firmware/status</code></td>
+<td style="text-align: left;">OTA check and progress (when product enables real updates).</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>Alt</strong></td>
+<td style="text-align: left;"><code>POST /api/webhooks/incoming</code></td>
+<td style="text-align: left;">Simpler gateway path with same API key; combine with schedule fetch from Device API as needed.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>Alt</strong></td>
+<td style="text-align: left;"><code>POST /api/integrations/sync</code></td>
+<td style="text-align: left;">Bulk catch-up after offline period.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="document-verification-source-of-truth">Document verification (source of truth)</h2>
+<p>This guide was <strong>cross-checked</strong> against the MVP backend in this repository:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Area</th>
+<th style="text-align: left;">Source files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Device routes &amp; auth</td>
+<td style="text-align: left;"><code>backend/src/Api/Controllers/DeviceApiController.cs</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Request/response DTOs (snake_case)</td>
+<td style="text-align: left;"><code>backend/src/Application/DTOs/DeviceEventDtos.cs</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Schedule JSON shape</td>
+<td style="text-align: left;"><code>backend/src/Application/DeviceApi/GetDeviceScheduleQueryHandler.cs</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/v1/events</code> processing</td>
+<td style="text-align: left;"><code>backend/src/Application/DeviceApi/ProcessDeviceEventCommandHandler.cs</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Incoming webhook</td>
+<td style="text-align: left;"><code>backend/src/Api/Controllers/WebhooksController.cs</code>, <code>…/Integrations/ProcessIncomingWebhookCommandHandler.cs</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Bulk sync</td>
+<td style="text-align: left;"><code>backend/src/Api/Controllers/IntegrationsController.cs</code>, <code>…/Integrations/SyncFromCloudCommandHandler.cs</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Registration rules</td>
+<td style="text-align: left;"><code>backend/src/Application/DeviceApi/RegisterDeviceCommandHandler.cs</code></td>
+</tr>
+</tbody>
+</table>
+<p>Regenerate HTML/PDF after edits: <code>python technical-docs/generate_device_api_pdf.py</code>.</p>
+<hr>
+<p><em>Engineering handoff. For narrative integration steps see root <code>INTEGRATION.md</code>.</em></p></section>
+</body>
+</html>

@@ -9,7 +9,7 @@ import { publicEase, publicSpring } from '@/lib/publicMotion';
 const items = [
   {
     q: 'What exactly is in scope for the MVP?',
-    a: `The monorepo intentionally matches ${DOC_LINKS.mvpScope}: JWT users (patient/caregiver/admin), devices, containers, schedules, dispense/confirm/miss flow, notifications, travel sessions, and integrations (webhooks, device API keys, incoming webhook). If a long-form software doc describes something you cannot find in backend + web + mobile code, treat it as roadmap until implemented.`,
+    a: `The monorepo intentionally matches ${DOC_LINKS.mvpScope}: JWT users (patient and caregiver), devices, containers, schedules, dispense/confirm/miss flow, notifications, travel sessions, and integrations (webhooks, device API keys, incoming webhook). If a long-form software doc describes something you cannot find in backend + web + mobile code, treat it as roadmap until implemented.`,
   },
   {
     q: 'Is there real hardware in the box?',
@@ -21,7 +21,7 @@ const items = [
   },
   {
     q: 'What are the demo logins?',
-    a: 'Seed data (see root README) includes patient@demo.com, caregiver@demo.com, and admin@demo.com with password Demo123!. Roles map to the same JWT role model the API enforces.',
+    a: 'Seed data (see root README) includes patient@demo.com and caregiver@demo.com with password Demo123!. Patient and caregiver get different web experiences; the patient owns devices while the caregiver sees linked patients’ hardware and adherence.',
   },
   {
     q: 'Can I use this for real PHI or HIPAA production?',
@@ -34,6 +34,7 @@ export default function FAQ() {
 
   return (
     <PublicPageShell
+      contentWidth="full"
       kicker="Support"
       title="FAQ"
       subtitle={`Answers tied to ${PRODUCT.name} repository docs—not generic marketing claims.`}

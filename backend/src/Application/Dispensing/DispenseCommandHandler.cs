@@ -9,17 +9,20 @@ namespace SmartMedicationDispenser.Application.Dispensing;
 public class DispenseCommandHandler : IRequestHandler<DispenseCommand, DispenseEventDto?>
 {
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
     private readonly IDispenseEventRepository _dispenseEventRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IDateTimeProvider _dateTime;
 
     public DispenseCommandHandler(
         IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess,
         IDispenseEventRepository dispenseEventRepository,
         IUnitOfWork unitOfWork,
         IDateTimeProvider dateTime)
     {
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
         _dispenseEventRepository = dispenseEventRepository;
         _unitOfWork = unitOfWork;
         _dateTime = dateTime;
@@ -32,7 +35,8 @@ public class DispenseCommandHandler : IRequestHandler<DispenseCommand, DispenseE
             return null;
         if (device.Status != DeviceStatus.Active)
             return null;
-        if (request.UserId.HasValue && device.UserId != request.UserId.Value)
+        if (request.UserId.HasValue &&
+            !await _deviceAccess.CanAccessDeviceAsync(request.UserId.Value, request.DeviceId, cancellationToken))
             return null;
 
         Schedule? schedule = null;

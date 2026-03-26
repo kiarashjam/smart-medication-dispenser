@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Plane, Play, Square, Loader2 } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 import { devicesApi, travelApi, type DeviceDto } from '@/api/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { isCaregiverRole } from '@/lib/roles';
+import { appPath } from '@/lib/appRoutes';
 
 export default function Travel() {
+  const { user } = useAuth();
   const [devices, setDevices] = useState<DeviceDto[]>([]);
   const [portableDeviceId, setPortableDeviceId] = useState('');
   const [days, setDays] = useState('7');
@@ -51,6 +56,8 @@ export default function Travel() {
     } catch { toast.error('Failed to end travel'); }
     finally { setEnding(false); }
   };
+
+  if (isCaregiverRole(user?.role)) return <Navigate to={appPath()} replace />;
 
   if (loading) return <div className="flex items-center justify-center py-12"><Loader2 className="w-5 h-5 text-gray-400 animate-spin" /></div>;
 

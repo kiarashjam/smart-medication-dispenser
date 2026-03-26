@@ -25,6 +25,13 @@ public class DeviceRepository : IDeviceRepository
     public async Task<IReadOnlyList<Device>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default) =>
         await _db.Devices.Where(d => d.UserId == userId).ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<Device>> GetByUserIdsAsync(IReadOnlyCollection<Guid> userIds, CancellationToken cancellationToken = default)
+    {
+        if (userIds == null || userIds.Count == 0)
+            return Array.Empty<Device>();
+        return await _db.Devices.Where(d => userIds.Contains(d.UserId)).ToListAsync(cancellationToken);
+    }
+
     public async Task<Device> AddAsync(Device device, CancellationToken cancellationToken = default)
     {
         _db.Devices.Add(device);

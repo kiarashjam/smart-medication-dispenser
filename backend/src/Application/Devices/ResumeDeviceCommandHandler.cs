@@ -8,20 +8,28 @@ namespace SmartMedicationDispenser.Application.Devices;
 public class ResumeDeviceCommandHandler : IRequestHandler<ResumeDeviceCommand, DeviceDto?>
 {
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IDateTimeProvider _dateTime;
 
-    public ResumeDeviceCommandHandler(IDeviceRepository deviceRepository, IUnitOfWork unitOfWork, IDateTimeProvider dateTime)
+    public ResumeDeviceCommandHandler(
+        IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess,
+        IUnitOfWork unitOfWork,
+        IDateTimeProvider dateTime)
     {
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
         _unitOfWork = unitOfWork;
         _dateTime = dateTime;
     }
 
     public async Task<DeviceDto?> Handle(ResumeDeviceCommand request, CancellationToken cancellationToken)
     {
+        if (!await _deviceAccess.CanAccessDeviceAsync(request.UserId, request.DeviceId, cancellationToken))
+            return null;
         var device = await _deviceRepository.GetByIdAsync(request.DeviceId, cancellationToken);
-        if (device == null || device.UserId != request.UserId)
+        if (device == null)
             return null;
         device.Status = DeviceStatus.Active;
         device.UpdatedAtUtc = _dateTime.UtcNow;

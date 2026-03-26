@@ -23,17 +23,20 @@ public class ExportUserDataQueryHandler : IRequestHandler<ExportUserDataQuery, U
 {
     private readonly IUserRepository _userRepository;
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
     private readonly IDispenseEventRepository _dispenseEventRepository;
     private readonly INotificationRepository _notificationRepository;
 
     public ExportUserDataQueryHandler(
         IUserRepository userRepository,
         IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess,
         IDispenseEventRepository dispenseEventRepository,
         INotificationRepository notificationRepository)
     {
         _userRepository = userRepository;
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
         _dispenseEventRepository = dispenseEventRepository;
         _notificationRepository = notificationRepository;
     }
@@ -43,7 +46,8 @@ public class ExportUserDataQueryHandler : IRequestHandler<ExportUserDataQuery, U
         var user = await _userRepository.GetByIdAsync(request.UserId, ct)
             ?? throw new KeyNotFoundException("User not found");
 
-        var devices = await _deviceRepository.GetByUserIdAsync(request.UserId, ct);
+        var ownerIds = await _deviceAccess.GetAccessibleDeviceOwnerUserIdsAsync(request.UserId, ct);
+        var devices = await _deviceRepository.GetByUserIdsAsync(ownerIds, ct);
         var notifications = await _notificationRepository.GetByUserIdAsync(request.UserId, 10000, ct);
 
         // Collect dispense events across all devices

@@ -89,7 +89,14 @@ export const historyApi = {
 }
 
 export const adherenceApi = {
-  me: (params?: { fromUtc?: string; toUtc?: string }) => api.get<AdherenceSummaryDto>('/api/patients/me/adherence', { params }),
+  me: (params?: { fromUtc?: string; toUtc?: string; forPatientUserId?: string }) =>
+    api.get<AdherenceSummaryDto>('/api/patients/me/adherence', { params }),
+}
+
+export type PatientSummaryDto = { id: string; fullName: string; email: string }
+
+export const caregiversApi = {
+  myPatients: () => api.get<PatientSummaryDto[]>('/api/caregivers/my-patients'),
 }
 
 export const notificationsApi = {

@@ -9,6 +9,7 @@ namespace SmartMedicationDispenser.Application.Travel;
 public class StartTravelCommandHandler : IRequestHandler<StartTravelCommand, TravelSessionDto?>
 {
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
     private readonly IContainerRepository _containerRepository;
     private readonly IScheduleRepository _scheduleRepository;
     private readonly ITravelSessionRepository _travelSessionRepository;
@@ -18,6 +19,7 @@ public class StartTravelCommandHandler : IRequestHandler<StartTravelCommand, Tra
 
     public StartTravelCommandHandler(
         IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess,
         IContainerRepository containerRepository,
         IScheduleRepository scheduleRepository,
         ITravelSessionRepository travelSessionRepository,
@@ -26,6 +28,7 @@ public class StartTravelCommandHandler : IRequestHandler<StartTravelCommand, Tra
         IDateTimeProvider dateTime)
     {
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
         _containerRepository = containerRepository;
         _scheduleRepository = scheduleRepository;
         _travelSessionRepository = travelSessionRepository;
@@ -37,22 +40,21 @@ public class StartTravelCommandHandler : IRequestHandler<StartTravelCommand, Tra
     public async Task<TravelSessionDto?> Handle(StartTravelCommand request, CancellationToken cancellationToken)
     {
         var days = Math.Clamp(request.Request.Days, 1, 14);
-        var mainDevice = await _deviceRepository.GetByIdWithContainersAndSchedulesAsync(request.Request.PortableDeviceId, cancellationToken);
-        if (mainDevice == null)
-            return null;
         var portableDevice = await _deviceRepository.GetByIdAsync(request.Request.PortableDeviceId, cancellationToken);
-        if (portableDevice == null || portableDevice.UserId != request.UserId || portableDevice.Type != DeviceType.Portable)
+        if (portableDevice == null || portableDevice.Type != DeviceType.Portable)
             return null;
-        var mainDev = await _deviceRepository.GetByIdWithContainersAndSchedulesAsync(portableDevice.Id, cancellationToken);
-        var mainDeviceId = request.UserId;
-        var userDevices = await _deviceRepository.GetByUserIdAsync(request.UserId, cancellationToken);
+        if (!await _deviceAccess.CanAccessDeviceAsync(request.UserId, portableDevice.Id, cancellationToken))
+            return null;
+
+        var patientUserId = portableDevice.UserId;
+        var userDevices = await _deviceRepository.GetByUserIdAsync(patientUserId, cancellationToken);
         var main = userDevices.FirstOrDefault(d => d.Type == DeviceType.Main);
         if (main == null)
             return null;
         if (portableDevice.Id == main.Id)
             return null;
 
-        var existing = await _travelSessionRepository.GetActiveByUserIdAsync(request.UserId, cancellationToken);
+        var existing = await _travelSessionRepository.GetActiveByUserIdAsync(patientUserId, cancellationToken);
         if (existing != null)
             throw new InvalidOperationException("Travel mode already active.");
 
@@ -104,7 +106,7 @@ public class StartTravelCommandHandler : IRequestHandler<StartTravelCommand, Tra
         var session = new TravelSession
         {
             Id = Guid.NewGuid(),
-            UserId = request.UserId,
+            UserId = patientUserId,
             MainDeviceId = main.Id,
             PortableDeviceId = portableDevice.Id,
             StartedAtUtc = startedAt,
@@ -116,7 +118,7 @@ public class StartTravelCommandHandler : IRequestHandler<StartTravelCommand, Tra
         await _notificationRepository.AddAsync(new Domain.Entities.Notification
         {
             Id = Guid.NewGuid(),
-            UserId = request.UserId,
+            UserId = patientUserId,
             Type = NotificationType.TravelStarted,
             Title = "Travel mode started",
             Body = $"Portable device is now active until {plannedEnd:g}.",

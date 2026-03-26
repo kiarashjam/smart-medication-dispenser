@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Plus, Trash2, Key, Globe, Copy, Loader2 } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
@@ -7,8 +8,12 @@ import { Label } from '@/app/components/ui/label';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/app/components/ui/alert-dialog';
 import { devicesApi, integrationsApi, type DeviceDto, type WebhookEndpointDto, type DeviceApiKeyDto } from '@/api/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { isCaregiverRole } from '@/lib/roles';
+import { appPath } from '@/lib/appRoutes';
 
 export default function Integrations() {
+  const { user } = useAuth();
   const [devices, setDevices] = useState<DeviceDto[]>([]);
   const [webhooks, setWebhooks] = useState<WebhookEndpointDto[]>([]);
   const [apiKeys, setApiKeys] = useState<Record<string, DeviceApiKeyDto[]>>({});
@@ -73,6 +78,8 @@ export default function Integrations() {
     try { await integrationsApi.deleteDeviceApiKey(deviceId, keyId); toast.success('API key revoked'); load(); }
     catch { toast.error('Failed to revoke'); }
   };
+
+  if (!isCaregiverRole(user?.role)) return <Navigate to={appPath()} replace />;
 
   if (loading) return <div className="flex items-center justify-center py-12"><Loader2 className="w-5 h-5 text-gray-400 animate-spin" /></div>;
 

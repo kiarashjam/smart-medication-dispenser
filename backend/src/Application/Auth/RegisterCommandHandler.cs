@@ -29,6 +29,8 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
             throw new InvalidOperationException("Password hashing failed.");
 
         var role = Enum.TryParse<UserRole>(request.Request.Role, true, out var r) ? r : UserRole.Patient;
+        if (role == UserRole.Admin)
+            role = UserRole.Patient;
         var user = new User
         {
             Id = Guid.NewGuid(),

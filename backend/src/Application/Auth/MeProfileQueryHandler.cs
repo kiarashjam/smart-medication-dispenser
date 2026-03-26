@@ -8,18 +8,24 @@ public class MeProfileQueryHandler : IRequestHandler<MeProfileQuery, MeProfileRe
 {
     private readonly IUserRepository _userRepository;
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
 
-    public MeProfileQueryHandler(IUserRepository userRepository, IDeviceRepository deviceRepository)
+    public MeProfileQueryHandler(
+        IUserRepository userRepository,
+        IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess)
     {
         _userRepository = userRepository;
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
     }
 
     public async Task<MeProfileResponse> Handle(MeProfileQuery request, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken)
             ?? throw new InvalidOperationException("User not found.");
-        var devices = await _deviceRepository.GetByUserIdAsync(request.UserId, cancellationToken);
+        var ownerIds = await _deviceAccess.GetAccessibleDeviceOwnerUserIdsAsync(request.UserId, cancellationToken);
+        var devices = await _deviceRepository.GetByUserIdsAsync(ownerIds, cancellationToken);
         var deviceSummaries = devices.Select(d => new UserDeviceSummaryDto(d.Id, d.Name, d.Type.ToString(), d.Status.ToString())).ToList();
         return new MeProfileResponse(user.Id, user.Email, user.FullName, user.Role.ToString(), deviceSummaries);
     }

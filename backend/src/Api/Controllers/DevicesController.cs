@@ -41,8 +41,15 @@ public class DevicesController : ControllerBase
     public async Task<ActionResult<DeviceDto>> Create([FromBody] CreateDeviceRequest request, CancellationToken ct)
     {
         if (!UserId.HasValue) return Unauthorized();
-        var d = await _mediator.Send(new CreateDeviceCommand(UserId.Value, request), ct);
-        return CreatedAtAction(nameof(GetById), new { id = d.Id }, d);
+        try
+        {
+            var d = await _mediator.Send(new CreateDeviceCommand(UserId.Value, request), ct);
+            return CreatedAtAction(nameof(GetById), new { id = d.Id }, d);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     /// <summary>Pause dispensing for the device.</summary>

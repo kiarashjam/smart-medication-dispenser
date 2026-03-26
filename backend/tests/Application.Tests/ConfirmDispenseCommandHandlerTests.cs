@@ -48,9 +48,20 @@ public class ConfirmDispenseCommandHandlerTests
         var webhookEndpoints = new Mock<IWebhookEndpointRepository>();
         webhookEndpoints.Setup(w => w.GetActiveByUserIdAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(new List<Domain.Entities.WebhookEndpoint>());
         var webhookDelivery = new Mock<IWebhookDeliveryService>();
+        var deviceAccess = new Mock<IDeviceAccessService>();
+        deviceAccess
+            .Setup(a => a.CanAccessDeviceAsync(userId, deviceId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
 
         var handler = new ConfirmDispenseCommandHandler(
-            dispenseRepo.Object, containerRepo.Object, deviceRepo.Object, unitOfWork.Object, dateTime.Object, webhookEndpoints.Object, webhookDelivery.Object);
+            dispenseRepo.Object,
+            containerRepo.Object,
+            deviceRepo.Object,
+            deviceAccess.Object,
+            unitOfWork.Object,
+            dateTime.Object,
+            webhookEndpoints.Object,
+            webhookDelivery.Object);
         var result = await handler.Handle(new ConfirmDispenseCommand(userId, evt.Id), default);
 
         Assert.NotNull(result);
@@ -81,9 +92,20 @@ public class ConfirmDispenseCommandHandlerTests
         var dateTime = new Mock<IDateTimeProvider>();
         var webhookEndpoints = new Mock<IWebhookEndpointRepository>();
         var webhookDelivery = new Mock<IWebhookDeliveryService>();
+        var deviceAccess = new Mock<IDeviceAccessService>();
+        deviceAccess
+            .Setup(a => a.CanAccessDeviceAsync(userId, evt.DeviceId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
 
         var handler = new ConfirmDispenseCommandHandler(
-            dispenseRepo.Object, containerRepo.Object, deviceRepo.Object, unitOfWork.Object, dateTime.Object, webhookEndpoints.Object, webhookDelivery.Object);
+            dispenseRepo.Object,
+            containerRepo.Object,
+            deviceRepo.Object,
+            deviceAccess.Object,
+            unitOfWork.Object,
+            dateTime.Object,
+            webhookEndpoints.Object,
+            webhookDelivery.Object);
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             handler.Handle(new ConfirmDispenseCommand(userId, evt.Id), default));
     }

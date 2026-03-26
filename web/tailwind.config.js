@@ -48,6 +48,15 @@ export default {
           '0%, 100%': { transform: 'translateX(0)' },
           '50%': { transform: 'translateX(4px)' },
         },
+        /** Bright marketing section rule — gradient travels along the bar */
+        homeSectionSweep: {
+          '0%': { backgroundPosition: '0% 50%' },
+          '100%': { backgroundPosition: '200% 50%' },
+        },
+        homeSectionShimmer: {
+          '0%': { transform: 'translateX(-140%)' },
+          '100%': { transform: 'translateX(440%)' },
+        },
       },
       animation: {
         'public-blob': 'publicBlob 20s ease-in-out infinite',
@@ -61,6 +70,8 @@ export default {
         'home-gradient-x': 'homeGradientX 10s ease infinite',
         'home-float': 'homeFloat 5.5s ease-in-out infinite',
         'home-chevron': 'homeChevron 1.8s ease-in-out infinite',
+        'home-section-sweep': 'homeSectionSweep 5s linear infinite',
+        'home-section-shimmer': 'homeSectionShimmer 3.8s ease-in-out infinite',
       },
       backgroundSize: {
         'gradient-wide': '200% 200%',

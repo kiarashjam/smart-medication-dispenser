@@ -8,11 +8,16 @@ public class GetContainerByIdQueryHandler : IRequestHandler<GetContainerByIdQuer
 {
     private readonly IContainerRepository _containerRepository;
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
 
-    public GetContainerByIdQueryHandler(IContainerRepository containerRepository, IDeviceRepository deviceRepository)
+    public GetContainerByIdQueryHandler(
+        IContainerRepository containerRepository,
+        IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess)
     {
         _containerRepository = containerRepository;
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
     }
 
     public async Task<ContainerDto?> Handle(GetContainerByIdQuery request, CancellationToken ct)
@@ -20,9 +25,8 @@ public class GetContainerByIdQueryHandler : IRequestHandler<GetContainerByIdQuer
         var container = await _containerRepository.GetByIdAsync(request.ContainerId, ct);
         if (container == null) return null;
 
-        // Verify ownership
         var device = await _deviceRepository.GetByIdAsync(container.DeviceId, ct);
-        if (device == null || device.UserId != request.UserId) return null;
+        if (device == null || !await _deviceAccess.CanAccessDeviceAsync(request.UserId, device.Id, ct)) return null;
 
         return new ContainerDto(
             container.Id,

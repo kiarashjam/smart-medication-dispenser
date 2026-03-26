@@ -8,15 +8,18 @@ public class GetSchedulesByContainerQueryHandler : IRequestHandler<GetSchedulesB
 {
     private readonly IContainerRepository _containerRepository;
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
     private readonly IScheduleRepository _scheduleRepository;
 
     public GetSchedulesByContainerQueryHandler(
         IContainerRepository containerRepository,
         IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess,
         IScheduleRepository scheduleRepository)
     {
         _containerRepository = containerRepository;
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
         _scheduleRepository = scheduleRepository;
     }
 
@@ -26,7 +29,7 @@ public class GetSchedulesByContainerQueryHandler : IRequestHandler<GetSchedulesB
         if (container == null)
             return Array.Empty<ScheduleDto>();
         var device = await _deviceRepository.GetByIdAsync(container.DeviceId, cancellationToken);
-        if (device == null || device.UserId != request.UserId)
+        if (device == null || !await _deviceAccess.CanAccessDeviceAsync(request.UserId, device.Id, cancellationToken))
             return Array.Empty<ScheduleDto>();
         var schedules = await _scheduleRepository.GetByContainerIdAsync(request.ContainerId, cancellationToken);
         return schedules.Select(s => new ScheduleDto(

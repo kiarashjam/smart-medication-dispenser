@@ -9,15 +9,18 @@ public class GetScheduleByIdQueryHandler : IRequestHandler<GetScheduleByIdQuery,
     private readonly IScheduleRepository _scheduleRepository;
     private readonly IContainerRepository _containerRepository;
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
 
     public GetScheduleByIdQueryHandler(
         IScheduleRepository scheduleRepository,
         IContainerRepository containerRepository,
-        IDeviceRepository deviceRepository)
+        IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess)
     {
         _scheduleRepository = scheduleRepository;
         _containerRepository = containerRepository;
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
     }
 
     public async Task<ScheduleDto?> Handle(GetScheduleByIdQuery request, CancellationToken ct)
@@ -25,12 +28,11 @@ public class GetScheduleByIdQueryHandler : IRequestHandler<GetScheduleByIdQuery,
         var schedule = await _scheduleRepository.GetByIdAsync(request.ScheduleId, ct);
         if (schedule == null) return null;
 
-        // Verify ownership: schedule -> container -> device -> user
         var container = await _containerRepository.GetByIdAsync(schedule.ContainerId, ct);
         if (container == null) return null;
 
         var device = await _deviceRepository.GetByIdAsync(container.DeviceId, ct);
-        if (device == null || device.UserId != request.UserId) return null;
+        if (device == null || !await _deviceAccess.CanAccessDeviceAsync(request.UserId, device.Id, ct)) return null;
 
         return new ScheduleDto(
             schedule.Id,

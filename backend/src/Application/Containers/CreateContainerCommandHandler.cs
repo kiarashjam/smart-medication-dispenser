@@ -8,17 +8,20 @@ namespace SmartMedicationDispenser.Application.Containers;
 public class CreateContainerCommandHandler : IRequestHandler<CreateContainerCommand, ContainerDto?>
 {
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
     private readonly IContainerRepository _containerRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IDateTimeProvider _dateTime;
 
     public CreateContainerCommandHandler(
         IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess,
         IContainerRepository containerRepository,
         IUnitOfWork unitOfWork,
         IDateTimeProvider dateTime)
     {
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
         _containerRepository = containerRepository;
         _unitOfWork = unitOfWork;
         _dateTime = dateTime;
@@ -26,8 +29,10 @@ public class CreateContainerCommandHandler : IRequestHandler<CreateContainerComm
 
     public async Task<ContainerDto?> Handle(CreateContainerCommand request, CancellationToken cancellationToken)
     {
+        if (!await _deviceAccess.CanAccessDeviceAsync(request.UserId, request.DeviceId, cancellationToken))
+            return null;
         var device = await _deviceRepository.GetByIdAsync(request.DeviceId, cancellationToken);
-        if (device == null || device.UserId != request.UserId)
+        if (device == null)
             return null;
         var r = request.Request;
         var container = new Container

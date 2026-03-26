@@ -3,6 +3,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/app/components/ui/sonner';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import PublicLayout from '@/components/PublicLayout';
+import AuthLayout from '@/components/AuthLayout';
 import Layout from '@/components/Layout';
 import Home from '@/pages/Home';
 import About from '@/pages/About';
@@ -25,6 +26,7 @@ import Travel from '@/pages/Travel';
 import Notifications from '@/pages/Notifications';
 import Integrations from '@/pages/Integrations';
 import Settings from '@/pages/Settings';
+import CaregiverPeople from '@/pages/CaregiverPeople';
 import { APP_BASE } from '@/lib/appRoutes';
 
 export default function App() {
@@ -43,17 +45,17 @@ export default function App() {
           <Route
             path="/login"
             element={
-              <PublicLayout>
+              <AuthLayout>
                 <Login />
-              </PublicLayout>
+              </AuthLayout>
             }
           />
           <Route
             path="/register"
             element={
-              <PublicLayout>
+              <AuthLayout>
                 <Register />
-              </PublicLayout>
+              </AuthLayout>
             }
           />
           <Route
@@ -130,6 +132,7 @@ export default function App() {
             }
           >
             <Route index element={<Dashboard />} />
+            <Route path="people" element={<CaregiverPeople />} />
             <Route path="devices" element={<Devices />} />
             <Route path="devices/:deviceId" element={<DeviceDetail />} />
             <Route path="devices/:deviceId/containers" element={<Containers />} />

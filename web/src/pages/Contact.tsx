@@ -33,6 +33,7 @@ export default function Contact() {
 
   return (
     <PublicPageShell
+      contentWidth="full"
       kicker="Reach us"
       title="Contact"
       subtitle={`This marketing site ships with ${PRODUCT.name}; it does not define a public support mailbox. Use the repository and docs for real project contact paths.`}

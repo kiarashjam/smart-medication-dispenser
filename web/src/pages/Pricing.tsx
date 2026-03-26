@@ -52,8 +52,8 @@ const tiers = [
 export default function Pricing() {
   return (
     <PublicPageShell
+      contentWidth="full"
       kicker="How to run it"
-      wide
       title="Pricing & deployment"
       subtitle={`${PRODUCT.name} is documented as an MVP monorepo. There is no commercial price list here—only how evaluation and optional self-hosting align with the docs.`}
     >

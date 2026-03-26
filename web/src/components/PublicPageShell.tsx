@@ -6,13 +6,30 @@ type PublicPageShellProps = {
   subtitle?: string;
   kicker?: string;
   children: React.ReactNode;
+  /** @deprecated use contentWidth="wide" */
   wide?: boolean;
+  /**
+   * Horizontal bounds for page body (page wrap already applies standard px-4 … xl:px-14).
+   * `full` = same max width as Home (public-inner / 1920px). `wide` = 1100px. `prose` = 720px reading column.
+   */
+  contentWidth?: 'prose' | 'wide' | 'full';
 };
 
-export default function PublicPageShell({ title, subtitle, kicker, children, wide }: PublicPageShellProps) {
+export default function PublicPageShell({
+  title,
+  subtitle,
+  kicker,
+  children,
+  wide,
+  contentWidth,
+}: PublicPageShellProps) {
+  const width = contentWidth ?? (wide ? 'wide' : 'prose');
+  const innerClass =
+    width === 'full' ? 'public-inner' : width === 'wide' ? 'public-inner-wide' : 'public-inner-prose';
+
   return (
     <div className="public-page-wrap">
-      <div className={wide ? 'public-inner-wide' : 'public-inner-prose'}>
+      <div className={innerClass}>
         {kicker ? (
           <motion.span
             className="public-kicker inline-flex"

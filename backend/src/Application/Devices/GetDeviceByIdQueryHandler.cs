@@ -6,18 +6,16 @@ namespace SmartMedicationDispenser.Application.Devices;
 
 public class GetDeviceByIdQueryHandler : IRequestHandler<GetDeviceByIdQuery, DeviceDto?>
 {
-    private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
 
-    public GetDeviceByIdQueryHandler(IDeviceRepository deviceRepository)
+    public GetDeviceByIdQueryHandler(IDeviceAccessService deviceAccess)
     {
-        _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
     }
 
     public async Task<DeviceDto?> Handle(GetDeviceByIdQuery request, CancellationToken cancellationToken)
     {
-        var device = await _deviceRepository.GetByIdAsync(request.DeviceId, cancellationToken);
-        if (device == null || device.UserId != request.UserId)
-            return null;
-        return device.ToDto();
+        var device = await _deviceAccess.GetDeviceIfAccessibleAsync(request.UserId, request.DeviceId, cancellationToken);
+        return device?.ToDto();
     }
 }

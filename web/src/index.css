@@ -87,6 +87,10 @@ body {
   .public-border-t-section {
     @apply border-t border-white/10;
   }
+  /** Full-bleed animated rule between Home sections (used with HomeSectionDivider) */
+  .public-section-divider-wrap {
+    @apply relative left-1/2 z-[2] w-screen max-w-[100vw] -translate-x-1/2 pointer-events-none select-none;
+  }
   .public-scroll-anchor {
     @apply scroll-mt-24;
   }

@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { isCaregiverRole } from '@/lib/roles';
+import CaregiverDashboard from '@/pages/CaregiverDashboard';
 import { motion } from 'motion/react';
 import {
   Box,
@@ -43,7 +46,7 @@ import {
 } from 'recharts';
 import { toast } from 'sonner';
 
-export default function Dashboard() {
+function PatientDashboard() {
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -498,4 +501,10 @@ export default function Dashboard() {
       </div>
     </motion.div>
   );
+}
+
+export default function Dashboard() {
+  const { user } = useAuth();
+  if (isCaregiverRole(user?.role)) return <CaregiverDashboard />;
+  return <PatientDashboard />;
 }

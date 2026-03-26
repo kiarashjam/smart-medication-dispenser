@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { appPath } from '@/lib/appRoutes';
@@ -18,9 +18,11 @@ import {
   Menu,
   X,
   ChevronDown,
+  Users,
 } from 'lucide-react';
 import { notificationsApi } from '@/api/client';
 import { PRODUCT } from '@/lib/productCopy';
+import { isCaregiverRole } from '@/lib/roles';
 
 function navIsActive(pathname: string, itemPath: string) {
   const base = appPath();
@@ -62,16 +64,30 @@ export default function Layout() {
   };
 
   const showMvpBadge = import.meta.env.VITE_MVP_MODE === 'true';
+  const caregiver = isCaregiverRole(user?.role);
 
-  const navItems = [
-    { path: appPath(), label: 'Dashboard', icon: LayoutDashboard },
-    { path: appPath('/devices'), label: 'Devices', icon: Box },
-    { path: appPath('/schedules'), label: 'Schedules', icon: Calendar },
-    { path: appPath('/history'), label: 'History', icon: History },
-    { path: appPath('/travel'), label: 'Travel', icon: Plane },
-    { path: appPath('/integrations'), label: 'Integrations', icon: Plug },
-    { path: appPath('/settings'), label: 'Settings', icon: Settings },
-  ];
+  const navItems = useMemo(
+    () =>
+      caregiver
+        ? [
+            { path: appPath(), label: 'Overview', icon: LayoutDashboard },
+            { path: appPath('/people'), label: 'People', icon: Users },
+            { path: appPath('/devices'), label: 'Devices', icon: Box },
+            { path: appPath('/schedules'), label: 'Schedules', icon: Calendar },
+            { path: appPath('/history'), label: 'History', icon: History },
+            { path: appPath('/integrations'), label: 'Integrations', icon: Plug },
+            { path: appPath('/settings'), label: 'Settings', icon: Settings },
+          ]
+        : [
+            { path: appPath(), label: 'My care', icon: LayoutDashboard },
+            { path: appPath('/devices'), label: 'Devices', icon: Box },
+            { path: appPath('/schedules'), label: 'Schedules', icon: Calendar },
+            { path: appPath('/history'), label: 'History', icon: History },
+            { path: appPath('/travel'), label: 'Travel', icon: Plane },
+            { path: appPath('/settings'), label: 'Settings', icon: Settings },
+          ],
+    [caregiver],
+  );
 
   const year = new Date().getFullYear();
 
@@ -270,7 +286,7 @@ export default function Layout() {
         <div className="w-full flex justify-center">
           <div className="w-full max-w-[min(100%,1920px)] px-4 sm:px-6 lg:px-10 xl:px-14 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
             <p>
-              © {year} {PRODUCT.name} — caregiver portal
+              © {year} {PRODUCT.name} — {caregiver ? 'caregiver workspace' : 'patient web'}
             </p>
             <div className="flex items-center gap-4">
               <Link to="/" className="hover:text-brand-600 transition-colors">

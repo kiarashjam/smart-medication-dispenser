@@ -9,6 +9,7 @@ public class DelayDispenseCommandHandler : IRequestHandler<DelayDispenseCommand,
 {
     private readonly IDispenseEventRepository _dispenseEventRepository;
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
     private readonly IContainerRepository _containerRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IDateTimeProvider _dateTime;
@@ -16,12 +17,14 @@ public class DelayDispenseCommandHandler : IRequestHandler<DelayDispenseCommand,
     public DelayDispenseCommandHandler(
         IDispenseEventRepository dispenseEventRepository,
         IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess,
         IContainerRepository containerRepository,
         IUnitOfWork unitOfWork,
         IDateTimeProvider dateTime)
     {
         _dispenseEventRepository = dispenseEventRepository;
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
         _containerRepository = containerRepository;
         _unitOfWork = unitOfWork;
         _dateTime = dateTime;
@@ -33,7 +36,7 @@ public class DelayDispenseCommandHandler : IRequestHandler<DelayDispenseCommand,
         if (evt == null)
             return null;
         var device = await _deviceRepository.GetByIdAsync(evt.DeviceId, cancellationToken);
-        if (device == null || device.UserId != request.UserId)
+        if (device == null || !await _deviceAccess.CanAccessDeviceAsync(request.UserId, device.Id, cancellationToken))
             return null;
         if (evt.Status != DispenseEventStatus.Pending && evt.Status != DispenseEventStatus.Dispensed)
             return null;

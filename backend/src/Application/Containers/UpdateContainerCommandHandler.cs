@@ -8,17 +8,20 @@ public class UpdateContainerCommandHandler : IRequestHandler<UpdateContainerComm
 {
     private readonly IContainerRepository _containerRepository;
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IDateTimeProvider _dateTime;
 
     public UpdateContainerCommandHandler(
         IContainerRepository containerRepository,
         IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess,
         IUnitOfWork unitOfWork,
         IDateTimeProvider dateTime)
     {
         _containerRepository = containerRepository;
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
         _unitOfWork = unitOfWork;
         _dateTime = dateTime;
     }
@@ -29,7 +32,7 @@ public class UpdateContainerCommandHandler : IRequestHandler<UpdateContainerComm
         if (container == null)
             return null;
         var device = await _deviceRepository.GetByIdAsync(container.DeviceId, cancellationToken);
-        if (device == null || device.UserId != request.UserId)
+        if (device == null || !await _deviceAccess.CanAccessDeviceAsync(request.UserId, device.Id, cancellationToken))
             return null;
         var r = request.Request;
         container.SlotNumber = r.SlotNumber;

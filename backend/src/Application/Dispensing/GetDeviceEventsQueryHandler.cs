@@ -7,18 +7,25 @@ namespace SmartMedicationDispenser.Application.Dispensing;
 public class GetDeviceEventsQueryHandler : IRequestHandler<GetDeviceEventsQuery, IReadOnlyList<DispenseEventDto>>
 {
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
     private readonly IDispenseEventRepository _dispenseEventRepository;
 
-    public GetDeviceEventsQueryHandler(IDeviceRepository deviceRepository, IDispenseEventRepository dispenseEventRepository)
+    public GetDeviceEventsQueryHandler(
+        IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess,
+        IDispenseEventRepository dispenseEventRepository)
     {
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
         _dispenseEventRepository = dispenseEventRepository;
     }
 
     public async Task<IReadOnlyList<DispenseEventDto>> Handle(GetDeviceEventsQuery request, CancellationToken cancellationToken)
     {
+        if (!await _deviceAccess.CanAccessDeviceAsync(request.UserId, request.DeviceId, cancellationToken))
+            return Array.Empty<DispenseEventDto>();
         var device = await _deviceRepository.GetByIdAsync(request.DeviceId, cancellationToken);
-        if (device == null || device.UserId != request.UserId)
+        if (device == null)
             return Array.Empty<DispenseEventDto>();
         var limit = request.Limit <= 0 ? 100 : Math.Min(request.Limit, 500);
         var events = await _dispenseEventRepository.GetByDeviceIdAsync(

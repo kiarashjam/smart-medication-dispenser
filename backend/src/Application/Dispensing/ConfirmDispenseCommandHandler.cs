@@ -10,6 +10,7 @@ public class ConfirmDispenseCommandHandler : IRequestHandler<ConfirmDispenseComm
     private readonly IDispenseEventRepository _dispenseEventRepository;
     private readonly IContainerRepository _containerRepository;
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceAccessService _deviceAccess;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IDateTimeProvider _dateTime;
     private readonly IWebhookEndpointRepository _webhookEndpoints;
@@ -19,6 +20,7 @@ public class ConfirmDispenseCommandHandler : IRequestHandler<ConfirmDispenseComm
         IDispenseEventRepository dispenseEventRepository,
         IContainerRepository containerRepository,
         IDeviceRepository deviceRepository,
+        IDeviceAccessService deviceAccess,
         IUnitOfWork unitOfWork,
         IDateTimeProvider dateTime,
         IWebhookEndpointRepository webhookEndpoints,
@@ -27,6 +29,7 @@ public class ConfirmDispenseCommandHandler : IRequestHandler<ConfirmDispenseComm
         _dispenseEventRepository = dispenseEventRepository;
         _containerRepository = containerRepository;
         _deviceRepository = deviceRepository;
+        _deviceAccess = deviceAccess;
         _unitOfWork = unitOfWork;
         _dateTime = dateTime;
         _webhookEndpoints = webhookEndpoints;
@@ -39,7 +42,7 @@ public class ConfirmDispenseCommandHandler : IRequestHandler<ConfirmDispenseComm
         if (evt == null)
             return null;
         var device = await _deviceRepository.GetByIdAsync(evt.DeviceId, cancellationToken);
-        if (device == null || device.UserId != request.UserId)
+        if (device == null || !await _deviceAccess.CanAccessDeviceAsync(request.UserId, device.Id, cancellationToken))
             return null;
         if (evt.Status != DispenseEventStatus.Dispensed)
             throw new InvalidOperationException("Only dispensed events can be confirmed.");

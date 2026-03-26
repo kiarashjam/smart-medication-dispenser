@@ -128,13 +128,12 @@ Scan QR code with Expo Go, or run on simulator/emulator. Use demo credentials.
 
 ## Demo Credentials (Seed Data)
 
-| Role     | Email              | Password   |
-|----------|--------------------|------------|
-| Patient  | patient@demo.com   | Demo123!   |
-| Caregiver| caregiver@demo.com | Demo123!   |
-| Admin    | admin@demo.com     | Demo123!   |
+| Role      | Email              | Password   |
+|-----------|--------------------|------------|
+| Patient   | patient@demo.com   | Demo123!   |
+| Caregiver | caregiver@demo.com | Demo123!   |
 
-Seed creates: demo patient, caregiver, main device, portable device, sample containers and schedules. See `backend/README.md` for details.
+Seed creates: demo patient (device owner), linked caregiver, main + portable devices, sample containers and schedules. The web app shows **patient** vs **caregiver** layouts after sign-in. See `backend/README.md` for details.
 
 ---
 

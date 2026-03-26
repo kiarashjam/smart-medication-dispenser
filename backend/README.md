@@ -40,13 +40,12 @@ ASP.NET Core 8 Web API with Clean Architecture: Domain, Application, Infrastruct
 
 ## Demo credentials (seed)
 
-| Role     | Email              | Password   |
-|----------|--------------------|------------|
-| Patient  | patient@demo.com   | Demo123!   |
-| Caregiver| caregiver@demo.com | Demo123!   |
-| Admin    | admin@demo.com     | Demo123!   |
+| Role      | Email              | Password   |
+|-----------|--------------------|------------|
+| Patient   | patient@demo.com   | Demo123!   |
+| Caregiver | caregiver@demo.com | Demo123!   |
 
-Seed creates: one patient, one caregiver, one admin; main + portable device for patient; two containers and two schedules on the main device.
+Seed creates: one patient (linked to caregiver), one caregiver; main + portable device for the patient; two containers and two schedules on the main device. API calls use **device owner** scope: caregivers access their patients’ devices.
 
 ## Tests
 
