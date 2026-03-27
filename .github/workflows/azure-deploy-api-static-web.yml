@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Normalizes default CLI JSON (appId/password/tenant) to the shape azure/login@v3 expects.
       - name: Verify and normalize AZURE_CREDENTIALS for azure/login@v3
@@ -70,7 +70,7 @@ jobs:
       VITE_MVP_MODE: "true"
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js 20
         uses: actions/setup-node@v4
