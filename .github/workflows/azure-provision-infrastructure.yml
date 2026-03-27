@@ -27,24 +27,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Verify AZURE_CREDENTIALS secret
+      - name: Verify and normalize AZURE_CREDENTIALS for azure/login@v3
+        id: azure_creds
         shell: bash
         env:
           AZURE_CREDS: ${{ secrets.AZURE_CREDENTIALS }}
-        run: |
-          if [ -z "$AZURE_CREDS" ]; then
-            echo "::error::Repository secret AZURE_CREDENTIALS is not set or is empty. See azure/README.md — Troubleshooting."
-            exit 1
-          fi
-          if ! echo "$AZURE_CREDS" | jq -e '.clientId and .clientSecret and .subscriptionId and .tenantId' >/dev/null 2>&1; then
-            echo "::error::AZURE_CREDENTIALS must be JSON with camelCase keys: clientId, clientSecret, subscriptionId, tenantId."
-            exit 1
-          fi
+        run: bash "${GITHUB_WORKSPACE}/.github/scripts/normalize-azure-credentials.sh"
 
       - name: Azure login (service principal)
         uses: azure/login@v3
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ steps.azure_creds.outputs.creds }}
 
       - name: Build parameter file (secrets not logged)
         env:

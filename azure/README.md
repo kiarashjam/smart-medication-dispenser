@@ -29,12 +29,14 @@ az ad sp create-for-rbac \
   --name "github-actions-smart-dispenser" \
   --role contributor \
   --scopes /subscriptions/<SUBSCRIPTION_ID> \
-  --sdk-auth
+  --json-auth
 ```
+
+(`--json-auth` is the supported name; `--sdk-auth` is a deprecated alias for the same JSON shape.)
 
 Copy the **entire JSON output** into GitHub secret **`AZURE_CREDENTIALS`** (one secret, one paste — do not split into separate variables unless you use the alternative below).
 
-The JSON must include these **camelCase** keys (as in the CLI output): `clientId`, `clientSecret`, `subscriptionId`, `tenantId`. If any are missing, `azure/login` will fail with errors about `client-id` / `tenant-id`.
+The JSON must allow the workflow to derive **`clientId`**, **`clientSecret`**, **`subscriptionId`**, and **`tenantId`**. The deploy workflows normalize common variants: `appId` → `clientId`, `password` → `clientSecret`, `tenant` → `tenantId`. You still need a **subscription id** in the JSON (use `--scopes /subscriptions/<SUBSCRIPTION_ID>` as above, or add `subscriptionId` manually). If any of the four values are missing, `azure/login@v3` fails with errors about `client-id` / `tenant-id`.
 
 4. GitHub repository secrets:
 
@@ -70,8 +72,9 @@ After **`AZURE_CREDENTIALS`** and the other deploy secrets are saved, the run wi
 | Cause | What to do |
 |--------|------------|
 | Secret **`AZURE_CREDENTIALS`** not created in **this** repository | Repo → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**. Forks do **not** inherit secrets from the upstream repo. |
-| Secret is empty or placeholder | Paste the full JSON from `az ad sp create-for-rbac ... --sdk-auth` again. |
-| Wrong JSON shape | Use camelCase: `clientId`, `clientSecret`, `subscriptionId`, `tenantId` (see [Azure login — service principal](https://github.com/Azure/login#login-with-a-service-principal-secret)). |
+| Secret is empty or placeholder | Paste the full JSON again (no markdown code fences, no leading/trailing commentary). Prefer `az ad sp create-for-rbac ... --scopes /subscriptions/<SUBSCRIPTION_ID> --json-auth` so `subscriptionId` is included. |
+| Default CLI JSON without subscription | Plain `create-for-rbac` output often has `appId` / `password` / `tenant` but **no** `subscriptionId`. Either add `--scopes /subscriptions/<SUBSCRIPTION_ID>` (recommended) or append `"subscriptionId": "<guid>"` to the JSON in the secret. Workflows map `appId`→`clientId`, `password`→`clientSecret`, `tenant`→`tenantId` automatically. |
+| Wrong JSON shape / not JSON | Must be a single JSON object. Expected keys (or aliases above) are documented in [Azure login — service principal](https://github.com/Azure/login#login-with-a-service-principal-secret). |
 
 **Alternative (four separate secrets):** create `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_SUBSCRIPTION_ID`, `AZURE_TENANT_ID`, then set workflow `creds` to a single-line JSON (see [Azure/login README](https://github.com/Azure/login#login-with-a-service-principal-secret)) — or keep one secret `AZURE_CREDENTIALS` with the combined JSON (simplest).
 

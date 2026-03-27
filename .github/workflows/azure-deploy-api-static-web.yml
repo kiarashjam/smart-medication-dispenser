@@ -24,27 +24,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Fails fast with a clear message if the secret is missing (avoids cryptic azure/login errors).
-      - name: Verify AZURE_CREDENTIALS secret
+      # Normalizes default CLI JSON (appId/password/tenant) to the shape azure/login@v3 expects.
+      - name: Verify and normalize AZURE_CREDENTIALS for azure/login@v3
+        id: azure_creds
         shell: bash
         env:
           AZURE_CREDS: ${{ secrets.AZURE_CREDENTIALS }}
-        run: |
-          if [ -z "$AZURE_CREDS" ]; then
-            echo "::error::Repository secret AZURE_CREDENTIALS is not set or is empty."
-            echo "Add it: GitHub repo → Settings → Secrets and variables → Actions → New repository secret."
-            echo "Value: full JSON from az ad sp create-for-rbac --sdk-auth (see azure/README.md — Troubleshooting)."
-            exit 1
-          fi
-          if ! echo "$AZURE_CREDS" | jq -e '.clientId and .clientSecret and .subscriptionId and .tenantId' >/dev/null 2>&1; then
-            echo "::error::AZURE_CREDENTIALS must be JSON with camelCase keys: clientId, clientSecret, subscriptionId, tenantId."
-            exit 1
-          fi
+        run: bash "${GITHUB_WORKSPACE}/.github/scripts/normalize-azure-credentials.sh"
 
       - name: Azure login
         uses: azure/login@v3
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ steps.azure_creds.outputs.creds }}
 
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
