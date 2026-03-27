@@ -52,7 +52,7 @@ jobs:
         run: (cd "${{ github.workspace }}/publish-device-sim" && zip -r "${{ github.workspace }}/device-sim.zip" .)
 
       - name: Deploy zip to Function App
-        uses: azure/cli@v2
+        uses: azure/cli@v3
         with:
           azcliversion: azure-cli/latest
           inlineScript: |
