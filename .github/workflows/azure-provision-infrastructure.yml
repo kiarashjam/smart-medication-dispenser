@@ -63,7 +63,7 @@ jobs:
             }' > deployment-params.json
 
       - name: Deploy azure/main.bicep at subscription scope
-        uses: azure/cli@v2
+        uses: azure/cli@v3
         with:
           azcliversion: azure-cli/latest
           inlineScript: |

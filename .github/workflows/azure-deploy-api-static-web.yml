@@ -50,7 +50,7 @@ jobs:
         run: (cd "${{ github.workspace }}/publish-api" && zip -r "${{ github.workspace }}/api.zip" .)
 
       - name: Deploy zip to App Service
-        uses: azure/cli@v2
+        uses: azure/cli@v3
         with:
           azcliversion: azure-cli/latest
           inlineScript: |
