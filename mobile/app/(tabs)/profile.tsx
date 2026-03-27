@@ -115,6 +115,13 @@ export default function Profile() {
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{profile?.role || 'Patient'}</Text>
             </View>
+            {profile?.linkedCaregiver && (
+              <View style={styles.caregiverBox}>
+                <Text style={styles.caregiverLabel}>Linked caregiver</Text>
+                <Text style={styles.caregiverName}>{profile.linkedCaregiver.fullName}</Text>
+                <Text style={styles.caregiverEmail}>{profile.linkedCaregiver.email}</Text>
+              </View>
+            )}
           </View>
         </View>
       </View>
@@ -331,6 +338,10 @@ const styles = StyleSheet.create({
   email: { fontSize: 14, color: '#6b7280', marginTop: 2 },
   badge: { backgroundColor: '#dbeafe', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 12, alignSelf: 'flex-start', marginTop: 6 },
   badgeText: { color: '#2563eb', fontSize: 12, fontWeight: '600' },
+  caregiverBox: { marginTop: 12, padding: 12, backgroundColor: '#f0fdf4', borderRadius: 10, borderWidth: 1, borderColor: '#bbf7d0' },
+  caregiverLabel: { fontSize: 11, color: '#15803d', fontWeight: '600', textTransform: 'uppercase' },
+  caregiverName: { fontSize: 15, fontWeight: '600', color: '#14532d', marginTop: 4 },
+  caregiverEmail: { fontSize: 13, color: '#166534', marginTop: 2 },
   adherenceRow: { flexDirection: 'row', gap: 8 },
   adherenceCard: { flex: 1, borderRadius: 10, padding: 12, alignItems: 'center' },
   adherenceValue: { fontSize: 20, fontWeight: '800' },

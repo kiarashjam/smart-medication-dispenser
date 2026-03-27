@@ -54,7 +54,15 @@ export type TodayScheduleItemDto = { scheduleId: string; containerId: string; sl
 export type DispenseEventDto = { id: string; deviceId: string; containerId: string; scheduleId: string; scheduledAtUtc: string; status: string; dispensedAtUtc?: string; confirmedAtUtc?: string; missedMarkedAtUtc?: string; medicationName?: string; pillsPerDose?: number }
 export type NotificationDto = { id: string; type: string; title: string; body: string; isRead: boolean; createdAtUtc: string }
 
-export type MeProfileResponse = { userId: string; email: string; fullName: string; role: string; devices: { deviceId: string; name: string; type: string; status: string }[] }
+export type LinkedCaregiverSummaryDto = { userId: string; fullName: string; email: string }
+export type MeProfileResponse = {
+  userId: string
+  email: string
+  fullName: string
+  role: string
+  devices: { deviceId: string; name: string; type: string; status: string }[]
+  linkedCaregiver?: LinkedCaregiverSummaryDto | null
+}
 
 export const authApi = {
   register: (body: { email: string; password: string; fullName: string; role: string }) => api.post<AuthResponse>('/api/auth/register', body),

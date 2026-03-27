@@ -19,6 +19,10 @@ public sealed class SwaggerSecurityRequirementsOperationFilter : IOperationFilte
         var method = cad.MethodInfo;
         var type = cad.ControllerTypeInfo;
 
+        // DeviceBoardTestController: steps 2–4 require X-API-Key in Swagger (see DeviceBoardTestSwaggerOperationFilter).
+        if (string.Equals(cad.ControllerName, "DeviceBoardTest", StringComparison.Ordinal))
+            return;
+
         if (method.GetCustomAttributes(inherit: true).OfType<AllowAnonymousAttribute>().Any()
             || type.GetCustomAttributes(inherit: true).OfType<AllowAnonymousAttribute>().Any())
             return;

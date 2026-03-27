@@ -44,7 +44,10 @@ export default function CaregiverPeople() {
           <Users className="mx-auto h-10 w-10 text-gray-300" />
           <p className="mt-3 text-sm font-medium text-gray-700">No linked patients</p>
           <p className="mt-1 text-xs text-gray-500">
-            Demo: sign in as <span className="font-mono">caregiver@demo.com</span> to see the seeded patient.
+            Demo: <span className="font-mono">caregiver@demo.com</span> / <span className="font-mono">Demo123!</span> — three
+            seeded patients (including <span className="font-mono">patient@demo.com</span>,{' '}
+            <span className="font-mono">maria.schneider@demo.com</span>, <span className="font-mono">hans.weber@demo.com</span>
+            ).
           </p>
         </div>
       ) : (

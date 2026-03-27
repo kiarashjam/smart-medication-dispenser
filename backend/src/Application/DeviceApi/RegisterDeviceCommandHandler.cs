@@ -56,11 +56,11 @@ public class RegisterDeviceCommandHandler : IRequestHandler<RegisterDeviceComman
             _ => DeviceType.Main
         };
 
-        // Create the device (will be associated with user during onboarding)
+        // Create the device (will be associated with a real patient during onboarding)
         var device = new Device
         {
             Id = Guid.NewGuid(),
-            UserId = Guid.Empty, // Will be assigned during user onboarding
+            UserId = DeviceRegistrationConstants.UnassignedOwnerUserId,
             Name = $"Device {request.DeviceId}",
             Type = deviceType,
             Status = DeviceStatus.Active,

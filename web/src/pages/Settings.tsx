@@ -151,6 +151,15 @@ export default function Settings() {
                   </span>
                 </div>
               </div>
+              {profile?.linkedCaregiver && (
+                <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                  <div>
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Linked caregiver</p>
+                    <p className="text-sm text-gray-900 mt-1">{profile.linkedCaregiver.fullName}</p>
+                    <p className="text-sm text-gray-500 mt-0.5">{profile.linkedCaregiver.email}</p>
+                  </div>
+                </div>
+              )}
               <div className="flex items-center justify-between py-3">
                 <div>
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">User ID</p>

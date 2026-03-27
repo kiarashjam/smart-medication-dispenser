@@ -27,6 +27,14 @@ public class MeProfileQueryHandler : IRequestHandler<MeProfileQuery, MeProfileRe
         var ownerIds = await _deviceAccess.GetAccessibleDeviceOwnerUserIdsAsync(request.UserId, cancellationToken);
         var devices = await _deviceRepository.GetByUserIdsAsync(ownerIds, cancellationToken);
         var deviceSummaries = devices.Select(d => new UserDeviceSummaryDto(d.Id, d.Name, d.Type.ToString(), d.Status.ToString())).ToList();
-        return new MeProfileResponse(user.Id, user.Email, user.FullName, user.Role.ToString(), deviceSummaries);
+        LinkedCaregiverSummaryDto? linked = null;
+        if (user.CaregiverUserId is { } cgId)
+        {
+            var cg = await _userRepository.GetByIdAsync(cgId, cancellationToken);
+            if (cg != null)
+                linked = new LinkedCaregiverSummaryDto(cg.Id, cg.FullName, cg.Email);
+        }
+
+        return new MeProfileResponse(user.Id, user.Email, user.FullName, user.Role.ToString(), deviceSummaries, linked);
     }
 }

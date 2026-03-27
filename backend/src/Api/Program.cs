@@ -103,6 +103,9 @@ app.UseMiddleware<CorrelationIdMiddleware>();
 // Global exception handler so all unhandled exceptions return consistent JSON
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
+// Static files (e.g. /css/swagger-theme.css for Swagger UI)
+app.UseStaticFiles();
+
 // Swagger: Development; or explicit Swagger:Enabled / Swagger__Enabled (Azure App Service). See software-docs/SWAGGER_AND_OPENAPI.md
 var swaggerEnabled = app.Environment.IsDevelopment()
     || string.Equals(Environment.GetEnvironmentVariable("Swagger__Enabled"), "true", StringComparison.OrdinalIgnoreCase)
@@ -136,6 +139,9 @@ using (var scope = app.Services.CreateScope())
     else
         await db.Database.MigrateAsync();
     await SeedData.SeedAsync(db);
+    await SeedData.EnsureUnassignedDeviceOwnerAsync(db);
+    var ensureDemo = app.Configuration.GetValue("SeedDemo:EnsureAccounts", true);
+    await SeedData.EnsureDemoAccountsAsync(db, ensureDemo);
 }
 
 app.Run();

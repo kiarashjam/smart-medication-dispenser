@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "DISPENSER_API_BASE": "http://localhost:5000",
+    "DISPENSER_DEVICE_ID": "",
+    "DISPENSER_X_API_KEY": "",
+    "DISPENSER_DEVICE_JWT": "",
+    "DISPENSER_HARDWARE_ID": "SMD-A1F4C9E2",
+    "DISPENSER_AUTO_REGISTER": "false"
+  }
+}

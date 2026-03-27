@@ -343,29 +343,28 @@ public class DeviceApiController : ControllerBase
 
     private async Task<Guid?> ValidateDeviceToken(string deviceId, CancellationToken ct)
     {
-        // 1. Check Bearer token (JWT from device registration)
+        Guid? resolved = null;
+
+        // 1. Bearer JWT (device registration token)
         var authHeader = Request.Headers["Authorization"].FirstOrDefault();
         if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
         {
             var token = authHeader["Bearer ".Length..].Trim();
-            // Validate the JWT token using the same parameters as user JWT
             try
             {
                 var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
-                
-                // Extract device ID from the token's NameIdentifier claim
-                var nameIdClaim = jwtToken.Claims.FirstOrDefault(c => 
+
+                var nameIdClaim = jwtToken.Claims.FirstOrDefault(c =>
                     c.Type == System.Security.Claims.ClaimTypes.NameIdentifier ||
                     c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
-                
+
                 if (nameIdClaim != null && Guid.TryParse(nameIdClaim.Value, out var tokenDeviceId))
                 {
-                    // Verify the token hasn't expired
                     if (jwtToken.ValidTo > DateTime.UtcNow)
-                        return tokenDeviceId;
-                    
-                    _logger.LogWarning("Device token expired for {DeviceId}", deviceId);
+                        resolved = tokenDeviceId;
+                    else
+                        _logger.LogWarning("Device token expired for {DeviceId}", deviceId);
                 }
             }
             catch (Exception ex)
@@ -374,18 +373,23 @@ public class DeviceApiController : ControllerBase
             }
         }
 
-        // 2. Check X-API-Key header (API key authentication)
-        var apiKey = Request.Headers["X-API-Key"].FirstOrDefault();
-        if (!string.IsNullOrEmpty(apiKey))
+        // 2. X-API-Key (only if Bearer did not authenticate)
+        if (resolved == null)
         {
-            return await _apiKeyResolver.ResolveDeviceIdFromApiKeyAsync(apiKey, ct);
+            var apiKey = Request.Headers["X-API-Key"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(apiKey))
+                resolved = await _apiKeyResolver.ResolveDeviceIdFromApiKeyAsync(apiKey, ct);
         }
 
-        // 3. Fallback: parse device ID from URL (for anonymous endpoints like register)
-        if (Guid.TryParse(deviceId, out var parsedGuid))
-            return parsedGuid;
+        if (resolved == null)
+            return null;
 
-        return null;
+        // If the request names a GUID (route or JSON), it must match the credential (blocks token + wrong deviceId).
+        // Hardware ids like SMD-XXXXXXXX do not parse as Guid — skip this check for those payloads.
+        if (Guid.TryParse(deviceId, out var claimedDeviceId) && claimedDeviceId != resolved.Value)
+            return null;
+
+        return resolved;
     }
 }
 

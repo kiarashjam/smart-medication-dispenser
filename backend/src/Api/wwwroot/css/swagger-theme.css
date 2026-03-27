@@ -1,0 +1,387 @@
+/* Smart Medication Dispenser — Swagger UI theme (local static file) */
+
+:root {
+  --smd-bg: #f4f8f8;
+  --smd-surface: #ffffff;
+  --smd-ink: #0c1f1d;
+  --smd-muted: #5c7370;
+  --smd-border: #c5ddd8;
+  --smd-accent: #0d9488;
+  --smd-accent-dark: #0f766e;
+  --smd-accent-soft: #ccfbf1;
+  --smd-get: #059669;
+  --smd-post: #0d9488;
+  --smd-put: #d97706;
+  --smd-delete: #dc2626;
+  --smd-patch: #7c3aed;
+  --smd-radius: 12px;
+  --smd-radius-sm: 8px;
+  --smd-shadow: 0 4px 24px rgba(12, 31, 29, 0.07);
+  --smd-shadow-sm: 0 1px 3px rgba(12, 31, 29, 0.08);
+  --smd-font: "Plus Jakarta Sans", system-ui, sans-serif;
+  --smd-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  background: var(--smd-bg);
+  background-image:
+    radial-gradient(ellipse 120% 80% at 100% -20%, rgba(13, 148, 136, 0.09), transparent),
+    radial-gradient(ellipse 80% 60% at -10% 50%, rgba(13, 148, 136, 0.05), transparent);
+  background-attachment: fixed;
+}
+
+.swagger-ui {
+  font-family: var(--smd-font) !important;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 20px 48px;
+}
+
+.swagger-ui .wrapper {
+  padding: 0;
+  max-width: none;
+}
+
+/* ——— Top bar ——— */
+.swagger-ui .topbar {
+  background: linear-gradient(105deg, #042f2e 0%, #0f766e 48%, #134e4a 100%);
+  box-shadow: var(--smd-shadow);
+  padding: 14px 0;
+  margin: 0 -20px 24px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.swagger-ui .topbar .download-url-wrapper {
+  display: none !important;
+}
+
+.swagger-ui .topbar-wrapper .topbar .wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.swagger-ui .topbar img {
+  filter: brightness(0) invert(1);
+  opacity: 0.95;
+}
+
+.swagger-ui .topbar a span {
+  color: #ecfdf5 !important;
+  font-weight: 700 !important;
+  font-size: 1.05rem !important;
+  letter-spacing: -0.02em;
+}
+
+/* ——— Info / intro ——— */
+.swagger-ui .information-container {
+  background: var(--smd-surface);
+  border-radius: var(--smd-radius);
+  border: 1px solid var(--smd-border);
+  box-shadow: var(--smd-shadow);
+  padding: 28px 32px 32px;
+  margin-bottom: 28px;
+}
+
+.swagger-ui .info {
+  margin: 0;
+}
+
+.swagger-ui .info .title {
+  font-family: var(--smd-font) !important;
+  font-size: 1.85rem !important;
+  font-weight: 800 !important;
+  color: var(--smd-ink) !important;
+  letter-spacing: -0.03em;
+}
+
+.swagger-ui .info .title small {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: var(--smd-accent-dark) !important;
+}
+
+.swagger-ui .info .markdown,
+.swagger-ui .info .description {
+  font-size: 15px !important;
+  line-height: 1.7 !important;
+  color: var(--smd-muted) !important;
+  max-width: 56rem;
+}
+
+.swagger-ui .info .markdown h1,
+.swagger-ui .info .markdown h2 {
+  font-family: var(--smd-font) !important;
+  color: var(--smd-ink) !important;
+  font-weight: 700 !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.5rem !important;
+  padding-bottom: 0.35rem;
+  border-bottom: 2px solid var(--smd-accent-soft);
+}
+
+.swagger-ui .info .markdown h1 { font-size: 1.25rem !important; }
+.swagger-ui .info .markdown h2 { font-size: 1.1rem !important; }
+
+.swagger-ui .info .markdown hr {
+  border: none;
+  border-top: 1px solid var(--smd-border);
+  margin: 1.25rem 0;
+}
+
+.swagger-ui .info .markdown code,
+.swagger-ui .info .markdown pre code {
+  font-family: var(--smd-mono) !important;
+  background: var(--smd-accent-soft) !important;
+  color: var(--smd-accent-dark) !important;
+  border-radius: 6px;
+  font-size: 0.88em !important;
+}
+
+.swagger-ui .info .markdown code {
+  padding: 0.15em 0.45em !important;
+}
+
+.swagger-ui .info .markdown pre {
+  background: #ecfdf5 !important;
+  border: 1px solid var(--smd-border);
+  border-radius: var(--smd-radius-sm);
+  padding: 14px 16px !important;
+}
+
+.swagger-ui .info .markdown a {
+  color: var(--smd-accent-dark) !important;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.swagger-ui .info .markdown a:hover {
+  text-decoration: underline;
+}
+
+/* ——— Authorize / schemes ——— */
+.swagger-ui .scheme-container {
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdfa 100%);
+  border: 1px solid var(--smd-border);
+  border-radius: var(--smd-radius);
+  padding: 18px 22px;
+  margin: 0 0 28px;
+  box-shadow: var(--smd-shadow-sm);
+}
+
+.swagger-ui .auth-wrapper .authorize {
+  border-radius: var(--smd-radius-sm) !important;
+  padding: 10px 22px !important;
+  font-weight: 700 !important;
+  font-family: var(--smd-font) !important;
+  border: none !important;
+  background: linear-gradient(180deg, var(--smd-accent) 0%, var(--smd-accent-dark) 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.swagger-ui .auth-wrapper .authorize:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.4);
+}
+
+.swagger-ui .auth-container .errors-wrapper,
+.swagger-ui .auth-container h4,
+.swagger-ui .auth-container .wrapper {
+  font-family: var(--smd-font) !important;
+}
+
+/* ——— Filter ——— */
+.swagger-ui .filter-container {
+  padding: 4px 0 20px;
+}
+
+.swagger-ui .filter .operation-filter-input {
+  font-family: var(--smd-font) !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--smd-border) !important;
+  padding: 10px 18px !important;
+  max-width: 400px;
+  font-size: 14px !important;
+  background: var(--smd-surface);
+  box-shadow: var(--smd-shadow-sm);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.swagger-ui .filter .operation-filter-input:focus {
+  outline: none;
+  border-color: var(--smd-accent) !important;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.2);
+}
+
+/* ——— Tag sections ——— */
+.swagger-ui section.models,
+.swagger-ui .opblock-tag-section {
+  border: none !important;
+}
+
+.swagger-ui .opblock-tag {
+  font-family: var(--smd-font) !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  color: var(--smd-ink) !important;
+  border-bottom: 2px solid var(--smd-accent) !important;
+  padding: 12px 0 10px !important;
+  margin: 28px 0 14px !important;
+}
+
+.swagger-ui .opblock-tag small {
+  font-weight: 500 !important;
+  color: var(--smd-muted) !important;
+}
+
+/* ——— Operation blocks ——— */
+.swagger-ui .opblock {
+  border-radius: var(--smd-radius-sm) !important;
+  border: 1px solid var(--smd-border) !important;
+  box-shadow: var(--smd-shadow-sm) !important;
+  margin-bottom: 12px !important;
+  background: var(--smd-surface) !important;
+  overflow: hidden;
+}
+
+.swagger-ui .opblock .opblock-summary {
+  border: none !important;
+}
+
+.swagger-ui .opblock .opblock-summary-method {
+  font-family: var(--smd-mono) !important;
+  font-weight: 700 !important;
+  font-size: 11px !important;
+  min-width: 64px !important;
+  border-radius: 6px !important;
+  padding: 6px 0 !important;
+}
+
+.swagger-ui .opblock.opblock-get .opblock-summary-method { background: var(--smd-get) !important; }
+.swagger-ui .opblock.opblock-post .opblock-summary-method { background: var(--smd-post) !important; }
+.swagger-ui .opblock.opblock-put .opblock-summary-method { background: var(--smd-put) !important; }
+.swagger-ui .opblock.opblock-delete .opblock-summary-method { background: var(--smd-delete) !important; }
+.swagger-ui .opblock.opblock-patch .opblock-summary-method { background: var(--smd-patch) !important; }
+
+.swagger-ui .opblock .opblock-summary-path,
+.swagger-ui .opblock .opblock-summary-path__deprecated {
+  font-family: var(--smd-mono) !important;
+  font-size: 14px !important;
+  color: var(--smd-ink) !important;
+}
+
+.swagger-ui .opblock .opblock-summary-description {
+  font-family: var(--smd-font) !important;
+  font-size: 13px !important;
+  color: var(--smd-muted) !important;
+}
+
+.swagger-ui .opblock-body {
+  border-top: 1px solid var(--smd-border) !important;
+}
+
+.swagger-ui .btn.execute {
+  background: var(--smd-accent) !important;
+  border-color: var(--smd-accent-dark) !important;
+  font-family: var(--smd-font) !important;
+  font-weight: 700 !important;
+  border-radius: var(--smd-radius-sm) !important;
+}
+
+.swagger-ui .btn.execute:hover {
+  background: var(--smd-accent-dark) !important;
+}
+
+.swagger-ui .btn.cancel {
+  font-family: var(--smd-font) !important;
+  border-radius: var(--smd-radius-sm) !important;
+}
+
+/* ——— Tables & inputs ——— */
+.swagger-ui table thead tr th,
+.swagger-ui table tbody tr td {
+  font-family: var(--smd-font) !important;
+}
+
+.swagger-ui input[type="text"],
+.swagger-ui input[type="password"],
+.swagger-ui textarea,
+.swagger-ui select {
+  font-family: var(--smd-mono) !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--smd-border) !important;
+}
+
+.swagger-ui .responses-inner h4,
+.swagger-ui .response-col_status {
+  font-family: var(--smd-font) !important;
+}
+
+/* ——— Models ——— */
+.swagger-ui section.models {
+  border-radius: var(--smd-radius) !important;
+  border: 1px solid var(--smd-border) !important;
+  background: var(--smd-surface) !important;
+  box-shadow: var(--smd-shadow-sm);
+}
+
+.swagger-ui section.models h4 {
+  font-family: var(--smd-font) !important;
+  font-weight: 800 !important;
+  color: var(--smd-ink) !important;
+}
+
+.swagger-ui .model-box {
+  background: #f8faf9 !important;
+  border-radius: var(--smd-radius-sm) !important;
+}
+
+.swagger-ui .prop-type,
+.swagger-ui .model .property {
+  font-family: var(--smd-mono) !important;
+}
+
+/* ——— Footer / misc ——— */
+.swagger-ui .curl-command .curl,
+.swagger-ui .microlight {
+  font-family: var(--smd-mono) !important;
+  font-size: 12px !important;
+}
+
+.swagger-ui .highlight-code > .microlight {
+  border-radius: var(--smd-radius-sm);
+}
+
+/* Scrollbar (WebKit) */
+.swagger-ui ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.swagger-ui ::-webkit-scrollbar-track {
+  background: #e7f5f3;
+  border-radius: 5px;
+}
+
+.swagger-ui ::-webkit-scrollbar-thumb {
+  background: #99d5cf;
+  border-radius: 5px;
+}
+
+.swagger-ui ::-webkit-scrollbar-thumb:hover {
+  background: var(--smd-accent);
+}
