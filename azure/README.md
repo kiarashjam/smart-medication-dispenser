@@ -65,6 +65,18 @@ After the **infra** workflow finishes, add:
 
 After **`AZURE_CREDENTIALS`** and the other deploy secrets are saved, the run will pass the verification step and continue to publish the API and upload the web build.
 
+### All Azure workflows (same `AZURE_CREDENTIALS` secret)
+
+| Workflow | Purpose |
+|----------|---------|
+| [**Azure — provision infrastructure (Bicep)**](../.github/workflows/azure-provision-infrastructure.yml) | Subscription deployment from `azure/main.bicep`. |
+| [**Azure — deploy API & static web**](../.github/workflows/azure-deploy-api-static-web.yml) | Zip deploy API to App Service; upload `web/dist` to Static Web Apps. |
+| [**Azure — deploy device simulator Function**](../.github/workflows/azure-deploy-device-simulator-function.yml) | Zip deploy `device-simulator-function` to an existing Function App. |
+
+Device simulator needs two extra secrets: **`AZURE_DEVICE_SIMULATOR_RESOURCE_GROUP`** (use **`rg-smart-dispenser-mvp`** so it stays with the MVP stack) and **`AZURE_DEVICE_SIMULATOR_FUNCTION_NAME`**. Provision the app first (see [`infrastructure/device-simulator/deploy-device-simulator.ps1`](../infrastructure/device-simulator/deploy-device-simulator.ps1)).
+
+On every push/PR, workflow [**CI — backend, web & mobile**](../.github/workflows/ci-backend-tests-web-build.yml) runs [`.github/scripts/normalize-azure-credentials.sh`](../.github/scripts/normalize-azure-credentials.sh) with test JSON so the credential shape stays compatible with **`azure/login@v3`**.
+
 ## Troubleshooting: Azure login in GitHub Actions
 
 **Error:** `Login failed ... Ensure 'client-id' and 'tenant-id' are supplied` (or similar from `azure/login`).
@@ -119,3 +131,4 @@ Point `EXPO_PUBLIC_API_URL` at the same **`VITE_API_URL`** value (your API HTTPS
 
 - `main.bicep` — subscription deployment (creates resource group + module).
 - `resources.bicep` — App Service, PostgreSQL, Static Web App.
+- [`.github/scripts/normalize-azure-credentials.sh`](../.github/scripts/normalize-azure-credentials.sh) — maps CLI-style SP JSON to the format **`azure/login@v3`** expects (used by all Azure deploy workflows; exercised in CI).

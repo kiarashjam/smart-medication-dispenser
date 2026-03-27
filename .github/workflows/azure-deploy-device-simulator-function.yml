@@ -3,7 +3,7 @@
 #
 # Secrets (repository → Settings → Secrets → Actions):
 #   AZURE_CREDENTIALS                      — same JSON as other Azure workflows
-#   AZURE_DEVICE_SIMULATOR_RESOURCE_GROUP  — e.g. rg-smd-device-simulator
+#   AZURE_DEVICE_SIMULATOR_RESOURCE_GROUP  — e.g. rg-smart-dispenser-mvp
 #   AZURE_DEVICE_SIMULATOR_FUNCTION_NAME   — e.g. func-smd-sim-xxxx
 #
 # App settings (Portal → Function App → Configuration) are not changed by this workflow;

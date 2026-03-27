@@ -1,7 +1,7 @@
 # Deploys the device simulator Azure Function (dotnet-isolated 8) and wires app settings to your Dispenser API.
 # Requires: Azure CLI (az), dotnet 8 SDK. Optional: DISPENSER_API_BASE must be reachable from Azure (public URL).
 param(
-    [string] $ResourceGroupName = "rg-smd-device-simulator",
+    [string] $ResourceGroupName = "rg-smart-dispenser-mvp",
     [string] $Location = "switzerlandnorth",
     [string] $DispenserApiBase = "",
     [string] $DispenserDeviceId = "",
